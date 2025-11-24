@@ -1,0 +1,9 @@
+### IntelliJ IDEA ###
+.idea/
+.iml
+.iws
+out/
+
+### Enviroment Variables
+.env
+.env.local
