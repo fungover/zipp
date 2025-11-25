@@ -1,4 +1,4 @@
-package com.zipp.backend;
+package org.fungover.zipp;
 
 import org.springframework.boot.SpringApplication;
 

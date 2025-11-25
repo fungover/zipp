@@ -1,4 +1,4 @@
-package com.zipp.backend;
+package org.fungover.zipp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

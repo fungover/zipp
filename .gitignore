@@ -4,6 +4,6 @@
 .iws
 out/
 
-### Enviroment Variables
+### Environment Variables
 .env
 .env.local
