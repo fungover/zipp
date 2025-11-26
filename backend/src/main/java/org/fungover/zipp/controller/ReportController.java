@@ -5,10 +5,9 @@ import org.fungover.zipp.service.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -36,5 +35,10 @@ public class ReportController {
      */
 
     return ResponseEntity.status(201).body(newReport);
+  }
+
+  @GetMapping
+  public ResponseEntity<List<Report>> getAllReports(@RequestParam Long userId) {
+    return ResponseEntity.ok(reportService.getAllReports(userId));
   }
 }
