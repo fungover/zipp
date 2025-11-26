@@ -53,15 +53,20 @@ public class ReportEntity {
   public ReportEntity() {
   }
 
-  public ReportEntity(Long id, Long submittedByUserId, String description, ReportType eventType, Point coordinates, Instant submittedAt, ReportStatus status, Set<ReportImageEntity> images) {
-    this.id = id;
+  public ReportEntity(Long submittedByUserId,
+                      String description,
+                      ReportType eventType,
+                      Point coordinates,
+                      Instant submittedAt,
+                      ReportStatus status,
+                      Set<ReportImageEntity> images) {
     this.submittedByUserId = submittedByUserId;
     this.description = description;
     this.eventType = eventType;
     this.coordinates = coordinates;
     this.submittedAt = submittedAt;
     this.status = status;
-    this.images = images;
+    this.images = images != null ? images : new HashSet<>();
   }
 
   public Long getId() {
