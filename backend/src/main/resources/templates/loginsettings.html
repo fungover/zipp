@@ -1,9 +1,148 @@
 <!DOCTYPE html>
-<html>
-<body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
 
-<h1>My First Heading</h1>
-<p>My first paragraph.</p>
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+<div class="max-w-3xl mx-auto px-4 py-10 space-y-8">
+
+    <!-- Profile Overview -->
+    <div class="bg-white rounded-xl shadow-md p-8 text-center">
+
+        <img src="https://i.pravatar.cc/200"
+             alt="User avatar"
+             class="w-32 h-32 rounded-full mx-auto object-cover shadow">
+
+        <h1 class="text-3xl font-bold mt-4">John Doe</h1>
+        <p class="text-gray-600 mt-1">john.doe@example.com</p>
+
+    </div>
+
+
+    <!-- GOOGLE ACCOUNT INFO -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Google Account Info</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div class="p-4 bg-gray-50 rounded-lg border">
+                <p class="text-gray-500 text-sm">Full Name</p>
+                <p class="font-medium">John Doe</p>
+            </div>
+
+            <div class="p-4 bg-gray-50 rounded-lg border">
+                <p class="text-gray-500 text-sm">Email</p>
+                <p class="font-medium">john.doe@example.com</p>
+            </div>
+
+            <div class="p-4 bg-gray-50 rounded-lg border">
+                <p class="text-gray-500 text-sm">Google ID</p>
+                <p class="font-medium">112938475612837465</p>
+            </div>
+
+            <div class="p-4 bg-gray-50 rounded-lg border">
+                <p class="text-gray-500 text-sm">Email Verified</p>
+                <p class="font-medium">Yes</p>
+            </div>
+
+            <div class="p-4 bg-gray-50 rounded-lg border">
+                <p class="text-gray-500 text-sm">Account Created</p>
+                <p class="font-medium">2024-10-02</p>
+            </div>
+
+            <div class="p-4 bg-gray-50 rounded-lg border">
+                <p class="text-gray-500 text-sm">Last Login</p>
+                <p class="font-medium">2025-01-27 13:15</p>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ADD PASSKEY -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Security</h2>
+
+        <button
+                class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold shadow transition w-full sm:w-auto">
+            Add Passkey
+        </button>
+
+        <p class="text-sm text-gray-500 mt-3">
+            Passkeys let you log in using biometrics or device credentials.
+        </p>
+    </div>
+
+
+    <!-- PROFILE SETTINGS -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Profile Settings</h2>
+
+        <div class="space-y-4">
+
+            <div>
+                <label class="block font-medium mb-1">Display Name</label>
+                <input type="text"
+                       value="JohnD92"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div>
+                <label class="block font-medium mb-1">Preferred Language</label>
+                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500">
+                    <option>English</option>
+                    <option>Swedish</option>
+                </select>
+            </div>
+
+            <button class="mt-4 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium">
+                Save Settings
+            </button>
+
+        </div>
+    </div>
+
+
+    <!-- USER REPORTS -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Your Reports</h2>
+
+        <ul class="space-y-4">
+
+            <li class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border">
+                <div>
+                    <p class="font-medium">Broken streetlight in Elm Road</p>
+                    <p class="text-gray-500 text-sm">Submitted: 2025-10-12</p>
+                </div>
+                <button class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg">Delete</button>
+            </li>
+
+            <li class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border">
+                <div>
+                    <p class="font-medium">Graffiti on town hall wall</p>
+                    <p class="text-gray-500 text-sm">Submitted: 2025-10-20</p>
+                </div>
+                <button class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg">Delete</button>
+            </li>
+
+            <li class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border">
+                <div>
+                    <p class="font-medium">Noise complaint in district 5</p>
+                    <p="text-gray-500 text-sm">Submitted: 2025-11-01</p>
+                </div>
+                <button class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg">Delete</button>
+            </li>
+
+        </ul>
+    </div>
+
+</div>
 
 </body>
 </html>
