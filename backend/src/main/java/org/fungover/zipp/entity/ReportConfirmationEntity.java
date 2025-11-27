@@ -22,7 +22,7 @@ public class ReportConfirmationEntity {
   public ReportConfirmationEntity() {
   }
 
-  ReportConfirmationEntity(ReportEntity report, Long userId) {
+  public ReportConfirmationEntity(ReportEntity report, Long userId) {
     this.report = report;
     this.userId = userId;
   }

@@ -1,6 +1,7 @@
 package org.fungover.zipp.controller;
 
 import org.fungover.zipp.dto.Report;
+import org.fungover.zipp.service.ReportConfirmationService;
 import org.fungover.zipp.service.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +16,11 @@ public class ReportController {
 
   private static final Logger log = LoggerFactory.getLogger(ReportController.class);
   private final ReportService reportService;
+  private final ReportConfirmationService reportConfirmationService;
 
-  public ReportController(ReportService reportService) {
+  public ReportController(ReportService reportService, ReportConfirmationService reportConfirmationService) {
     this.reportService = reportService;
+    this.reportConfirmationService = reportConfirmationService;
   }
 
   @PostMapping
@@ -40,5 +43,12 @@ public class ReportController {
   @GetMapping
   public ResponseEntity<List<Report>> getAllReports(@RequestParam Long userId) {
     return ResponseEntity.ok(reportService.getAllReports(userId));
+  }
+
+  @PostMapping("/{id}/confirm")
+  public ResponseEntity<Integer> confirmReport(@PathVariable Long id,
+                                               @RequestParam Long userId) {
+    int totalConfirmations = reportConfirmationService.confirmReport(id, userId);
+    return ResponseEntity.ok(totalConfirmations);
   }
 }
