@@ -1,0 +1,2 @@
+ALTER TABLE user_profile
+    ADD COLUMN google_id VARCHAR(64) NOT NULL UNIQUE AFTER id;
