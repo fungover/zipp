@@ -8,6 +8,6 @@ public class LoginSettingsController {
 
     @GetMapping("/loginsettings")
     public String loginSettings() {
-        return "loginsettings";  // this maps to loginsettings.html in templates
+        return "loginsettings";
     }
 }
