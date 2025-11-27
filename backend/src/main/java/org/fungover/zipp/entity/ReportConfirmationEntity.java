@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
+@Table(name = "reports_confirmations")
 public class ReportConfirmationEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
