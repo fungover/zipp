@@ -1,4 +1,4 @@
-package org.fungover.zipp.Profile.dto;
+package org.fungover.zipp.profile.dto;
 
 public class ProfileUpdateRequest {
 }

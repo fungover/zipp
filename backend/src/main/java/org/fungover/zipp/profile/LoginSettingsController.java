@@ -1,4 +1,4 @@
-package org.fungover.zipp.Profile;
+package org.fungover.zipp.profile;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,11 +1,10 @@
-package org.fungover.zipp.Profile.model;
+package org.fungover.zipp.profile.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "user_profile")
@@ -31,28 +30,39 @@ public class User {
     private String city;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private OffsetDateTime createdAt;
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+
+    public User() {}
+
     public User(Long id, String bio, String displayName, String googleId,
-                String address, String city
-                /*OffsetDateTime createdAt, LocalDateTime updatedAt*/) {
+                String address, String city,
+                LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.bio = bio;
         this.displayName = displayName;
         this.googleId = googleId;
         this.address = address;
         this.city = city;
-        /*this.createdAt = createdAt;
-        this.updatedAt = updatedAt;*/
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    public User() {
+    // -------------------------------------------------
+    // Getters / Setters
+    // -------------------------------------------------
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getBio() {
@@ -71,20 +81,20 @@ public class User {
         this.displayName = displayName;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+    public String getGoogleId() {
+        return googleId;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
     }
 
-    public OffsetDateTime getCreatedAt() {
-        return createdAt;
+    public String getAddress() {
+        return address;
     }
 
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getCity() {
@@ -95,12 +105,11 @@ public class User {
         this.city = city;
     }
 
-    public String getAddress() {
-        return address;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }
-
