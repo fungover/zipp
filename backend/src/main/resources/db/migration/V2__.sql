@@ -1,0 +1,5 @@
+ALTER TABLE users
+    MODIFY provider VARCHAR (255) NULL;
+
+ALTER TABLE users
+    MODIFY provider_id VARCHAR (255) NULL;

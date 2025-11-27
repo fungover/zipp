@@ -1,4 +1,7 @@
 spring:
+  config:
+    activate:
+      on-profile: dev
   security:
     oauth2:
       client:

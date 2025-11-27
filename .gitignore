@@ -5,5 +5,5 @@
 out/
 
 ### Environment Variables
-.env
+backend/.env
 .env.local
