@@ -31,7 +31,6 @@ import java.util.List;
       Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
       point.setSRID(4326);
 
-
       ReportEntity entity = new ReportEntity(
               dto.submittedByUserId(),
               dto.description(),
@@ -56,31 +55,13 @@ import java.util.List;
 
   @Transactional(readOnly = true)
   public List<Report> getAllReports() {
-    List<ReportEntity> reports = reportRepository.findAllByStatus(ReportStatus.ACTIVE);
-
-    if (reports.isEmpty()) {
-      return List.of();
-    } else {
-      return reports.stream().map(entity -> new Report(
-              entity.getSubmittedByUserId(),
-              entity.getDescription(),
-              entity.getEventType(),
-              entity.getCoordinates() != null ? entity.getCoordinates().getY() : 0,
-              entity.getCoordinates() != null ? entity.getCoordinates().getX() : 0,
-              entity.getSubmittedAt(),
-              entity.getStatus(),
-              entity.getImages().stream()
-                      .map(ReportImageEntity::getImageUrl)
-                      .toList()
-      )).toList();
-    }
+    return reportRepository.findAllByStatus(ReportStatus.ACTIVE)
+            .stream()
+            .map(this::toDto)
+            .toList();
   }
 
   private Report toDto(ReportEntity savedEntity) {
-    List<String> images = savedEntity.getImages().stream()
-            .map(ReportImageEntity::getImageUrl)
-            .toList();
-
     return new Report(
             savedEntity.getSubmittedByUserId(),
             savedEntity.getDescription(),
@@ -89,7 +70,9 @@ import java.util.List;
             savedEntity.getCoordinates().getX(),
             savedEntity.getSubmittedAt(),
             savedEntity.getStatus(),
-            images
+            savedEntity.getImages().stream()
+                    .map(ReportImageEntity::getImageUrl)
+                    .toList()
     );
   }
 }
