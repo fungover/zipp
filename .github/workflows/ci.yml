@@ -82,5 +82,4 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: OWASP Dependency Check
-        run: mvn dependency-check:check
-        continue-on-error: true
+        run: mvn dependency-check:check -DfailBuildOnCVSS=7
