@@ -17,7 +17,7 @@ public class ViewController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/loginsettings")   // eller den route där din HTML ska visas
+    @GetMapping("/loginsettings")
     public String loginSettings(Model model, Authentication authentication) {
 
         OAuth2User oauth = (OAuth2User) authentication.getPrincipal();
