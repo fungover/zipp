@@ -33,32 +33,22 @@
 
             <div class="p-4 bg-gray-50 rounded-lg border">
                 <p class="text-gray-500 text-sm">Full Name</p>
-                <p class="font-medium">John Doe</p>
+                <p th:text="${user.name}" class="font-medium">John Doe</p>
             </div>
 
             <div class="p-4 bg-gray-50 rounded-lg border">
                 <p class="text-gray-500 text-sm">Email</p>
-                <p class="font-medium">john.doe@example.com</p>
+                <p th:text="${user.email}" class="font-medium">john.doe@example.com</p>
             </div>
 
             <div class="p-4 bg-gray-50 rounded-lg border">
                 <p class="text-gray-500 text-sm">Google ID</p>
-                <p class="font-medium">112938475612837465</p>
+                <p th:text="${user.id}" class="font-medium">112938475612837465</p>
             </div>
 
             <div class="p-4 bg-gray-50 rounded-lg border">
-                <p class="text-gray-500 text-sm">Email Verified</p>
-                <p class="font-medium">Yes</p>
-            </div>
-
-            <div class="p-4 bg-gray-50 rounded-lg border">
-                <p class="text-gray-500 text-sm">Account Created</p>
-                <p class="font-medium">2024-10-02</p>
-            </div>
-
-            <div class="p-4 bg-gray-50 rounded-lg border">
-                <p class="text-gray-500 text-sm">Last Login</p>
-                <p class="font-medium">2025-01-27 13:15</p>
+                <p class="text-gray-500 text-sm">Provider</p>
+                <p th:text="${user.provider}" class="font-medium">Yes</p>
             </div>
 
         </div>
