@@ -1,5 +1,6 @@
 package org.fungover.zipp.service;
 
+import org.fungover.zipp.entity.Role;
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -14,35 +15,38 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
 
-    public CustomOAuth2UserService(UserRepository userRepository){
+    public CustomOAuth2UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
     @Transactional
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        System.out.println("Custom0ath2UserService loadUser1");
+    public OAuth2User loadUser(
+      OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        System.out.println("Custom0ath2UserService loadUser2");
 
-        String provider_Id = oAuth2User.getAttribute("sub");
+        String providerId = oAuth2User.getAttribute("sub");
         String name = oAuth2User.getAttribute("name");
         String email = oAuth2User.getAttribute("email");
-        //String provider = oAuth2User.getAttribute("provider");
+        String provider = userRequest
+          .getClientRegistration()
+          .getRegistrationId();
 
-        String provider = userRequest.getClientRegistration().getRegistrationId();
+        User user = userRepository
+          .findByProviderAndProviderId(provider, providerId)
+          .orElseGet(() -> {
+              User newUser = new User();
 
-        User user = userRepository.findByProviderAndProviderId(provider, provider_Id)
-          .orElseGet(() -> new User());
+              newUser.setProviderId(providerId);
+              newUser.setEmail(email);
+              newUser.setName(name);
+              newUser.setProvider(provider);
+              newUser.setRole(Role.USER);
 
-        //update fields
-        user.setProviderId(provider_Id);
-        user.setEmail(email);
-        user.setName(name);
-        user.setProvider(provider);
+              return newUser;
+          });
 
         userRepository.save(user);
-
 
         return oAuth2User;
     }
