@@ -55,8 +55,8 @@ import java.util.List;
     }
 
   @Transactional(readOnly = true)
-  public List<Report> getAllReports(Long userId) {
-    List<ReportEntity> reports = reportRepository.findAllBySubmittedByUserId(userId);
+  public List<Report> getAllReports() {
+    List<ReportEntity> reports = reportRepository.findAllByStatus(ReportStatus.ACTIVE);
 
     if (reports.isEmpty()) {
       return List.of();

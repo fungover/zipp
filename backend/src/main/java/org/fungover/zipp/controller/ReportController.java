@@ -38,7 +38,7 @@ public class ReportController {
   }
 
   @GetMapping
-  public ResponseEntity<List<Report>> getAllReports(@RequestParam Long userId) {
-    return ResponseEntity.ok(reportService.getAllReports(userId));
+  public ResponseEntity<List<Report>> getAllReports() {
+    return ResponseEntity.ok(reportService.getAllReports());
   }
 }
