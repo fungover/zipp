@@ -32,14 +32,12 @@ pipeline {
 		DOMAIN = 'zipp.city'
 		CLUSTER_ISSUER = 'letsencrypt-prod'
 		KAFKA_BOOTSTRAP_SERVERS = 'my-kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092'
-		GITHUB_ACCOUNT = 'Deansie'
-		GITHUB_REPO = 'zipp'
 	}
 	stages {
 		stage('Checkout') {
 			steps {
 				checkout scm
-				githubNotify credentialsId: 'github-pat', status: 'PENDING', context: 'cd/jenkins/deploy', description: 'Deployment starting', sha: env.GIT_COMMIT, targetUrl: env.BUILD_URL
+				publishChecks name: 'Deployment', title: 'Starting deployment', status: 'QUEUED', summary: 'Deployment pipeline initiated'
 			}
 		}
 		stage('Verify Dockerfile') {
@@ -51,6 +49,7 @@ pipeline {
 		}
 		stage('Build Docker Image') {
 			steps {
+				publishChecks name: 'Deployment', title: 'Building image', status: 'IN_PROGRESS', summary: 'Docker build in progress'
 				echo 'Building Docker image from merged code...'
 				sh 'mvn clean package -DskipTests'
 				sh 'docker build -t ${DOCKER_IMAGE} --no-cache -f Dockerfile .'
@@ -58,11 +57,16 @@ pipeline {
 		}
 		stage('Scan Image for Vulnerabilities') {
 			steps {
+				publishChecks name: 'Deployment', title: 'Scanning image', status: 'IN_PROGRESS', summary: 'Vulnerability scan in progress'
 				sh 'trivy image --exit-code 1 --no-progress --severity HIGH,CRITICAL ${DOCKER_IMAGE}'
 			}
 		}
 		stage('Push Docker Image') {
+			when {
+				branch 'main'  // Only on main (post-merge)
+			}
 			steps {
+				publishChecks name: 'Deployment', title: 'Pushing image', status: 'IN_PROGRESS', summary: 'Docker push in progress'
 				sh '''
                     docker push ${DOCKER_IMAGE}
                     docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE_LATEST}
@@ -71,7 +75,11 @@ pipeline {
 			}
 		}
 		stage('Generate Kubernetes Manifests') {
+			when {
+				branch 'main'
+			}
 			steps {
+				publishChecks name: 'Deployment', title: 'Generating manifests', status: 'IN_PROGRESS', summary: 'k8s manifest generation in progress'
 				script {
 					sh "mkdir -p ${K8S_MANIFEST_DIR}/{deployments,services,hpas,ingresses}"
 					writeFile file: "${K8S_MANIFEST_DIR}/deployments/deployment.yaml", text: """
@@ -118,11 +126,83 @@ spec:
         - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
           value: "${KAFKA_BOOTSTRAP_SERVERS}"
 """
+					writeFile file: "${K8S_MANIFEST_DIR}/services/service.yaml", text: """
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${APP_NAME}-service
+  namespace: ${K8S_NAMESPACE}
+spec:
+  selector:
+    app: ${APP_NAME}
+  type: ClusterIP
+  ports:
+  - port: ${SERVICE_PORT}
+    targetPort: ${APP_PORT}
+"""
+					writeFile file: "${K8S_MANIFEST_DIR}/hpas/hpa.yaml", text: """
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ${APP_NAME}-hpa
+  namespace: ${K8S_NAMESPACE}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ${APP_NAME}
+  minReplicas: 3
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+"""
+					writeFile file: "${K8S_MANIFEST_DIR}/ingresses/ingress.yaml", text: """
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${APP_NAME}-ingress
+  namespace: ${K8S_NAMESPACE}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/session-cookie-name: INGRESSCOOKIE
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/affinity-mode: balanced
+    cert-manager.io/cluster-issuer: "${CLUSTER_ISSUER}"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+      - ${DOMAIN}
+    secretName: ${APP_NAME}-tls
+  rules:
+  - host: ${DOMAIN}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ${APP_NAME}-service
+            port:
+              number: ${SERVICE_PORT}
+"""
 				}
 			}
 		}
 		stage('Deploy to Kubernetes via SSH') {
+			when {
+				branch 'main'
+			}
 			steps {
+				publishChecks name: 'Deployment', title: 'Deploying to k8s', status: 'IN_PROGRESS', summary: 'k8s deployment in progress'
 				withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
 					sh '''
                         ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${SSH_USER}@${CONTROL_PLANE_IP} "
@@ -146,7 +226,7 @@ spec:
 	}
 	post {
 		always {
-			githubNotify credentialsId: 'github-pat', status: currentBuild.currentResult, context: 'cd/jenkins/deploy', description: "Deployment ${currentBuild.currentResult}", sha: env.GIT_COMMIT, targetUrl: env.BUILD_URL
+			publishChecks name: 'Deployment', title: 'Deployment complete', status: 'COMPLETED', conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE', summary: "Deployment ${currentBuild.currentResult}", detailsURL: env.BUILD_URL
 			cleanWs()
 		}
 	}
