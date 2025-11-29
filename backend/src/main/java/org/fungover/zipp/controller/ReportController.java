@@ -13,18 +13,18 @@ import java.util.List;
 @RequestMapping("/api/reports")
 public class ReportController {
 
-  private static final Logger log = LoggerFactory.getLogger(ReportController.class);
-  private final ReportService reportService;
+    private static final Logger log = LoggerFactory.getLogger(ReportController.class);
+    private final ReportService reportService;
 
-  public ReportController(ReportService reportService) {
-    this.reportService = reportService;
-  }
+    public ReportController(ReportService reportService) {
+        this.reportService = reportService;
+    }
 
-  @PostMapping
-  public ResponseEntity<Report> createReport(@RequestBody Report reportRequest) {
-    log.info("Report received: {}", reportRequest);
+    @PostMapping
+    public ResponseEntity<Report> createReport(@RequestBody Report reportRequest) {
+        log.info("Report received: {}", reportRequest);
 
-    var newReport = reportService.createReport(reportRequest);
+        var newReport = reportService.createReport(reportRequest);
 
     /* For now the userId is provided by the client
      later this can be replaced with SecurityContextHolder.getContext().getAuthentication()
@@ -34,11 +34,11 @@ public class ReportController {
       cf.join();
      */
 
-    return ResponseEntity.status(201).body(newReport);
-  }
+        return ResponseEntity.status(201).body(newReport);
+    }
 
-  @GetMapping
-  public ResponseEntity<List<Report>> getAllReports() {
-    return ResponseEntity.ok(reportService.getAllReports());
-  }
+    @GetMapping
+    public ResponseEntity<List<Report>> getAllReports() {
+        return ResponseEntity.ok(reportService.getAllReports());
+    }
 }
