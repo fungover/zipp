@@ -16,39 +16,39 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
-    Map<String, Object> body = new HashMap<>();
-    body.put("timestamp", Instant.now());
-    body.put("error", ex.getMessage());
-    body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("error", ex.getMessage());
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
 
-    return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
-  }
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-    Map<String, Object> body = new HashMap<>();
-    body.put("timestamp", Instant.now());
-    body.put("status", HttpStatus.BAD_REQUEST.value());
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
 
-    Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
+        Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
             .collect(Collectors.toMap(
-                    FieldError::getField,
-                    DefaultMessageSourceResolvable::getDefaultMessage
+                FieldError::getField,
+                DefaultMessageSourceResolvable::getDefaultMessage
             ));
-    body.put("errors", errors);
+        body.put("errors", errors);
 
-    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-  }
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
 
-  @ExceptionHandler(RuntimeException.class)
-  public ResponseEntity<Map<String, Object>> handleRuntimeExceptions(RuntimeException ex) {
-    Map<String, Object> body = new HashMap<>();
-    body.put("timestamp", Instant.now());
-    body.put("status", HttpStatus.BAD_REQUEST.value());
-    body.put("error", ex.getMessage());
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, Object>> handleRuntimeExceptions(RuntimeException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", ex.getMessage());
 
-    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-  }
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
 }

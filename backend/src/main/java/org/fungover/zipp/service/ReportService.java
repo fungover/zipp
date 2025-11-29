@@ -16,53 +16,53 @@ import java.util.HashSet;
 import java.util.List;
 
 @Service
-  public class ReportService {
+public class ReportService {
 
     private final GeometryFactory geometryFactory;
     private final ReportRepository reportRepository;
 
     public ReportService(GeometryFactory geometryFactory, ReportRepository reportRepository) {
-      this.geometryFactory = geometryFactory;
-      this.reportRepository = reportRepository;
+        this.geometryFactory = geometryFactory;
+        this.reportRepository = reportRepository;
     }
 
     @Transactional
     public Report createReport(Report dto) {
-      Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
-      point.setSRID(4326);
+        Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
+        point.setSRID(4326);
 
-      ReportEntity entity = new ReportEntity(
-              dto.submittedByUserId(),
-              dto.description(),
-              dto.eventType(),
-              point,
-              Instant.now(),
-              ReportStatus.ACTIVE,
-              new HashSet<>()
-      );
+        ReportEntity entity = new ReportEntity(
+            dto.submittedByUserId(),
+            dto.description(),
+            dto.eventType(),
+            point,
+            Instant.now(),
+            ReportStatus.ACTIVE,
+            new HashSet<>()
+        );
 
-      if (dto.imageUrls() != null) {
-        for (String url : dto.imageUrls()) {
-          ReportImageEntity image = new ReportImageEntity();
-          image.setImageUrl(url);
-          image.setReport(entity);
-          entity.getImages().add(image);
+        if (dto.imageUrls() != null) {
+            for (String url : dto.imageUrls()) {
+                ReportImageEntity image = new ReportImageEntity();
+                image.setImageUrl(url);
+                image.setReport(entity);
+                entity.getImages().add(image);
+            }
         }
-      }
 
-      return toDto(reportRepository.save(entity));
+        return toDto(reportRepository.save(entity));
     }
 
-  @Transactional(readOnly = true)
-  public List<Report> getAllReports() {
-    return reportRepository.findAllByStatus(ReportStatus.ACTIVE)
+    @Transactional(readOnly = true)
+    public List<Report> getAllReports() {
+        return reportRepository.findAllByStatus(ReportStatus.ACTIVE)
             .stream()
             .map(this::toDto)
             .toList();
-  }
+    }
 
-  private Report toDto(ReportEntity savedEntity) {
-    return new Report(
+    private Report toDto(ReportEntity savedEntity) {
+        return new Report(
             savedEntity.getSubmittedByUserId(),
             savedEntity.getDescription(),
             savedEntity.getEventType(),
@@ -71,8 +71,8 @@ import java.util.List;
             savedEntity.getSubmittedAt(),
             savedEntity.getStatus(),
             savedEntity.getImages().stream()
-                    .map(ReportImageEntity::getImageUrl)
-                    .toList()
-    );
-  }
+                .map(ReportImageEntity::getImageUrl)
+                .toList()
+        );
+    }
 }

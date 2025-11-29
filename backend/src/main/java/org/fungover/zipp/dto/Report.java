@@ -9,21 +9,21 @@ import java.time.Instant;
 import java.util.List;
 
 public record Report(
-        @NotNull Long submittedByUserId,
-        @NotBlank String description,
-        @NotNull ReportType eventType,
+    @NotNull Long submittedByUserId,
+    @NotBlank String description,
+    @NotNull ReportType eventType,
 
-        @DecimalMin(value = "-90.0")
-        @DecimalMax(value = "90.0")
-        @NotNull double latitude,
+    @DecimalMin(value = "-90.0")
+    @DecimalMax(value = "90.0")
+    @NotNull double latitude,
 
 
-        @DecimalMin(value = "-180.0")
-        @DecimalMax(value = "180.0")
-        @NotNull double longitude,
+    @DecimalMin(value = "-180.0")
+    @DecimalMax(value = "180.0")
+    @NotNull double longitude,
 
-        Instant submittedAt,
-        ReportStatus status,
-        List<@NotBlank String> imageUrls
+    Instant submittedAt,
+    ReportStatus status,
+    List<@NotBlank String> imageUrls
 ) {
 }
