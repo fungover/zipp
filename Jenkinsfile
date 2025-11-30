@@ -300,31 +300,16 @@ spec:
 	post {
 		always {
 			script {
-
 				def checkName = env.BRANCH_NAME == 'main' ? 'Deployment' : 'PR Build'
-				def summary = env.BRANCH_NAME == 'main' ?
-				"Deployment ${currentBuild.currentResult}" :
-				"PR build and scan successful. Image ready for deployment on merge."
-
+				def summary = env.BRANCH_NAME == 'main' ? "Deployment ${currentBuild.currentResult}" : "PR build and scan successful. Image ready for deployment on merge."
 				try {
-					publishChecks(
-						name: checkName,
-						title: "${checkName} complete",
-						status: 'COMPLETED',
-						conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE',
-						summary: summary,
-						detailsURL: env.BUILD_URL
-					)
+					publishChecks name: checkName, title: "${checkName} complete", status: 'COMPLETED', conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE', summary: summary, detailsURL: env.BUILD_URL
 				} catch (Exception e) {
 					echo "Failed to publish checks: ${e.message}"
 				}
 
-				/*
-				 * SAFE PR COMMENT GENERATION (NO QUOTING BUGS)
-				 */
 				if (env.CHANGE_ID) {
 					try {
-
 						for (comment in pullRequest.comments) {
 							if (comment.user == 'Jenkins-CD-for-Zipp') {
 								pullRequest.deleteComment(comment.id)
@@ -333,8 +318,6 @@ spec:
 
 						def buildStatus = currentBuild.currentResult
 						def buildDuration = "${currentBuild.durationString.replace(' and counting', '')}"
-
-						// START BUILDING SAFE COMMENT
 						def message = new StringBuilder()
 						message.append("**Jenkins Build #${env.BUILD_ID} Summary** (for PR #${env.CHANGE_ID})\n")
 						message.append("- **Status**: ${buildStatus}\n")
@@ -349,7 +332,7 @@ spec:
 						message.append("- Push: ${buildStatus == 'SUCCESS' ? 'Successful' : 'Skipped (due to earlier failure)'}\n\n")
 
 						if (buildStatus != 'SUCCESS') {
-							
+
 							def rawLog = ''
 							try {
 								rawLog = manager.getLogFile().text
