@@ -1,7 +1,7 @@
 pipeline {
 	agent any
 	tools {
-		maven 'Maven3.9.9' //
+		maven 'Maven3.9.9'
 		jdk 'jdk-25'
 	}
 	environment {
@@ -100,23 +100,23 @@ pipeline {
 			steps {
 				publishChecks name: 'Deployment', title: 'Scanning image', status: 'IN_PROGRESS', summary: 'Vulnerability scan in progress'
 				sh '''
-            export PATH="$HOME/bin:$PATH"
-            trivy image --exit-code 1 --no-progress --severity HIGH,CRITICAL ${DOCKER_IMAGE}
-        '''
+                    export PATH="$HOME/bin:$PATH"
+                    trivy image --exit-code 1 --no-progress --severity HIGH,CRITICAL ${DOCKER_IMAGE}
+                '''
 			}
 		}
 		stage('Push Docker Image') {
 			steps {
 				publishChecks name: 'Deployment', title: 'Pushing image', status: 'IN_PROGRESS', summary: 'Docker push in progress'
 				sh '''
-                docker push ${DOCKER_IMAGE}
-             '''
+                    docker push ${DOCKER_IMAGE}
+                '''
 				script {
 					if (env.BRANCH_NAME == 'main') {
 						sh '''
-                      docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE_LATEST}
-                      docker push ${DOCKER_IMAGE_LATEST}
-                   '''
+                            docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE_LATEST}
+                            docker push ${DOCKER_IMAGE_LATEST}
+                        '''
 					}
 				}
 			}
@@ -286,6 +286,46 @@ spec:
 				def checkName = env.BRANCH_NAME == 'main' ? 'Deployment' : 'PR Build'
 				def summary = env.BRANCH_NAME == 'main' ? "Deployment ${currentBuild.currentResult}" : "PR build and scan successful. Image ready for deployment on merge."
 				publishChecks name: checkName, title: "${checkName} complete", status: 'COMPLETED', conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE', summary: summary, detailsURL: env.BUILD_URL
+
+				// Post detailed comment to GitHub PR (only if this is a PR build)
+				if (env.CHANGE_ID) {
+					for (comment in pullRequest.comments) {
+						if (comment.user == 'Jenkins-CD-for-Zipp') {
+							pullRequest.deleteComment(comment.id)
+						}
+					}
+
+					def buildStatus = currentBuild.currentResult
+					def buildDuration = "${currentBuild.durationString.replace(' and counting', '')}"
+					def message = """
+**Jenkins Build #${env.BUILD_ID} Summary** (for PR #${env.CHANGE_ID})
+- **Status**: ${buildStatus}
+- **Duration**: ${buildDuration}
+- **Branch**: ${env.BRANCH_NAME}
+- **Commit**: ${GIT_COMMIT_SHORT}
+- **Docker Image**: ${DOCKER_IMAGE} (pushed to registry)
+
+Details:
+- Checkout: Successful
+- Build & Scan: ${buildStatus == 'SUCCESS' ? 'Passed' : 'Failed (check logs below)'}
+- Push: Successful
+
+"""
+
+					// Add truncated logs if failed
+					if (buildStatus != 'SUCCESS') {
+						def logs = currentBuild.rawBuild.getLog(1000).join('\n')
+						message += """
+**Error Logs (truncated):**
+For full logs, contact the Jenkins admin.
+"""
+					} else {
+						message += "All stages passed—no issues detected."
+					}
+
+					// Post the comment
+					pullRequest.comment(message)
+				}
 			}
 			cleanWs()
 		}
