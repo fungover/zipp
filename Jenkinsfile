@@ -32,6 +32,7 @@ pipeline {
 		DOMAIN = 'zipp.city'
 		CLUSTER_ISSUER = 'letsencrypt-prod'
 		KAFKA_BOOTSTRAP_SERVERS = 'my-kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092'
+		IS_CACHED = ''
 	}
 	stages {
 		stage('Checkout') {
@@ -43,16 +44,56 @@ pipeline {
 		stage('Verify Dockerfile') {
 			steps {
 				script {
-					if (!fileExists('Dockerfile')) error 'Dockerfile not found'
+					if (!fileExists('backend/Dockerfile')) error 'Dockerfile not found'
+				}
+			}
+		}
+		stage('Try Reuse PR Image') {
+			when {
+				branch 'main'
+			}
+			steps {
+				script {
+					def parentsOutput = sh(script: 'git log -1 --pretty=format:%P', returnStdout: true).trim()
+					if (parentsOutput) {
+						def parentList = parentsOutput.split(/\s+/)
+						if (parentList.length > 1) {
+							def prCommit = parentList[1]
+							def prShort = prCommit.take(7)
+							def cachedImage = "${DOCKER_REGISTRY}/${APP_NAME}:${prShort}"
+							try {
+								sh "docker pull ${cachedImage}"
+								env.DOCKER_IMAGE = cachedImage
+								env.IS_CACHED = 'true'
+								echo "Reusing cached image from PR: ${cachedImage}"
+								publishChecks name: 'Deployment', title: 'Reusing PR image', status: 'SUCCESS', summary: 'Pulled cached Docker image from approved PR'
+							} catch (Exception e) {
+								env.IS_CACHED = 'false'
+								echo "No cached image found (or pull failed), will build fresh."
+							}
+						} else {
+							env.IS_CACHED = 'false'
+						}
+					} else {
+						env.IS_CACHED = 'false'
+					}
 				}
 			}
 		}
 		stage('Build Docker Image') {
+			when {
+				not {
+					allOf {
+						branch 'main'
+						expression { env.IS_CACHED == 'true' }
+					}
+				}
+			}
 			steps {
 				publishChecks name: 'Deployment', title: 'Building image', status: 'IN_PROGRESS', summary: 'Docker build in progress'
-				echo 'Building Docker image from merged code...'
-				sh 'mvn clean package -DskipTests'
-				sh 'docker build -t ${DOCKER_IMAGE} --no-cache -f Dockerfile .'
+				echo 'Building Docker image...'
+				sh 'mvn -f backend/pom.xml clean package -DskipTests'
+				sh 'docker build -t ${DOCKER_IMAGE} --no-cache -f backend/Dockerfile backend/.'
 			}
 		}
 		stage('Scan Image for Vulnerabilities') {
@@ -62,16 +103,28 @@ pipeline {
 			}
 		}
 		stage('Push Docker Image') {
-			when {
-				branch 'main'  // Only on main (post-merge)
-			}
 			steps {
 				publishChecks name: 'Deployment', title: 'Pushing image', status: 'IN_PROGRESS', summary: 'Docker push in progress'
 				sh '''
-                    docker push ${DOCKER_IMAGE}
-                    docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE_LATEST}
-                    docker push ${DOCKER_IMAGE_LATEST}
-                '''
+                docker push ${DOCKER_IMAGE}
+             '''
+				script {
+					if (env.BRANCH_NAME == 'main') {
+						sh '''
+                      docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE_LATEST}
+                      docker push ${DOCKER_IMAGE_LATEST}
+                   '''
+					}
+				}
+			}
+		}
+		stage('PR Deployability Check') {
+			when {
+				not { branch 'main' }
+			}
+			steps {
+				echo "PR build successful! Docker image '${DOCKER_IMAGE}' has been built, scanned, and pushed to the registry. This PR is deployable—once merged to main, the image will be tagged as 'latest' and deployed to Kubernetes."
+				publishChecks name: 'PR Readiness', title: 'Ready for Merge', status: 'COMPLETED', conclusion: 'SUCCESS', summary: "Image '${DOCKER_IMAGE}' ready. Merge to deploy."
 			}
 		}
 		stage('Generate Kubernetes Manifests') {
@@ -226,7 +279,11 @@ spec:
 	}
 	post {
 		always {
-			publishChecks name: 'Deployment', title: 'Deployment complete', status: 'COMPLETED', conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE', summary: "Deployment ${currentBuild.currentResult}", detailsURL: env.BUILD_URL
+			script {
+				def checkName = env.BRANCH_NAME == 'main' ? 'Deployment' : 'PR Build'
+				def summary = env.BRANCH_NAME == 'main' ? "Deployment ${currentBuild.currentResult}" : "PR build and scan successful. Image ready for deployment on merge."
+				publishChecks name: checkName, title: "${checkName} complete", status: 'COMPLETED', conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE', summary: summary, detailsURL: env.BUILD_URL
+			}
 			cleanWs()
 		}
 	}
