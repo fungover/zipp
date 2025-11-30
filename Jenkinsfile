@@ -363,6 +363,7 @@ spec:
 							.replaceAll("([a-zA-Z0-9+/=]{20,})", "[TOKEN]")
 
 							message.append("**Error Logs (truncated):**\n")
+							message.append("```\n${safeLog}\n```\n")
 							message.append("For full logs, contact the Jenkins admin.\n")
 						} else {
 							message.append("All stages passed—no issues detected.\n")
