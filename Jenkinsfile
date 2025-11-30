@@ -33,12 +33,15 @@ pipeline {
 		CLUSTER_ISSUER = 'letsencrypt-prod'
 		KAFKA_BOOTSTRAP_SERVERS = 'my-kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092'
 		IS_CACHED = ''
+		PROGRESS_CHECK_NAME = env.BRANCH_NAME == 'main' ? 'Deployment' : 'PR Build'
+		PROGRESS_CHECK_TITLE = env.BRANCH_NAME == 'main' ? 'Starting deployment' : 'Starting PR Build'
+		PROGRESS_CHECK_SUMMARY = env.BRANCH_NAME == 'main' ? 'Deployment pipeline initiated' : 'PR Build pipeline initiated'
 	}
 	stages {
 		stage('Checkout') {
 			steps {
 				checkout scm
-				publishChecks name: 'Deployment', title: 'Starting deployment', status: 'QUEUED', summary: 'Deployment pipeline initiated'
+				publishChecks name: PROGRESS_CHECK_NAME, title: PROGRESS_CHECK_TITLE, status: 'QUEUED', summary: PROGRESS_CHECK_SUMMARY
 			}
 		}
 		stage('Verify Dockerfile') {
@@ -67,7 +70,7 @@ pipeline {
 								env.DOCKER_IMAGE = cachedImage
 								env.IS_CACHED = 'true'
 								echo "Reusing cached image from PR: ${cachedImage}"
-								publishChecks name: 'Deployment', title: 'Reusing PR image', status: 'SUCCESS', summary: 'Pulled cached Docker image from approved PR'
+								publishChecks name: PROGRESS_CHECK_NAME, title: 'Reusing PR image', status: 'SUCCESS', summary: 'Pulled cached Docker image from approved PR'
 							} catch (Exception e) {
 								env.IS_CACHED = 'false'
 								echo "No cached image found (or pull failed), will build fresh."
@@ -93,7 +96,7 @@ pipeline {
 				}
 			}
 			steps {
-				publishChecks name: 'Deployment', title: 'Building image', status: 'IN_PROGRESS', summary: 'Docker build in progress'
+				publishChecks name: PROGRESS_CHECK_NAME, title: 'Building image', status: 'IN_PROGRESS', summary: 'Docker build in progress'
 				echo 'Building Docker image...'
 				sh 'mvn -f backend/pom.xml clean package -DskipTests'
 				sh 'docker build -t ${DOCKER_IMAGE} --no-cache -f backend/Dockerfile backend/.'
@@ -101,7 +104,7 @@ pipeline {
 		}
 		stage('Scan Image for Vulnerabilities') {
 			steps {
-				publishChecks name: 'Deployment', title: 'Scanning image', status: 'IN_PROGRESS', summary: 'Vulnerability scan in progress'
+				publishChecks name: PROGRESS_CHECK_NAME, title: 'Scanning image', status: 'IN_PROGRESS', summary: 'Vulnerability scan in progress'
 				sh '''
                     export PATH="$HOME/bin:$PATH"
                     trivy image --exit-code 1 --no-progress --severity HIGH,CRITICAL ${DOCKER_IMAGE}
@@ -110,7 +113,7 @@ pipeline {
 		}
 		stage('Push Docker Image') {
 			steps {
-				publishChecks name: 'Deployment', title: 'Pushing image', status: 'IN_PROGRESS', summary: 'Docker push in progress'
+				publishChecks name: PROGRESS_CHECK_NAME, title: 'Pushing image', status: 'IN_PROGRESS', summary: 'Docker push in progress'
 				sh '''
                     docker push ${DOCKER_IMAGE}
                 '''
@@ -138,7 +141,7 @@ pipeline {
 				branch 'main'
 			}
 			steps {
-				publishChecks name: 'Deployment', title: 'Generating manifests', status: 'IN_PROGRESS', summary: 'k8s manifest generation in progress'
+				publishChecks name: PROGRESS_CHECK_NAME, title: 'Generating manifests', status: 'IN_PROGRESS', summary: 'k8s manifest generation in progress'
 				script {
 					sh "mkdir -p ${K8S_MANIFEST_DIR}/{deployments,services,hpas,ingresses}"
 					writeFile file: "${K8S_MANIFEST_DIR}/deployments/deployment.yaml", text: """
@@ -261,11 +264,11 @@ spec:
 				branch 'main'
 			}
 			steps {
-				publishChecks name: 'Deployment', title: 'Deploying to k8s', status: 'IN_PROGRESS', summary: 'k8s deployment in progress'
+				publishChecks name: PROGRESS_CHECK_NAME, title: 'Deploying to k8s', status: 'IN_PROGRESS', summary: 'k8s deployment in progress'
 				withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
 					sh '''
-						set -e
-						set -o pipefail
+                        set -e
+                        set -o pipefail
                         ssh -i ${SSH_KEY} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts ${SSH_USER}@${CONTROL_PLANE_IP} "
                             mkdir -p ${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/{deployments,services,hpas,ingresses}
                         "
@@ -326,7 +329,6 @@ For full logs, contact the Jenkins admin.
 						message += "All stages passed—no issues detected."
 					}
 
-					// Post the comment
 					pullRequest.comment(message)
 				}
 			}
