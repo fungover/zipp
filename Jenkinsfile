@@ -5,7 +5,7 @@ pipeline {
 		jdk 'jdk-25'
 	}
 	environment {
-		DOCKER_REGISTRY = credentials('docker-registry-url')
+		DOCKER_REGISTRY = 'docker-registry-url'
 		APP_NAME = 'zipp'
 		GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
 		DOCKER_IMAGE = "${DOCKER_REGISTRY}/${APP_NAME}:${GIT_COMMIT_SHORT}"
@@ -13,7 +13,7 @@ pipeline {
 		GIT_REPO_URL = 'https://github.com/fungover/zipp'
 		GIT_BRANCH = 'main'
 		SSH_CREDENTIALS_ID = 'jenkins-ssh'
-		CONTROL_PLANE_IP = credentials('k8s-control-plane-ip')
+		CONTROL_PLANE_IP = 'k8s-control-plane-ip'
 		SSH_USER = 'root'
 		K8S_MANIFEST_PATH = '/root/kubernetes/manifests/applications'
 		K8S_MANIFEST_DIR = 'zipp'
@@ -264,14 +264,17 @@ spec:
 				publishChecks name: 'Deployment', title: 'Deploying to k8s', status: 'IN_PROGRESS', summary: 'k8s deployment in progress'
 				withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
 					sh '''
+						set -e
+						set -o pipefail
                         ssh -i ${SSH_KEY} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts ${SSH_USER}@${CONTROL_PLANE_IP} "
                             mkdir -p ${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/{deployments,services,hpas,ingresses}
                         "
-                        scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/deployments/deployment.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/deployments/
-                        scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/services/service.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/services/
-                        scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/hpas/hpa.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/hpas/
-                        scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/ingresses/ingress.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/ingresses/
+                        scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/deployments/deployment.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/deployments/ || { echo "SCP deployment.yaml failed"; exit 1; }
+                        scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/services/service.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/services/ || { echo "SCP service.yaml failed"; exit 1; }
+                        scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/hpas/hpa.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/hpas/ || { echo "SCP hpa.yaml failed"; exit 1; }
+                        scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/ingresses/ingress.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/ingresses/ || { echo "SCP ingress.yaml failed"; exit 1; }
                         ssh -i ${SSH_KEY} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts ${SSH_USER}@${CONTROL_PLANE_IP} "
+                            set -e
                             kubectl apply -f ${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/services/
                             kubectl apply -f ${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/deployments/
                             kubectl apply -f ${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/hpas/
