@@ -300,16 +300,31 @@ spec:
 	post {
 		always {
 			script {
+
 				def checkName = env.BRANCH_NAME == 'main' ? 'Deployment' : 'PR Build'
-				def summary = env.BRANCH_NAME == 'main' ? "Deployment ${currentBuild.currentResult}" : "PR build and scan successful. Image ready for deployment on merge."
+				def summary = env.BRANCH_NAME == 'main' ?
+				"Deployment ${currentBuild.currentResult}" :
+				"PR build and scan successful. Image ready for deployment on merge."
+
 				try {
-					publishChecks name: checkName, title: "${checkName} complete", status: 'COMPLETED', conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE', summary: summary, detailsURL: env.BUILD_URL
+					publishChecks(
+						name: checkName,
+						title: "${checkName} complete",
+						status: 'COMPLETED',
+						conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE',
+						summary: summary,
+						detailsURL: env.BUILD_URL
+					)
 				} catch (Exception e) {
 					echo "Failed to publish checks: ${e.message}"
 				}
 
+				/*
+				 * SAFE PR COMMENT GENERATION (NO QUOTING BUGS)
+				 */
 				if (env.CHANGE_ID) {
 					try {
+
 						for (comment in pullRequest.comments) {
 							if (comment.user == 'Jenkins-CD-for-Zipp') {
 								pullRequest.deleteComment(comment.id)
@@ -318,44 +333,48 @@ spec:
 
 						def buildStatus = currentBuild.currentResult
 						def buildDuration = "${currentBuild.durationString.replace(' and counting', '')}"
-						def message = """
-**Jenkins Build #${env.BUILD_ID} Summary** (for PR #${env.CHANGE_ID})
-- **Status**: ${buildStatus}
-- **Duration**: ${buildDuration}
-- **Branch**: ${env.BRANCH_NAME}
-- **Commit**: ${GIT_COMMIT_SHORT}
-- **Docker Image**: ${DOCKER_IMAGE} (pushed to registry)
 
-Details:
-- Checkout: Successful
-- Build & Scan: ${buildStatus == 'SUCCESS' ? 'Passed' : 'Failed (check logs below)'}
-- Push: ${buildStatus == 'SUCCESS' ? 'Successful' : 'Skipped (due to earlier failure)'}
+						// START BUILDING SAFE COMMENT
+						def message = new StringBuilder()
+						message.append("**Jenkins Build #${env.BUILD_ID} Summary** (for PR #${env.CHANGE_ID})\n")
+						message.append("- **Status**: ${buildStatus}\n")
+						message.append("- **Duration**: ${buildDuration}\n")
+						message.append("- **Branch**: ${env.BRANCH_NAME}\n")
+						message.append("- **Commit**: ${GIT_COMMIT_SHORT}\n")
+						message.append("- **Docker Image**: ${DOCKER_IMAGE} (pushed to registry)\n\n")
 
-"""
+						message.append("Details:\n")
+						message.append("- Checkout: Successful\n")
+						message.append("- Build & Scan: ${buildStatus == 'SUCCESS' ? 'Passed' : 'Failed (check logs below)'}\n")
+						message.append("- Push: ${buildStatus == 'SUCCESS' ? 'Successful' : 'Skipped (due to earlier failure)'}\n\n")
+
 						if (buildStatus != 'SUCCESS') {
+
 							def rawLog = ''
 							try {
 								rawLog = currentBuild.rawBuild.getLog(1000).join('\n')
 							} catch (Exception logEx) {
 								rawLog = "Unable to retrieve logs: ${logEx.message}"
 							}
+
 							def safeLog = rawLog
-							.replaceAll(/(?i)password|secret|token|key|credential|private/i, '[REDACTED]')
+							.replaceAll(/(?i)password|secret|token|key|credential|private/, '[REDACTED]')
 							.replaceAll(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/, '[IP]')
-							.replaceAll("([a-zA-Z0-9+/=]{20,})", "[TOKEN]") // crude base64/secret redaction
-						message += """
-**Error Logs (truncated):**
-For full logs, contact the Jenkins admin.
-"""
-							} else {
-							message += "All stages passed—no issues detected."
+							.replaceAll("([a-zA-Z0-9+/=]{20,})", "[TOKEN]")
+
+							message.append("**Error Logs (truncated):**\n")
+							message.append("For full logs, contact the Jenkins admin.\n")
+						} else {
+							message.append("All stages passed—no issues detected.\n")
 						}
 
-						pullRequest.comment(message)
+						pullRequest.comment(message.toString())
+
 					} catch (Exception e) {
 						echo "Failed to post PR comment: ${e.message}"
 					}
 				}
+
 			}
 			cleanWs()
 		}
