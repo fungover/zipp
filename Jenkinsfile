@@ -5,7 +5,7 @@ pipeline {
 		jdk 'jdk-25'
 	}
 	environment {
-		DOCKER_REGISTRY = 'docker-registry-url'
+		DOCKER_REGISTRY = '192.168.0.82:5000'
 		APP_NAME = 'zipp'
 		GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
 		DOCKER_IMAGE = "${DOCKER_REGISTRY}/${APP_NAME}:${GIT_COMMIT_SHORT}"
@@ -13,7 +13,7 @@ pipeline {
 		GIT_REPO_URL = 'https://github.com/fungover/zipp'
 		GIT_BRANCH = 'main'
 		SSH_CREDENTIALS_ID = 'jenkins-ssh'
-		CONTROL_PLANE_IP = 'k8s-control-plane-ip'
+		CONTROL_PLANE_IP = '192.168.0.142'
 		SSH_USER = 'root'
 		K8S_MANIFEST_PATH = '/root/kubernetes/manifests/applications'
 		K8S_MANIFEST_DIR = 'zipp'
