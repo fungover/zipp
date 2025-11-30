@@ -5,7 +5,7 @@ pipeline {
 		jdk 'jdk-25'
 	}
 	environment {
-		DOCKER_REGISTRY = '192.168.0.82:5000'
+		DOCKER_REGISTRY = credentials('docker-registry-url')
 		APP_NAME = 'zipp'
 		GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
 		DOCKER_IMAGE = "${DOCKER_REGISTRY}/${APP_NAME}:${GIT_COMMIT_SHORT}"
@@ -13,7 +13,7 @@ pipeline {
 		GIT_REPO_URL = 'https://github.com/fungover/zipp'
 		GIT_BRANCH = 'main'
 		SSH_CREDENTIALS_ID = 'jenkins-ssh'
-		CONTROL_PLANE_IP = '192.168.0.142'
+		CONTROL_PLANE_IP = credentials('k8s-control-plane-ip')
 		SSH_USER = 'root'
 		K8S_MANIFEST_PATH = '/root/kubernetes/manifests/applications'
 		K8S_MANIFEST_DIR = 'zipp'
@@ -55,11 +55,12 @@ pipeline {
 			steps {
 				script {
 					def parentsOutput = sh(script: 'git log -1 --pretty=format:%P', returnStdout: true).trim()
-					if (parentsOutput) {
-						def parentList = parentsOutput.split(/\s+/)
-						if (parentList.length > 1) {
-							def prCommit = parentList[1]
-							def prShort = prCommit.take(7)
+					def parents = parentsOutput.split(/\s+/)
+					if (parents.size() > 1) {
+						def prCommit = parents[1]
+						try {
+							sh "git rev-parse ${prCommit} >/dev/null"
+							def prShort = sh(script: "git rev-parse --short ${prCommit}", returnStdout: true).trim()
 							def cachedImage = "${DOCKER_REGISTRY}/${APP_NAME}:${prShort}"
 							try {
 								sh "docker pull ${cachedImage}"
@@ -71,11 +72,13 @@ pipeline {
 								env.IS_CACHED = 'false'
 								echo "No cached image found (or pull failed), will build fresh."
 							}
-						} else {
+						} catch (Exception e) {
 							env.IS_CACHED = 'false'
+							echo "WARNING: Invalid PR commit detected—building fresh image."
 						}
 					} else {
 						env.IS_CACHED = 'false'
+						echo "WARNING: Not a merge commit—skipping image reuse and building fresh."
 					}
 				}
 			}
@@ -261,14 +264,14 @@ spec:
 				publishChecks name: 'Deployment', title: 'Deploying to k8s', status: 'IN_PROGRESS', summary: 'k8s deployment in progress'
 				withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
 					sh '''
-                        ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${SSH_USER}@${CONTROL_PLANE_IP} "
+                        ssh -i ${SSH_KEY} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts ${SSH_USER}@${CONTROL_PLANE_IP} "
                             mkdir -p ${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/{deployments,services,hpas,ingresses}
                         "
                         scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/deployments/deployment.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/deployments/
                         scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/services/service.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/services/
                         scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/hpas/hpa.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/hpas/
                         scp -i ${SSH_KEY} ${K8S_MANIFEST_DIR}/ingresses/ingress.yaml ${SSH_USER}@${CONTROL_PLANE_IP}:${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/ingresses/
-                        ssh -i ${SSH_KEY} ${SSH_USER}@${CONTROL_PLANE_IP} "
+                        ssh -i ${SSH_KEY} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts ${SSH_USER}@${CONTROL_PLANE_IP} "
                             kubectl apply -f ${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/services/
                             kubectl apply -f ${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/deployments/
                             kubectl apply -f ${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/hpas/
@@ -287,7 +290,6 @@ spec:
 				def summary = env.BRANCH_NAME == 'main' ? "Deployment ${currentBuild.currentResult}" : "PR build and scan successful. Image ready for deployment on merge."
 				publishChecks name: checkName, title: "${checkName} complete", status: 'COMPLETED', conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE', summary: summary, detailsURL: env.BUILD_URL
 
-				// Post detailed comment to GitHub PR (only if this is a PR build)
 				if (env.CHANGE_ID) {
 					for (comment in pullRequest.comments) {
 						if (comment.user == 'Jenkins-CD-for-Zipp') {
@@ -311,8 +313,6 @@ Details:
 - Push: Successful
 
 """
-
-					// Add truncated logs if failed
 					if (buildStatus != 'SUCCESS') {
 						def logs = currentBuild.rawBuild.getLog(1000).join('\n')
 						message += """
