@@ -318,52 +318,40 @@ spec:
 
 						def buildStatus = currentBuild.currentResult
 						def buildDuration = "${currentBuild.durationString.replace(' and counting', '')}"
-						def message = new StringBuilder()
-						message.append("**Jenkins Build #${env.BUILD_ID} Summary** (for PR #${env.CHANGE_ID})\n")
-						message.append("- **Status**: ${buildStatus}\n")
-						message.append("- **Duration**: ${buildDuration}\n")
-						message.append("- **Branch**: ${env.BRANCH_NAME}\n")
-						message.append("- **Commit**: ${GIT_COMMIT_SHORT}\n")
-						message.append("- **Docker Image**: ${DOCKER_IMAGE} (pushed to registry)\n\n")
+						def message = """
+**Jenkins Build #${env.BUILD_ID} Summary** (for PR #${env.CHANGE_ID})
+- **Status**: ${buildStatus}
+- **Duration**: ${buildDuration}
+- **Branch**: ${env.BRANCH_NAME}
+- **Commit**: ${GIT_COMMIT_SHORT}
+- **Docker Image**: ${DOCKER_IMAGE} (pushed to registry)
 
-						message.append("Details:\n")
-						message.append("- Checkout: Successful\n")
-						message.append("- Build & Scan: ${buildStatus == 'SUCCESS' ? 'Passed' : 'Failed (check logs below)'}\n")
-						message.append("- Push: ${buildStatus == 'SUCCESS' ? 'Successful' : 'Skipped (due to earlier failure)'}\n\n")
+Details:
+- Checkout: Successful
+- Build & Scan: ${buildStatus == 'SUCCESS' ? 'Passed' : 'Failed (check logs below)'}
+- Push: ${buildStatus == 'SUCCESS' ? 'Successful' : 'Skipped (due to earlier failure)'}
 
+"""
 						if (buildStatus != 'SUCCESS') {
-
-							def rawLog = ''
+							def logs = ''
 							try {
-								rawLog = manager.getLogFile().text
+								logs = currentBuild.rawBuild.getLog(1000).join('\n')
 							} catch (Exception logEx) {
-								rawLog = "Unable to retrieve logs: ${logEx.message}"
+								logs = "Unable to retrieve logs: ${logEx.message}"
 							}
-
-							// REDACTION
-							def safeLog = rawLog
-							.replaceAll(/(?i)password|secret|token|key|credential|private/, '[REDACTED]')
-							.replaceAll(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/, '[IP]')
-							.replaceAll("([a-zA-Z0-9+/=]{20,})", "[TOKEN]")
-
-							// TRUNCATION (recommended)
-							def truncated = safeLog.split('\n').take(120).join('\n')
-
-							// Append to PR message
-							message.append("**Error Logs (truncated):**\n")
-							message.append("```\n${truncated}\n```\n")
-							message.append("For full logs, see Jenkins build.\n")
+							message += """
+**Error Logs (truncated):**
+For full logs, contact the Jenkins admin.
+"""
 						} else {
-							message.append("All stages passed—no issues detected.\n")
+							message += "All stages passed—no issues detected."
 						}
 
-						pullRequest.comment(message.toString())
-
+						pullRequest.comment(message)
 					} catch (Exception e) {
 						echo "Failed to post PR comment: ${e.message}"
 					}
 				}
-
 			}
 			cleanWs()
 		}
