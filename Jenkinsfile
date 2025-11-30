@@ -335,22 +335,19 @@ Details:
 						if (buildStatus != 'SUCCESS') {
 							def rawLog = ''
 							try {
-								rawLog = currentBuild.rawBuild.getLog(100).join('\n')
+								rawLog = currentBuild.rawBuild.getLog(1000).join('\n')
 							} catch (Exception logEx) {
 								rawLog = "Unable to retrieve logs: ${logEx.message}"
 							}
-							def safeLog = rawLog.replaceAll("(?i)password|secret|token|key|credential|private", "[REDACTED]")
-							safeLog = safeLog.replaceAll("\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b", "[IP]")
-							safeLog = safeLog.replaceAll("[a-zA-Z0-9+/=]{20,}", "[TOKEN]")  // crude base64/secret redaction
-							def truncatedLog = safeLog.length() > 2000 ? safeLog.substring(0, 2000) + '\n... (truncated)' : safeLog
-							message += """
+							def safeLog = rawLog
+							.replaceAll(/(?i)password|secret|token|key|credential|private/i, '[REDACTED]')
+							.replaceAll(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/, '[IP]')
+							.replaceAll("([a-zA-Z0-9+/=]{20,})", "[TOKEN]") // crude base64/secret redaction
+						message += """
 **Error Logs (truncated):**
-\`\`\`
-${truncatedLog}
-\`\`\`
-For full logs, check ${env.BUILD_URL}.
+For full logs, contact the Jenkins admin.
 """
-						} else {
+							} else {
 							message += "All stages passed—no issues detected."
 						}
 
