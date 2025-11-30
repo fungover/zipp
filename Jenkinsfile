@@ -349,22 +349,27 @@ spec:
 						message.append("- Push: ${buildStatus == 'SUCCESS' ? 'Successful' : 'Skipped (due to earlier failure)'}\n\n")
 
 						if (buildStatus != 'SUCCESS') {
-
+							
 							def rawLog = ''
 							try {
-								rawLog = currentBuild.rawBuild.getLog(1000).join('\n')
+								rawLog = manager.getLogFile().text
 							} catch (Exception logEx) {
 								rawLog = "Unable to retrieve logs: ${logEx.message}"
 							}
 
+							// REDACTION
 							def safeLog = rawLog
 							.replaceAll(/(?i)password|secret|token|key|credential|private/, '[REDACTED]')
 							.replaceAll(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/, '[IP]')
 							.replaceAll("([a-zA-Z0-9+/=]{20,})", "[TOKEN]")
 
+							// TRUNCATION (recommended)
+							def truncated = safeLog.split('\n').take(120).join('\n')
+
+							// Append to PR message
 							message.append("**Error Logs (truncated):**\n")
-							message.append("```\n${safeLog}\n```\n")
-							message.append("For full logs, contact the Jenkins admin.\n")
+							message.append("```\n${truncated}\n```\n")
+							message.append("For full logs, see Jenkins build.\n")
 						} else {
 							message.append("All stages passed—no issues detected.\n")
 						}
