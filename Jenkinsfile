@@ -33,18 +33,19 @@ pipeline {
 		CLUSTER_ISSUER = 'letsencrypt-prod'
 		KAFKA_BOOTSTRAP_SERVERS = 'my-kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092'
 		IS_CACHED = ''
-
-	stage('Init') {
-		steps {
-			script {
-				env.PROGRESS_CHECK_NAME = env.BRANCH_NAME == 'main' ? 'Deployment' : 'PR Build'
-				env.PROGRESS_CHECK_TITLE = env.BRANCH_NAME == 'main' ? 'Starting deployment' : 'Starting PR Build'
-				env.PROGRESS_CHECK_SUMMARY = env.BRANCH_NAME == 'main' ? 'Deployment pipeline initiated' : 'PR Build pipeline initiated'
+	}
+	
+	stages {
+		stage('Init') {
+			steps {
+				script {
+					env.PROGRESS_CHECK_NAME = env.BRANCH_NAME == 'main' ? 'Deployment' : 'PR Build'
+					env.PROGRESS_CHECK_TITLE = env.BRANCH_NAME == 'main' ? 'Starting deployment' : 'Starting PR Build'
+					env.PROGRESS_CHECK_SUMMARY = env.BRANCH_NAME == 'main' ? 'Deployment pipeline initiated' : 'PR Build pipeline initiated'
+				}
 			}
 		}
-	}
-		
-	stages {
+
 		stage('Checkout') {
 			steps {
 				checkout scm
