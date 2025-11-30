@@ -34,7 +34,7 @@ pipeline {
 		KAFKA_BOOTSTRAP_SERVERS = 'my-kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092'
 		IS_CACHED = ''
 	}
-	
+
 	stages {
 		stage('Init') {
 			steps {
@@ -302,18 +302,23 @@ spec:
 			script {
 				def checkName = env.BRANCH_NAME == 'main' ? 'Deployment' : 'PR Build'
 				def summary = env.BRANCH_NAME == 'main' ? "Deployment ${currentBuild.currentResult}" : "PR build and scan successful. Image ready for deployment on merge."
-				publishChecks name: checkName, title: "${checkName} complete", status: 'COMPLETED', conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE', summary: summary, detailsURL: env.BUILD_URL
+				try {
+					publishChecks name: checkName, title: "${checkName} complete", status: 'COMPLETED', conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE', summary: summary, detailsURL: env.BUILD_URL
+				} catch (Exception e) {
+					echo "Failed to publish checks: ${e.message}"
+				}
 
 				if (env.CHANGE_ID) {
-					for (comment in pullRequest.comments) {
-						if (comment.user == 'Jenkins-CD-for-Zipp') {
-							pullRequest.deleteComment(comment.id)
+					try {
+						for (comment in pullRequest.comments) {
+							if (comment.user == 'Jenkins-CD-for-Zipp') {
+								pullRequest.deleteComment(comment.id)
+							}
 						}
-					}
 
-					def buildStatus = currentBuild.currentResult
-					def buildDuration = "${currentBuild.durationString.replace(' and counting', '')}"
-					def message = """
+						def buildStatus = currentBuild.currentResult
+						def buildDuration = "${currentBuild.durationString.replace(' and counting', '')}"
+						def message = """
 **Jenkins Build #${env.BUILD_ID} Summary** (for PR #${env.CHANGE_ID})
 - **Status**: ${buildStatus}
 - **Duration**: ${buildDuration}
@@ -327,17 +332,25 @@ Details:
 - Push: Successful
 
 """
-					if (buildStatus != 'SUCCESS') {
-						def logs = currentBuild.rawBuild.getLog(1000).join('\n')
-						message += """
+						if (buildStatus != 'SUCCESS') {
+							def logs = ''
+							try {
+								logs = currentBuild.rawBuild.getLog(1000).join('\n')
+							} catch (Exception logEx) {
+								logs = "Unable to retrieve logs: ${logEx.message}"
+							}
+							message += """
 **Error Logs (truncated):**
 For full logs, contact the Jenkins admin.
 """
-					} else {
-						message += "All stages passed—no issues detected."
-					}
+						} else {
+							message += "All stages passed—no issues detected."
+						}
 
-					pullRequest.comment(message)
+						pullRequest.comment(message)
+					} catch (Exception e) {
+						echo "Failed to post PR comment: ${e.message}"
+					}
 				}
 			}
 			cleanWs()
