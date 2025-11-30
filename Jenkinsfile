@@ -329,19 +329,26 @@ spec:
 Details:
 - Checkout: Successful
 - Build & Scan: ${buildStatus == 'SUCCESS' ? 'Passed' : 'Failed (check logs below)'}
-- Push: Successful
+- Push: ${buildStatus == 'SUCCESS' ? 'Successful' : 'Skipped (due to earlier failure)'}
 
 """
 						if (buildStatus != 'SUCCESS') {
-							def logs = ''
+							def rawLog = ''
 							try {
-								logs = currentBuild.rawBuild.getLog(1000).join('\n')
+								rawLog = currentBuild.rawBuild.getLog(100).join('\n')
 							} catch (Exception logEx) {
-								logs = "Unable to retrieve logs: ${logEx.message}"
+								rawLog = "Unable to retrieve logs: ${logEx.message}"
 							}
+							def safeLog = rawLog.replaceAll("(?i)password|secret|token|key|credential|private", "[REDACTED]")
+							safeLog = safeLog.replaceAll("\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b", "[IP]")
+							safeLog = safeLog.replaceAll("[a-zA-Z0-9+/=]{20,}", "[TOKEN]")  // crude base64/secret redaction
+							def truncatedLog = safeLog.length() > 2000 ? safeLog.substring(0, 2000) + '\n... (truncated)' : safeLog
 							message += """
 **Error Logs (truncated):**
-For full logs, contact the Jenkins admin.
+\`\`\`
+${truncatedLog}
+\`\`\`
+For full logs, check ${env.BUILD_URL}.
 """
 						} else {
 							message += "All stages passed—no issues detected."
