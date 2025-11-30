@@ -1,3 +1,5 @@
+# This Dockerfile is a placeholder until the project is ready for a real dockerbuild
+
 FROM eclipse-temurin:25-jdk
 
 WORKDIR /app
