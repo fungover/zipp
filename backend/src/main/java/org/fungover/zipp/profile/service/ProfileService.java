@@ -1,9 +1,9 @@
-/*package org.fungover.zipp.profile.service;
+package org.fungover.zipp.profile.service;
 
-import org.fungover.zipp.profile.dto.UserDTO;
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.repository.UserRepository;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,29 +15,21 @@ public class ProfileService {
         this.userRepository = userRepository;
     }
 
-    public User updateProfile(UserDTO updatedUser) {
+    public User getCurrentUser(Authentication authentication) {
+        OAuth2User oauth = (OAuth2User) authentication.getPrincipal();
+        String email = oauth.getAttribute("email");
 
-        User user = userRepository.findById(updatedUser.id())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found in DB"));
+    }
 
-        user.setBio(updatedUser.bio());
-        user.setCity(updatedUser.city());
-        user.setDisplayName(updatedUser.displayName());
-        System.out.println(user.getCity() + user.getBio() + user.getDisplayName());
+    public User updateProfile(Authentication authentication, User formUser) {
+        User user = getCurrentUser(authentication);
+
+        user.setDisplayName(formUser.getDisplayName());
+        user.setCity(formUser.getCity());
+        user.setBio(formUser.getBio());
 
         return userRepository.save(user);
     }
-
-    public User getCurrentUser() {
-        // Hämta den inloggades email från SecurityContext
-        String email = SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getName(); // Google & Spring Security använder email som principal
-
-        // Slå upp användaren i databasen
-        return userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
-    }
 }
-
-*/
