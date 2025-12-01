@@ -15,12 +15,12 @@ public record Report(
 
     @DecimalMin(value = "-90.0")
     @DecimalMax(value = "90.0")
-    @NotNull double latitude,
+    @NotNull Double latitude,
 
 
     @DecimalMin(value = "-180.0")
     @DecimalMax(value = "180.0")
-    @NotNull double longitude,
+    @NotNull Double longitude,
 
     Instant submittedAt,
     ReportStatus status,
