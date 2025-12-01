@@ -29,7 +29,7 @@ public class ReportEntity {
      * private UserEntity user;
      */
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2000)
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -37,7 +37,7 @@ public class ReportEntity {
     private ReportType eventType;
 
     @JdbcTypeCode(SqlTypes.GEOMETRY)
-    @Column(columnDefinition = "POINT SRID 4326")
+    @Column(columnDefinition = "POINT SRID 4326", nullable = false)
     private Point coordinates;
 
     @Column(nullable = false)
