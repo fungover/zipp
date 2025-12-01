@@ -1,6 +1,5 @@
 package org.fungover.zipp.service;
 
-import org.fungover.zipp.entity.Role;
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
-
     private final UserRepository userRepository;
 
     public CustomOAuth2UserService(UserRepository userRepository) {
@@ -32,21 +30,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
           .getClientRegistration()
           .getRegistrationId();
 
-        User user = userRepository
-          .findByProviderAndProviderId(provider, providerId)
-          .orElseGet(() -> {
-              User newUser = new User();
+        User existing = userRepository.findByProviderAndProviderId(provider, providerId)
+                                      .orElse(null);
 
-              newUser.setProviderId(providerId);
-              newUser.setEmail(email);
-              newUser.setName(name);
-              newUser.setProvider(provider);
-              newUser.setRole(Role.USER);
-
-              return newUser;
-          });
-
-        userRepository.save(user);
+        if (existing == null) {
+            User newUser = new User();
+            newUser.setProvider(provider);
+            newUser.setProviderId(providerId);
+            newUser.setName(name);
+            newUser.setEmail(email);
+            userRepository.save(newUser);
+        }
 
         return oAuth2User;
     }
