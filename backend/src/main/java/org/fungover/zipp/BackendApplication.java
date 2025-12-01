@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public final class BackendApplication {
 
     private BackendApplication() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+        throw new UnsupportedOperationException
+                ("This is a utility class and cannot be instantiated");
     }
 
     /**
