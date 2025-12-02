@@ -16,17 +16,9 @@ public class EventListenerService {
     }
 
     @KafkaListener(topics = "reports", groupId = "zipp")
-    public void listen(String message) {
-        System.out.println("Received: " + message);
+    public void listen(ReportEvent event) {
+        System.out.println("Received: " + event);
 
-        String[] parts = message.split(":", 2);
-        if (parts.length == 2) {
-            String id = parts[0];
-            String payload = parts[1];
-
-            sseService.send(id, Map.of("type", "report", "payload", payload));
-        } else {
-            sseService.send("default", Map.of("type", "report", "payload", message));
-        }
+        sseService.send(event.id(), event);
     }
 }
