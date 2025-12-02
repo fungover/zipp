@@ -31,9 +31,13 @@ body{
     color: white;
     text-decoration: none;
 }
-.navigation__link:hover:active{
+.navigation__link:hover{
     font-weight: bold;
     color:cadetblue;
+}
+.navigation__link:active{
+  font-weight: bold;
+  color:cadetblue;
 }
 
 .navigation__link:focus{
