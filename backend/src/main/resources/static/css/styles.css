@@ -31,9 +31,14 @@ body{
     color: white;
     text-decoration: none;
 }
-.navigation__link:hover:active:focus{
+.navigation__link:hover:active{
     font-weight: bold;
     color:cadetblue;
+}
+
+.navigation__link:focus{
+  outline: 0.25rem solid cadetblue;
+  outline-offset: 0.25rem;
 }
 
 .footer{
