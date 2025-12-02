@@ -5,28 +5,45 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class SseService {
 
-    private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
+    private final Map<String, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
-    public SseEmitter createEmitter() {
-        SseEmitter emitter = new SseEmitter();
-        emitters.add(emitter);
+    public SseEmitter subscribe(String id) {
+        SseEmitter emitter = new SseEmitter(0L);
+        emitters.computeIfAbsent(id, k -> new CopyOnWriteArrayList<>()).add(emitter);
 
-        emitter.onCompletion(() -> emitters.remove(emitter));
-        emitter.onTimeout(() -> emitters.remove(emitter));
+        emitter.onCompletion(() -> remove(id, emitter));
+        emitter.onTimeout(() -> remove(id, emitter));
+        emitter.onError(ex -> remove(id, emitter));
+
         return emitter;
     }
 
-    public void sendEvent(String message) {
-        for (SseEmitter emitter : emitters) {
+    public void send(String id, Object event) {
+        var list = emitters.get(id);
+        if (list == null) return;
+
+        for (var emitter : list) {
             try {
-                emitter.send(SseEmitter.event().data(message));
-            } catch (IOException e) {
-                emitters.remove(emitter);
+                emitter.send(SseEmitter.event().data(event));
+            } catch (Exception e) {
+                remove(id, emitter);
+            }
+        }
+    }
+
+    private void remove(String id, SseEmitter emitter) {
+        var list = emitters.get(id);
+        if (list != null) {
+            list.remove(emitter);
+            if (list.isEmpty()) {
+                emitters.remove(id);
             }
         }
     }
