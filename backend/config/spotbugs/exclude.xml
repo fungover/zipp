@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!--
+        SpotBugs exclusion filter for zipp project
+        Add patterns here to suppress false positives
+    -->
+
+    <!-- Exclude generated code (e.g., from Lombok, MapStruct) -->
+    <Match>
+        <Source name="~.*generated.*"/>
+    </Match>
+
+    <!-- Exclude test classes from certain checks -->
+    <Match>
+        <Class name="~.*Test"/>
+        <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+    </Match>
+
+    <!-- Spring-specific exclusions -->
+    <!-- Spring Data repositories often trigger false positives -->
+    <Match>
+        <Class name="~.*Repository"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+
+    <!-- DTOs and entities may expose internal representation by design -->
+    <Match>
+        <Or>
+            <Class name="~.*Dto"/>
+            <Class name="~.*DTO"/>
+            <Class name="~.*Entity"/>
+            <Class name="~.*Request"/>
+            <Class name="~.*Response"/>
+        </Or>
+        <Or>
+            <Bug pattern="EI_EXPOSE_REP"/>
+            <Bug pattern="EI_EXPOSE_REP2"/>
+        </Or>
+    </Match>
+
+    <!-- Configuration classes -->
+    <Match>
+        <Class name="~.*Config"/>
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+    </Match>
+
+    <!-- Example: Exclude specific package -->
+    <!--
+    <Match>
+        <Package name="com.example.zipp.legacy"/>
+    </Match>
+    -->
+</FindBugsFilter>

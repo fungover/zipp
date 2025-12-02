@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+    Checkstyle configuration for zipp project
+    Based on Google Java Style with some adjustments
+-->
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="warning"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- Exclude generated files -->
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value=".*[\\/]target[\\/].*"/>
+    </module>
+
+    <!-- File length -->
+    <module name="FileLength">
+        <property name="max" value="500"/>
+        <property name="severity" value="warning"/>
+    </module>
+
+    <!-- No trailing whitespace -->
+    <module name="RegexpSingleline">
+        <property name="format" value="\s+$"/>
+        <property name="message" value="Line has trailing whitespace."/>
+    </module>
+
+    <!-- Newline at end of file -->
+    <module name="NewlineAtEndOfFile"/>
+
+    <module name="TreeWalker">
+        <!-- Naming conventions -->
+        <module name="ConstantName"/>
+        <module name="LocalFinalVariableName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="PackageName"/>
+        <module name="ParameterName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
+
+        <!-- Imports -->
+        <module name="AvoidStarImport"/>
+        <module name="IllegalImport"/>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+
+        <!-- Size violations -->
+        <module name="LineLength">
+            <property name="max" value="120"/>
+            <property name="ignorePattern" value="^package.*|^import.*|a]"/>
+        </module>
+        <module name="MethodLength">
+            <property name="max" value="60"/>
+        </module>
+        <module name="ParameterNumber">
+            <property name="max" value="7"/>
+        </module>
+
+        <!-- Whitespace -->
+        <module name="EmptyForIteratorPad"/>
+        <module name="GenericWhitespace"/>
+        <module name="MethodParamPad"/>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="ParenPad"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround"/>
+
+        <!-- Modifier checks -->
+        <module name="ModifierOrder"/>
+        <module name="RedundantModifier"/>
+
+        <!-- Block checks -->
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyBlock"/>
+        <module name="LeftCurly"/>
+        <module name="NeedBraces"/>
+        <module name="RightCurly"/>
+
+        <!-- Coding -->
+        <module name="EmptyStatement"/>
+        <module name="EqualsHashCode"/>
+        <module name="IllegalInstantiation"/>
+        <module name="InnerAssignment"/>
+        <module name="MissingSwitchDefault"/>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StringLiteralEquality"/>
+        <module name="OneStatementPerLine"/>
+        <module name="OverloadMethodsDeclarationOrder"/>
+
+        <!-- Design -->
+        <module name="FinalClass"/>
+        <module name="HideUtilityClassConstructor"/>
+        <module name="InterfaceIsType"/>
+        <module name="VisibilityModifier">
+            <property name="protectedAllowed" value="true"/>
+        </module>
+
+        <!-- Miscellaneous -->
+        <module name="ArrayTypeStyle"/>
+        <module name="TodoComment">
+            <property name="severity" value="info"/>
+        </module>
+        <module name="UpperEll"/>
+
+        <!-- Annotations -->
+        <module name="MissingOverride"/>
+
+        <!-- Javadoc - relaxed for now, can be stricter later -->
+        <module name="MissingJavadocMethod">
+            <property name="scope" value="public"/>
+            <property name="allowMissingPropertyJavadoc" value="true"/>
+            <property name="severity" value="info"/>
+        </module>
+    </module>
+</module>
