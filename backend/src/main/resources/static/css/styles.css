@@ -1,7 +1,9 @@
 body{
-    margin: auto;
-    align-content: center;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
     max-width: 1280px;
+    min-height: 100vh;
 }
 .header{
     display: grid;
@@ -29,16 +31,9 @@ body{
     color: white;
     text-decoration: none;
 }
-.navigation__link:hover{
+.navigation__link:hover:active:focus{
     font-weight: bold;
     color:cadetblue;
-}
-.navigation__link:active{
-    color: cadetblue;
-}
-
-.menu__burger{
-    color: white;
 }
 
 .footer{
