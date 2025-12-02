@@ -13,6 +13,9 @@ body{
     font-size: 2rem;
     color: white;
 }
+.header__image{
+    margin-left: 1rem;
+}
 .navigation{
     justify-content: center;
 }
