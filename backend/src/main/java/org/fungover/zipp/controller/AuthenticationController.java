@@ -20,25 +20,11 @@ public class AuthenticationController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/env-test")
-    public String envTest() {
-        return System.getenv("GOOGLE_CLIENT_ID");
-    }
-
-    @GetMapping("/debug/client")
-    public String client() {
-        return repo
-          .findByRegistrationId("google")
-          .getClientId();
-    }
-
     @GetMapping("/")
     public String publicHome(){
 
-        return "this is public home";}
-
-    @GetMapping("/private")
-    public String privateHome() {return "Authenticated";}
+        return "this is public home";
+    }
 
     /** Example of accessing values from OAuth2 via Controller
      *  can be used to test user login

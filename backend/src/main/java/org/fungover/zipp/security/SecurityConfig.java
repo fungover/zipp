@@ -20,7 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.authorizeHttpRequests(auth -> auth
-              .requestMatchers("/","/debug/client","/env-test").permitAll()
+              .requestMatchers("/").permitAll()
               .anyRequest()
               .authenticated()
             )
@@ -36,10 +36,7 @@ public class SecurityConfig {
             .deleteCookies("JSESSIONID")) //removes session cookie
         ;
 
-        System.out.println("Security stuff happened with values: "
-                           + co2us);
         return http.build();
-
 
     }
 }
