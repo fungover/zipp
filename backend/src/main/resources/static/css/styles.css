@@ -2,7 +2,6 @@ body{
     margin: auto;
     align-content: center;
     max-width: 1280px;
-    max-height: 110px;
 }
 .header{
     display: grid;
@@ -16,8 +15,15 @@ body{
 .header__image{
     margin-left: 1rem;
 }
+
+.header__title{
+    text-align: center;
+}
+
 .navigation{
+    display: flex;
     justify-content: center;
+    gap: 1rem;
 }
 .navigation__link{
     color: white;
@@ -37,8 +43,9 @@ body{
 
 .footer{
     font-size: 1rem;
+    min-height: 50px;
     background-color: #1E1E1E;
     border-radius: 0.5rem;
-    align-content: center;
+    text-align: center;
     color: white;
 }
