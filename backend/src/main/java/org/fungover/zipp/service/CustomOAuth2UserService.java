@@ -1,5 +1,6 @@
 package org.fungover.zipp.service;
 
+import org.fungover.zipp.entity.Role;
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -39,10 +40,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             newUser.setProviderId(providerId);
             newUser.setName(name);
             newUser.setEmail(email);
+            newUser.setRole(Role.USER);
             userRepository.save(newUser);
         }
 
         return oAuth2User;
     }
-
 }
