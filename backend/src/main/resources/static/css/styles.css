@@ -1,0 +1,41 @@
+body{
+    margin: auto;
+    align-content: center;
+    max-width: 1280px;
+    max-height: 110px;
+}
+.header{
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+    align-items: center;
+    border-radius: 0.5rem;
+    background-color: #1E1E1E;
+    font-size: 2rem;
+    color: white;
+}
+.navigation{
+    justify-content: center;
+}
+.navigation__link{
+    color: white;
+    text-decoration: none;
+}
+.navigation__link:hover{
+    font-weight: bold;
+    color:cadetblue;
+}
+.navigation__link:active{
+    color: cadetblue;
+}
+
+.menu__burger{
+    color: white;
+}
+
+.footer{
+    font-size: 1rem;
+    background-color: #1E1E1E;
+    border-radius: 0.5rem;
+    align-content: center;
+    color: white;
+}
