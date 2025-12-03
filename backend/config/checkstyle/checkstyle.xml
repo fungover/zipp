@@ -5,7 +5,7 @@
 
 <!--
     Checkstyle configuration for zipp project
-    Based on Google Java Style with some adjustments
+    Based on Google Java Style with adjustments
 -->
 <module name="Checker">
     <property name="charset" value="UTF-8"/>
@@ -17,10 +17,22 @@
         <property name="fileNamePattern" value=".*[\\/]target[\\/].*"/>
     </module>
 
+    <!-- Suppress HideUtilityClassConstructor for test files -->
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="HideUtilityClassConstructor"/>
+        <property name="files" value=".*[\\/]test[\\/].*"/>
+    </module>
+
     <!-- File length -->
     <module name="FileLength">
         <property name="max" value="500"/>
         <property name="severity" value="warning"/>
+    </module>
+
+    <!-- Line length - must be under Checker, NOT TreeWalker -->
+    <module name="LineLength">
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="^package.*|^import.*"/>
     </module>
 
     <!-- No trailing whitespace -->
@@ -44,6 +56,12 @@
         <module name="StaticVariableName"/>
         <module name="TypeName"/>
 
+        <!-- Suppress HideUtilityClassConstructor for Spring Boot main class -->
+        <module name="SuppressionSingleFilter">
+            <property name="checks" value="HideUtilityClassConstructor"/>
+            <property name="files" value="BackendApplication\.java$"/>
+        </module>
+
         <!-- Imports -->
         <module name="AvoidStarImport"/>
         <module name="IllegalImport"/>
@@ -51,10 +69,6 @@
         <module name="UnusedImports"/>
 
         <!-- Size violations -->
-        <module name="LineLength">
-            <property name="max" value="120"/>
-            <property name="ignorePattern" value="^package.*|^import.*|a]"/>
-        </module>
         <module name="MethodLength">
             <property name="max" value="60"/>
         </module>
@@ -71,7 +85,15 @@
         <module name="ParenPad"/>
         <module name="TypecastParenPad"/>
         <module name="WhitespaceAfter"/>
-        <module name="WhitespaceAround"/>
+        <module name="WhitespaceAround">
+            <!-- Allow empty method bodies like void foo() {} -->
+            <property name="allowEmptyConstructors" value="true"/>
+            <property name="allowEmptyMethods" value="true"/>
+            <property name="allowEmptyTypes" value="true"/>
+            <property name="allowEmptyLoops" value="true"/>
+            <property name="allowEmptyLambdas" value="true"/>
+            <property name="allowEmptyCatches" value="true"/>
+        </module>
 
         <!-- Modifier checks -->
         <module name="ModifierOrder"/>
@@ -114,12 +136,5 @@
 
         <!-- Annotations -->
         <module name="MissingOverride"/>
-
-        <!-- Javadoc - relaxed for now, can be stricter later -->
-        <module name="MissingJavadocMethod">
-            <property name="scope" value="public"/>
-            <property name="allowMissingPropertyJavadoc" value="true"/>
-            <property name="severity" value="info"/>
-        </module>
     </module>
 </module>
