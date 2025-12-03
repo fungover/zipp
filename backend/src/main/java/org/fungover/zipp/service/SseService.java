@@ -1,9 +1,9 @@
 package org.fungover.zipp.service;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,5 +46,19 @@ public class SseService {
                 emitters.remove(id);
             }
         }
+    }
+
+        @Scheduled(fixedRate = 20000)
+                public void sendKeepAlive() {
+            for (var entry : emitters.entrySet()) {
+                String id = entry.getKey();
+                for (var emitter : entry.getValue()) {
+                    try {
+                        emitter.send(SseEmitter.event().comment("keep-alive"));
+                    } catch (Exception e) {
+                        remove(id, emitter);
+                    }
+                }
+            }
     }
 }
