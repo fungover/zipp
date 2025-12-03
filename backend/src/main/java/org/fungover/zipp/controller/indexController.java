@@ -13,18 +13,12 @@ public class indexController {
     public String index(Model model, Authentication authentication) {
         model.addAttribute("title", "Zipp");
 
-        if (authentication != null && authentication.isAuthenticated()){
-            if (authentication.getPrincipal() instanceof OAuth2User oAuth2User) {
+        boolean loggedIn = authentication != null && authentication.isAuthenticated();
+        model.addAttribute("isLoggedIn", loggedIn);
 
-                OAuth2User oauth2user = (OAuth2User) authentication.getPrincipal();
-
-                String userName = oauth2user.getAttribute("name");
-
-                model.addAttribute("userName", userName);
-                model.addAttribute("isLoggedIn", true);
-            }
-        } else {
-            model.addAttribute("isLoggedIn", false);
+        if (loggedIn && authentication.getPrincipal() instanceof OAuth2User oAuth2User) {
+            String userName = oAuth2User.getAttribute("name");
+            model.addAttribute("userName", userName);
         }
         return "index";
     }
