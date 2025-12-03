@@ -27,12 +27,12 @@ public class ReportService {
     }
 
     @Transactional
-    public Report createReport(Report dto) {
+    public Report createReport(String userId, Report dto) {
         Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
         point.setSRID(4326);
 
         ReportEntity entity = new ReportEntity(
-            dto.submittedByUserId(),
+            userId,
             dto.description(),
             dto.eventType(),
             point,
@@ -63,7 +63,6 @@ public class ReportService {
 
     private Report toDto(ReportEntity savedEntity) {
         return new Report(
-            savedEntity.getSubmittedByUserId(),
             savedEntity.getDescription(),
             savedEntity.getEventType(),
             savedEntity.getCoordinates().getY(),

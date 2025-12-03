@@ -21,7 +21,7 @@ public class ReportEntity {
 
     // TODO: Replace this field with the proper @ManyToOne relationship once Issue #4 is ready
     @Column(name = "submitted_by_user_id", nullable = false)
-    private Long submittedByUserId;
+    private String submittedByUserId;
 
     /* Target Implementation:
      * @ManyToOne
@@ -53,7 +53,7 @@ public class ReportEntity {
     public ReportEntity() {
     }
 
-    public ReportEntity(Long submittedByUserId,
+    public ReportEntity(String submittedByUserId,
                         String description,
                         ReportType eventType,
                         Point coordinates,
@@ -117,11 +117,11 @@ public class ReportEntity {
         this.status = status;
     }
 
-    public Long getSubmittedByUserId() {
+    public String getSubmittedByUserId() {
         return submittedByUserId;
     }
 
-    public void setSubmittedByUserId(Long submittedByUserId) {
+    public void setSubmittedByUserId(String submittedByUserId) {
         this.submittedByUserId = submittedByUserId;
     }
 

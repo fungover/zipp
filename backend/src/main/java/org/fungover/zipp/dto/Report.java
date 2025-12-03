@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.util.List;
 
 public record Report(
-    @NotNull Long submittedByUserId,
     @NotBlank String description,
     @NotNull ReportType eventType,
 
