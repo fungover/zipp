@@ -18,18 +18,18 @@ public class ProfileController {
         this.profileService = profileService;
     }
 
-    @GetMapping("/loginsettings")
+    @GetMapping("/profilesettings")
     public String showProfile(Model model, Authentication authentication) {
         User user = profileService.getCurrentUser(authentication);
         model.addAttribute("user", user);
-        return "loginsettings";
+        return "profilesettings";
     }
 
-    @PostMapping("/loginsettings")
+    @PostMapping("/profilesettings")
     public String updateProfile(@ModelAttribute("user") User formUser,
                                 Authentication authentication) {
 
         profileService.updateProfile(authentication, formUser);
-        return "redirect:/loginsettings";
+        return "redirect:/profilesettings";
     }
 }
