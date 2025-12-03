@@ -21,12 +21,6 @@ public class AuthenticationController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/")
-    public String publicHome() {
-
-        return "this is public home";
-    }
-
     /**
      * Example of accessing values from OAuth2 via Controller can be used to test
      * user login
