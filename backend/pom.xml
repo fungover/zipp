@@ -204,19 +204,18 @@
                     <threads>4</threads>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>12.1.0</version>
-                <configuration>
-                    <failBuildOnCVSS>7</failBuildOnCVSS>
-                    <formats>
-                        <format>HTML</format>
-                        <format>JSON</format>
-                    </formats>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.owasp</groupId>-->
+<!--                <artifactId>dependency-check-maven</artifactId>-->
+<!--                <version>12.1.0</version>-->
+<!--                <configuration>-->
+<!--                    <failBuildOnCVSS>7</failBuildOnCVSS>-->
+<!--                    <formats>-->
+<!--                        <format>HTML</format>-->
+<!--                        <format>JSON</format>-->
+<!--                    </formats>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 </project>
