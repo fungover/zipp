@@ -7,7 +7,6 @@ pipeline {
 	environment {
 		DOCKER_REGISTRY = '192.168.0.82:5000'
 		APP_NAME = 'zipp'
-		GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
 		DOCKER_IMAGE = "${DOCKER_REGISTRY}/${APP_NAME}:${GIT_COMMIT_SHORT}"
 		DOCKER_IMAGE_LATEST = "${DOCKER_REGISTRY}/${APP_NAME}:latest"
 		GIT_REPO_URL = 'https://github.com/fungover/zipp'
@@ -49,6 +48,11 @@ pipeline {
 		stage('Checkout') {
 			steps {
 				checkout scm
+				script {
+					env.GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+					env.DOCKER_IMAGE = "${DOCKER_REGISTRY}/${APP_NAME}:${GIT_COMMIT_SHORT}"
+					env.DOCKER_IMAGE_LATEST = "${DOCKER_REGISTRY}/${APP_NAME}:latest"
+				}
 				publishChecks name: PROGRESS_CHECK_NAME, title: PROGRESS_CHECK_TITLE, status: 'QUEUED', summary: PROGRESS_CHECK_SUMMARY
 			}
 		}
