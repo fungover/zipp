@@ -46,7 +46,6 @@ public class User {
     }
 
     public User() {
-        //Needed for Entity classes
     }
 
     public UUID getId() {
