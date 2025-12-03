@@ -1,16 +1,16 @@
-spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
-            scope:
-              - profile
-              - email
-            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
-            authorization-grant-type: authorization_code
+#spring:
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: ${GOOGLE_CLIENT_ID}
+#            client-secret: ${GOOGLE_CLIENT_SECRET}
+#            scope:
+#              - profile
+#              - email
+#            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
+#            authorization-grant-type: authorization_code
 #        provider:
 #          google:
 #            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
@@ -18,4 +18,3 @@ spring:
 #            user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
 #            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
 #            user-name-attribute: sub
-

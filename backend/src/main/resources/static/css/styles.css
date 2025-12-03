@@ -1,17 +1,20 @@
 body{
     margin: auto;
     align-content: center;
+    align-items: center;
     max-width: 1280px;
-    max-height: 110px;
+    min-height: 100%;
 }
 .header{
     display: grid;
-    grid-template-columns: 1fr 1fr 2fr;
+    grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
+    justify-items: center;
     border-radius: 0.5rem;
     background-color: #1E1E1E;
     font-size: 2rem;
     color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 .header__image{
     margin-left: 1rem;
@@ -41,4 +44,23 @@ body{
     border-radius: 0.5rem;
     align-content: center;
     color: white;
+    box-shadow: 0 -4px 6px rgba(0,0,0,0.3);
 }
+
+.login__container{
+  display: block;
+  width: 192px;
+  margin: 2rem auto;
+  min-height: 300px;
+}
+
+.login__button{
+  border-radius: 0.5rem;
+}
+
+.login__button:hover{
+  border: 3px solid;
+  border-color: cadetblue;
+  border-radius: 0.5rem;
+}
+

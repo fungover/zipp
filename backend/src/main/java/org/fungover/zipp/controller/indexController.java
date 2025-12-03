@@ -12,4 +12,10 @@ public class indexController {
         model.addAttribute("title", "Zipp");
         return "index";
     }
+
+    @GetMapping("/login")
+    public String login(Model model) {
+        model.addAttribute("title", "Login");
+        return "pages/login";
+    }
 }
