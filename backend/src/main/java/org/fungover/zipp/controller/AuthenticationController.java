@@ -10,36 +10,38 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AuthenticationController {
-    private final ClientRegistrationRepository repo;
-    private final UserService userService;
-    private final UserRepository userRepository;
+	private final ClientRegistrationRepository repo;
+	private final UserService userService;
+	private final UserRepository userRepository;
 
-    public AuthenticationController(ClientRegistrationRepository repo, UserService userService, UserRepository userRepository) {
-        this.repo = repo;
-        this.userService = userService;
-        this.userRepository = userRepository;
-    }
+	public AuthenticationController(ClientRegistrationRepository repo, UserService userService,
+			UserRepository userRepository) {
+		this.repo = repo;
+		this.userService = userService;
+		this.userRepository = userRepository;
+	}
 
-    @GetMapping("/")
-    public String publicHome(){
+	@GetMapping("/")
+	public String publicHome() {
 
-        return "this is public home";
-    }
+		return "this is public home";
+	}
 
-    /** Example of accessing values from OAuth2 via Controller
-     *  can be used to test user login
-     * @param principal returns String Name and email of logged-in user
-     * @return
-     */
-    @GetMapping("/me")
-    public String greet(@AuthenticationPrincipal OAuth2User principal) {
-        String name = principal.getAttribute("name");
-        String email = principal.getAttribute("email");
-        String id = principal.getAttribute("sub");
+	/**
+	 * Example of accessing values from OAuth2 via Controller can be used to test
+	 * user login
+	 * 
+	 * @param principal
+	 *            returns String Name and email of logged-in user
+	 * @return
+	 */
+	@GetMapping("/me")
+	public String greet(@AuthenticationPrincipal OAuth2User principal) {
+		String name = principal.getAttribute("name");
+		String email = principal.getAttribute("email");
+		String id = principal.getAttribute("sub");
 
-        return "Hello " + name + ", your email adress is: " + email + ", this is your id " + id;
-    }
+		return "Hello " + name + ", your email adress is: " + email + ", this is your id " + id;
+	}
 
 }
-
-

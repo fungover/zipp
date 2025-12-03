@@ -12,39 +12,35 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
-    private final UserRepository userRepository;
+	private final UserRepository userRepository;
 
-    public CustomOAuth2UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+	public CustomOAuth2UserService(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
-    @Override
-    @Transactional
-    public OAuth2User loadUser(
-      OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(userRequest);
+	@Override
+	@Transactional
+	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+		OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        String providerId = oAuth2User.getAttribute("sub");
-        String name = oAuth2User.getAttribute("name");
-        String email = oAuth2User.getAttribute("email");
-        String provider = userRequest
-          .getClientRegistration()
-          .getRegistrationId();
+		String providerId = oAuth2User.getAttribute("sub");
+		String name = oAuth2User.getAttribute("name");
+		String email = oAuth2User.getAttribute("email");
+		String provider = userRequest.getClientRegistration().getRegistrationId();
 
-        User existing = userRepository.findByProviderAndProviderId(provider, providerId)
-                                      .orElse(null);
+		User existing = userRepository.findByProviderAndProviderId(provider, providerId).orElse(null);
 
-        if (existing == null) {
-            User newUser = new User();
-            newUser.setProvider(provider);
-            newUser.setProviderId(providerId);
-            newUser.setName(name);
-            newUser.setEmail(email);
-            newUser.setRole(Role.USER);
-            userRepository.save(newUser);
-        }
+		if (existing == null) {
+			User newUser = new User();
+			newUser.setProvider(provider);
+			newUser.setProviderId(providerId);
+			newUser.setName(name);
+			newUser.setEmail(email);
+			newUser.setRole(Role.USER);
+			userRepository.save(newUser);
+		}
 
-        return oAuth2User;
-    }
+		return oAuth2User;
+	}
 
 }
