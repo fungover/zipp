@@ -3,13 +3,13 @@ package org.fungover.zipp.controller;
 import jakarta.validation.Valid;
 import org.fungover.zipp.dto.Report;
 import org.fungover.zipp.service.ReportService;
+import org.fungover.zipp.service.UserIdentityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -19,18 +19,20 @@ public class ReportController {
 
     private static final Logger log = LoggerFactory.getLogger(ReportController.class);
     private final ReportService reportService;
+    private final UserIdentityService userIdentityService;
 
-    public ReportController(ReportService reportService) {
+    public ReportController(ReportService reportService, UserIdentityService userIdentityService) {
         this.reportService = reportService;
+        this.userIdentityService = userIdentityService;
     }
 
     @PostMapping
-    public ResponseEntity<Report> createReport(@Valid @RequestBody Report reportRequest, @AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<Report> createReport(@Valid @RequestBody Report reportRequest, Authentication authentication) {
         log.info("Report received: {}", reportRequest);
 
-        String id = principal.getAttribute("sub");
+        String userId = userIdentityService.getUserId(authentication);
 
-        var newReport = reportService.createReport(id, reportRequest);
+        var newReport = reportService.createReport(userId, reportRequest);
 
     /* For now the userId is provided by the client
      later this can be replaced with SecurityContextHolder.getContext().getAuthentication()
