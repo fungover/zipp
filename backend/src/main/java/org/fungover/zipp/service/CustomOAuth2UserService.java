@@ -20,19 +20,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     @Transactional
-    public OAuth2User loadUser(
-      OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         String providerId = oAuth2User.getAttribute("sub");
         String name = oAuth2User.getAttribute("name");
         String email = oAuth2User.getAttribute("email");
-        String provider = userRequest
-          .getClientRegistration()
-          .getRegistrationId();
+        String provider = userRequest.getClientRegistration().getRegistrationId();
 
-        User existing = userRepository.findByProviderAndProviderId(provider, providerId)
-                                      .orElse(null);
+        User existing = userRepository.findByProviderAndProviderId(provider, providerId).orElse(null);
 
         if (existing == null) {
             User newUser = new User();
