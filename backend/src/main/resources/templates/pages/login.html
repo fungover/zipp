@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}"
+>
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${title}"></title>
+</head>
+<body>
+<main>
+  <div class="login__container" layout:fragment="welcome">
+    <a th:href="@{/oauth2/authorization/google}">
+    <img class="login__button" th:src="@{/images/LoginGoogle.png}" alt="Google login button">
+    </a>
+  </div>
+</main>
+</body>
+</html>
