@@ -27,5 +27,6 @@ public class IndexController {
     public String login(Model model) {
         model.addAttribute("title", "Login");
         return "pages/login";
+
     }
 }
