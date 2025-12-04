@@ -3,6 +3,9 @@ package org.fungover.zipp.entity;
 import jakarta.persistence.*;
 import org.springframework.security.web.webauthn.api.AuthenticatorTransport;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Entity
 @Table(name = "webauthn_credentials")
 public class WebAuthnCredentialEntity {
@@ -12,8 +15,8 @@ public class WebAuthnCredentialEntity {
     private byte[] credentialId;
 
     @ManyToOne
-    @JoinColumn(name = "username", nullable = false)
-    private WebAuthnUserEntity user;
+    @JoinColumn(name = "user_id", nullable = false) // FK -> users.id (UUID)
+    private User user;
 
     @Lob
     @Column(nullable = false)
@@ -37,7 +40,7 @@ public class WebAuthnCredentialEntity {
 
     public WebAuthnCredentialEntity(
         byte[] credentialId,
-        WebAuthnUserEntity user,
+        User user,
         byte[] publicKey,
         long signatureCount,
         String transports,
@@ -57,7 +60,7 @@ public class WebAuthnCredentialEntity {
         return credentialId;
     }
 
-    public WebAuthnUserEntity getUser() {
+    public User getUser() {
         return user;
     }
 
@@ -81,29 +84,26 @@ public class WebAuthnCredentialEntity {
         return clientDataJSON;
     }
 
-    public java.util.Set<AuthenticatorTransport> getTransportsAsSet() {
+    // === Hjälpmetoder för transports ===
+
+    public Set<AuthenticatorTransport> getTransportsAsSet() {
         if (transports == null || transports.isBlank()) {
-            return java.util.Set.of();
+            return Set.of();
         }
         return java.util.Arrays.stream(transports.split(","))
             .map(String::trim)
             .filter(s -> !s.isEmpty())
             .map(AuthenticatorTransport::valueOf)
-            .collect(java.util.stream.Collectors.toSet());
+            .collect(Collectors.toSet());
     }
 
-    public static String transportsToString(
-        java.util.Set<AuthenticatorTransport> transports
-    ) {
+    public static String transportsToString(Set<AuthenticatorTransport> transports) {
         if (transports == null || transports.isEmpty()) {
             return null;
         }
         return transports.stream()
-            .map(Object::toString)   // ← byt till detta, strunta i name()
+            .map(AuthenticatorTransport::getValue) // "internal", "usb", "hybrid" etc
             .sorted()
-            .reduce((a, b) -> a + "," + b)
-            .orElse(null);
+            .collect(Collectors.joining(","));
     }
-
-
 }

@@ -19,7 +19,7 @@ public class ProfileService {
         OAuth2User oauth = (OAuth2User) authentication.getPrincipal();
         String email = oauth.getAttribute("email");
 
-        return userRepository.findUserByEmail(email)
+        return userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found in DB"));
     }
 

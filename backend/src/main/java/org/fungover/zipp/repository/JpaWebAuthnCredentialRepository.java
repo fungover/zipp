@@ -1,7 +1,7 @@
 package org.fungover.zipp.repository;
 
+import org.fungover.zipp.entity.User;
 import org.fungover.zipp.entity.WebAuthnCredentialEntity;
-import org.fungover.zipp.entity.WebAuthnUserEntity;
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.api.CredentialRecord;
 import org.springframework.security.web.webauthn.api.ImmutableCredentialRecord;
@@ -9,27 +9,48 @@ import org.springframework.security.web.webauthn.api.ImmutablePublicKeyCose;
 import org.springframework.security.web.webauthn.management.UserCredentialRepository;
 import org.springframework.stereotype.Component;
 
+import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class JpaWebAuthnCredentialRepository implements UserCredentialRepository {
 
     private final WebAuthnCredentialEntityRepository credRepo;
-    private final WebAuthnUserEntityRepository userRepo;
+    private final UserRepository userRepo;
 
     public JpaWebAuthnCredentialRepository(
         WebAuthnCredentialEntityRepository credRepo,
-        WebAuthnUserEntityRepository userRepo
+        UserRepository userRepo
     ) {
         this.credRepo = credRepo;
         this.userRepo = userRepo;
     }
 
+    // === helpers: UUID <-> byte[] ===
+
+    private static byte[] uuidToBytes(UUID uuid) {
+        ByteBuffer bb = ByteBuffer.allocate(16);
+        bb.putLong(uuid.getMostSignificantBits());
+        bb.putLong(uuid.getLeastSignificantBits());
+        return bb.array();
+    }
+
+    private static UUID bytesToUuid(byte[] bytes) {
+        ByteBuffer bb = ByteBuffer.wrap(bytes);
+        long most = bb.getLong();
+        long least = bb.getLong();
+        return new UUID(most, least);
+    }
+
     private CredentialRecord mapToRecord(WebAuthnCredentialEntity c) {
+        UUID userId = c.getUser().getId();
+
         return ImmutableCredentialRecord.builder()
             .credentialId(new Bytes(c.getCredentialId()))
-            .userEntityUserId(new Bytes(c.getUser().getUserId()))
+            // userEntityUserId = samma userHandle som i PublicKeyCredentialUserEntity (UUID -> bytes)
+            .userEntityUserId(new Bytes(uuidToBytes(userId)))
             .publicKey(new ImmutablePublicKeyCose(c.getPublicKey()))
             .signatureCount(c.getSignatureCount())
             .transports(c.getTransportsAsSet())
@@ -42,12 +63,12 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
             .build();
     }
 
-    private WebAuthnCredentialEntity mapToEntity(CredentialRecord record, WebAuthnUserEntity user) {
+    private WebAuthnCredentialEntity mapToEntity(CredentialRecord record, User user) {
         byte[] credentialId = record.getCredentialId().getBytes();
-        byte[] userId = record.getUserEntityUserId().getBytes();
+        UUID userIdFromRecord = bytesToUuid(record.getUserEntityUserId().getBytes());
 
-        if (!java.util.Arrays.equals(user.getUserId(), userId)) {
-            throw new IllegalStateException("UserId mismatch mellan CredentialRecord och WebAuthnUserEntity");
+        if (!user.getId().equals(userIdFromRecord)) {
+            throw new IllegalStateException("UserId mismatch mellan CredentialRecord och User");
         }
 
         String transports = WebAuthnCredentialEntity.transportsToString(record.getTransports());
@@ -63,7 +84,7 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
         return new WebAuthnCredentialEntity(
             credentialId,
             user,
-            record.getPublicKey().getBytes(),
+            record.getPublicKey().getBytes(),   // du lagrar public key som raw bytes
             record.getSignatureCount(),
             transports,
             attestationObject,
@@ -80,7 +101,8 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
 
     @Override
     public List<CredentialRecord> findByUserId(Bytes userId) {
-        return credRepo.findAllByUser_UserId(userId.getBytes())
+        UUID uuid = bytesToUuid(userId.getBytes());
+        return credRepo.findAllByUser_Id(uuid)
             .stream()
             .map(this::mapToRecord)
             .collect(Collectors.toList());
@@ -88,10 +110,10 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
 
     @Override
     public void save(CredentialRecord credentialRecord) {
-        WebAuthnUserEntity user = userRepo.findByUserId(
-                credentialRecord.getUserEntityUserId().getBytes()
-            )
-            .orElseThrow(() -> new IllegalStateException("User not found"));
+        UUID uuid = bytesToUuid(credentialRecord.getUserEntityUserId().getBytes());
+
+        User user = userRepo.findById(uuid)
+            .orElseThrow(() -> new IllegalStateException("User not found for WebAuthn credential"));
 
         WebAuthnCredentialEntity entity = mapToEntity(credentialRecord, user);
         credRepo.save(entity);
