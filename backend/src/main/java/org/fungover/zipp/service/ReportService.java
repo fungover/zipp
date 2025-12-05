@@ -20,6 +20,7 @@ public class ReportService {
 
     private final GeometryFactory geometryFactory;
     private final ReportRepository reportRepository;
+    private static final int MAX_URL_LENGTH = 2048;
 
     public ReportService(GeometryFactory geometryFactory, ReportRepository reportRepository) {
         this.geometryFactory = geometryFactory;
@@ -36,6 +37,16 @@ public class ReportService {
 
         if (dto.imageUrls() != null) {
             for (String url : dto.imageUrls()) {
+                if (url == null || url.isBlank()) {
+                    throw new IllegalArgumentException("Image URL cannot be null or blank");
+                    }
+                if (url.length() > MAX_URL_LENGTH) {
+                    throw new IllegalArgumentException("Image URL exceeds maximum length");
+                    }
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    throw new IllegalArgumentException("Image URL must use HTTP or HTTPS protocol");
+                    }
+
                 ReportImageEntity image = new ReportImageEntity();
                 image.setImageUrl(url);
                 image.setReport(entity);
