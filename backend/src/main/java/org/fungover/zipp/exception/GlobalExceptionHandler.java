@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
-        logger.error("Unhandled exception", ex);
+        LOG.error("Unhandled exception", ex);
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", Instant.now());
         body.put("error", ex.getMessage());
