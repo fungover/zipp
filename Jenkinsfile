@@ -204,6 +204,16 @@ spec:
               key: ${MYSQL_SECRET_PASSWORD_KEY}
         - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
           value: "${KAFKA_BOOTSTRAP_SERVERS}"
+				- name: GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: google-oauth2-credentials
+              key: GOOGLE_CLIENT_ID
+        - name: GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: google-oauth2-credentials
+              key: GOOGLE_CLIENT_SECRET
 """
 					writeFile file: "${K8S_MANIFEST_DIR}/services/service.yaml", text: """
 apiVersion: v1
