@@ -7,7 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -15,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api/reports")
 public class ReportController {
 
-    private static final Logger log = LoggerFactory.getLogger(ReportController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
     private final ReportService reportService;
 
     public ReportController(ReportService reportService) {
@@ -24,14 +28,14 @@ public class ReportController {
 
     @PostMapping
     public ResponseEntity<Report> createReport(@Valid @RequestBody Report reportRequest) {
-        log.info("Report received: {}", reportRequest);
+        LOG.info("Report received: {}", reportRequest);
 
         var newReport = reportService.createReport(reportRequest);
 
         /*
          * For now the userId is provided by the client later this can be replaced with
          * SecurityContextHolder.getContext().getAuthentication()
-         * 
+         *
          * And Spring kafka later var cf = template.send("report", newReport);
          * cf.join();
          */
