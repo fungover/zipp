@@ -19,14 +19,17 @@ public class ReportEntity {
     @Column(nullable = false)
     private Long id;
 
-    // TODO: Replace this field with the proper @ManyToOne relationship once Issue #4 is ready
+    // TODO: Replace this field with the proper @ManyToOne relationship once Issue
+    // #4 is ready
     @Column(name = "submitted_by_user_id", nullable = false)
     private Long submittedByUserId;
 
-    /* Target Implementation:
+    /*
+     * Target Implementation:
+     * 
      * @ManyToOne
-     * @JoinColumn(name = "user_id", nullable = false)
-     * private UserEntity user;
+     * 
+     * @JoinColumn(name = "user_id", nullable = false) private UserEntity user;
      */
 
     @Column(nullable = false, length = 2000)
@@ -53,13 +56,8 @@ public class ReportEntity {
     public ReportEntity() {
     }
 
-    public ReportEntity(Long submittedByUserId,
-                        String description,
-                        ReportType eventType,
-                        Point coordinates,
-                        Instant submittedAt,
-                        ReportStatus status,
-                        Set<ReportImageEntity> images) {
+    public ReportEntity(Long submittedByUserId, String description, ReportType eventType, Point coordinates,
+            Instant submittedAt, ReportStatus status, Set<ReportImageEntity> images) {
         this.submittedByUserId = submittedByUserId;
         this.description = description;
         this.eventType = eventType;
