@@ -27,6 +27,8 @@ pipeline {
 		MYSQL_SECRET_NAME = 'mysql-auth'
 		MYSQL_SECRET_USERNAME_KEY = 'username'
 		MYSQL_SECRET_PASSWORD_KEY = 'password'
+		MYSQL_URL_SECRET_NAME = 'mysql-url'
+		MYSQL_URL_SECRET_KEY = 'url'
 		SPRING_MYSQL_DATABASE = 'appdb'
 		DOMAIN = 'zipp.city'
 		CLUSTER_ISSUER = 'letsencrypt-prod'
@@ -186,7 +188,10 @@ spec:
             memory: "${MEMORY_LIMIT}"
         env:
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:mysql://mycluster.mysql.svc.cluster.local:3306/${SPRING_MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true
+          valueFrom:
+            secretKeyRef:
+              name: ${MYSQL_URL_SECRET_NAME}
+              key: ${MYSQL_URL_SECRET_KEY}
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
