@@ -5,11 +5,7 @@ pipeline {
 		jdk 'jdk-25'
 	}
 	options {
-		script {
-			if (env.BRANCH_NAME == 'main') {
-				disableConcurrentBuilds()
-			}
-		}
+		disableConcurrentBuilds()
 	}
 	environment {
 		DOCKER_REGISTRY = '192.168.0.82:5000'
