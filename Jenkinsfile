@@ -51,7 +51,8 @@ pipeline {
 			steps {
 				checkout scm
 				script {
-					env.GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+					def commitShort = sh(script: "git rev-parse --short HEAD || echo 'unknown'", returnStdout: true).trim()
+					env.GIT_COMMIT_SHORT = commitShort ?: "build-${BUILD_ID}"
 					env.DOCKER_IMAGE = "${DOCKER_REGISTRY}/${APP_NAME}:${GIT_COMMIT_SHORT}"
 					env.DOCKER_IMAGE_LATEST = "${DOCKER_REGISTRY}/${APP_NAME}:latest"
 				}
@@ -117,11 +118,19 @@ pipeline {
 			}
 		}
 		stage('Scan Image for Vulnerabilities') {
+			when {
+				not {
+					allOf {
+						branch 'main'
+						expression { env.IS_CACHED == 'true' }
+					}
+				}
+			}
 			steps {
 				publishChecks name: PROGRESS_CHECK_NAME, title: 'Scanning image', status: 'IN_PROGRESS', summary: 'Vulnerability scan in progress'
 				sh '''
                     export PATH="$HOME/bin:$PATH"
-                    trivy image --exit-code 1 --no-progress --severity HIGH,CRITICAL ${DOCKER_IMAGE}
+                    trivy image --clear-cache --exit-code 1 --no-progress --severity HIGH,CRITICAL ${DOCKER_IMAGE}
                 '''
 			}
 		}
@@ -204,7 +213,7 @@ spec:
               key: ${MYSQL_SECRET_PASSWORD_KEY}
         - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
           value: "${KAFKA_BOOTSTRAP_SERVERS}"
-				- name: GOOGLE_CLIENT_ID
+     - name: GOOGLE_CLIENT_ID
           valueFrom:
             secretKeyRef:
               name: google-oauth2-credentials
