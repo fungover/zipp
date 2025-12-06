@@ -7,7 +7,6 @@ pipeline {
 	environment {
 		DOCKER_REGISTRY = '192.168.0.82:5000'
 		APP_NAME = 'zipp'
-		DOCKER_IMAGE = "${DOCKER_REGISTRY}/${APP_NAME}:${GIT_COMMIT_SHORT}"
 		DOCKER_IMAGE_LATEST = "${DOCKER_REGISTRY}/${APP_NAME}:latest"
 		GIT_REPO_URL = 'https://github.com/fungover/zipp'
 		GIT_BRANCH = 'main'
@@ -57,9 +56,8 @@ pipeline {
 				])
 				script {
 					def fullCommit = env.GIT_COMMIT ?: sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-					env.GIT_COMMIT_SHORT = fullCommit.take(7) 
+					env.GIT_COMMIT_SHORT = fullCommit.take(7)
 					env.DOCKER_IMAGE = "${DOCKER_REGISTRY}/${APP_NAME}:${GIT_COMMIT_SHORT}"
-					env.DOCKER_IMAGE_LATEST = "${DOCKER_REGISTRY}/${APP_NAME}:latest"
 					echo "DEBUG: GIT_COMMIT=${fullCommit}, GIT_COMMIT_SHORT=${GIT_COMMIT_SHORT}, DOCKER_IMAGE=${DOCKER_IMAGE}"
 				}
 				publishChecks name: PROGRESS_CHECK_NAME, title: PROGRESS_CHECK_TITLE, status: 'QUEUED', summary: PROGRESS_CHECK_SUMMARY
