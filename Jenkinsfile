@@ -129,9 +129,10 @@ pipeline {
 			steps {
 				publishChecks name: PROGRESS_CHECK_NAME, title: 'Scanning image', status: 'IN_PROGRESS', summary: 'Vulnerability scan in progress'
 				sh '''
-                    export PATH="$HOME/bin:$PATH"
-                    trivy image --clear-cache --exit-code 1 --no-progress --severity HIGH,CRITICAL ${DOCKER_IMAGE}
-                '''
+            export PATH="$HOME/bin:$PATH"
+            trivy clean --scan-cache 
+            trivy image --exit-code 1 --no-progress --severity HIGH,CRITICAL ${DOCKER_IMAGE}
+        '''
 			}
 		}
 		stage('Push Docker Image') {
