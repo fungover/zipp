@@ -52,14 +52,15 @@ pipeline {
 				checkout([
 					$class: 'GitSCM',
 					branches: [[name: "*/${env.BRANCH_NAME}"]],
-					extensions: [[$class: 'CloneOption', shallow: false, depth: 0]],  // Full history for reliable git rev-parse
+					extensions: [[$class: 'CloneOption', shallow: false, depth: 0]],
 					userRemoteConfigs: [[url: env.GIT_REPO_URL]]
 				])
 				script {
-					def commitShort = sh(script: "git rev-parse --short HEAD || echo 'unknown'", returnStdout: true).trim()
-					env.GIT_COMMIT_SHORT = commitShort ?: "build-${BUILD_ID}"
+					def fullCommit = env.GIT_COMMIT ?: sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+					env.GIT_COMMIT_SHORT = fullCommit.take(7) 
 					env.DOCKER_IMAGE = "${DOCKER_REGISTRY}/${APP_NAME}:${GIT_COMMIT_SHORT}"
 					env.DOCKER_IMAGE_LATEST = "${DOCKER_REGISTRY}/${APP_NAME}:latest"
+					echo "DEBUG: GIT_COMMIT=${fullCommit}, GIT_COMMIT_SHORT=${GIT_COMMIT_SHORT}, DOCKER_IMAGE=${DOCKER_IMAGE}"
 				}
 				publishChecks name: PROGRESS_CHECK_NAME, title: PROGRESS_CHECK_TITLE, status: 'QUEUED', summary: PROGRESS_CHECK_SUMMARY
 			}
