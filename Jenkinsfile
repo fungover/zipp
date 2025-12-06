@@ -49,7 +49,12 @@ pipeline {
 
 		stage('Checkout') {
 			steps {
-				checkout scm
+				checkout([
+					$class: 'GitSCM',
+					branches: [[name: "*/${env.BRANCH_NAME}"]],
+					extensions: [[$class: 'CloneOption', shallow: false, depth: 0]],  // Full history for reliable git rev-parse
+					userRemoteConfigs: [[url: env.GIT_REPO_URL]]
+				])
 				script {
 					def commitShort = sh(script: "git rev-parse --short HEAD || echo 'unknown'", returnStdout: true).trim()
 					env.GIT_COMMIT_SHORT = commitShort ?: "build-${BUILD_ID}"
@@ -130,7 +135,7 @@ pipeline {
 				publishChecks name: PROGRESS_CHECK_NAME, title: 'Scanning image', status: 'IN_PROGRESS', summary: 'Vulnerability scan in progress'
 				sh '''
             export PATH="$HOME/bin:$PATH"
-            trivy clean --scan-cache 
+            trivy clean --scan-cache
             trivy image --exit-code 1 --no-progress --severity HIGH,CRITICAL ${DOCKER_IMAGE}
         '''
 			}
@@ -214,7 +219,7 @@ spec:
               key: ${MYSQL_SECRET_PASSWORD_KEY}
         - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
           value: "${KAFKA_BOOTSTRAP_SERVERS}"
-     - name: GOOGLE_CLIENT_ID
+        - name: GOOGLE_CLIENT_ID
           valueFrom:
             secretKeyRef:
               name: google-oauth2-credentials
