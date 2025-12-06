@@ -4,6 +4,13 @@ pipeline {
 		maven 'Maven3.9.9'
 		jdk 'jdk-25'
 	}
+	options {
+		script {
+			if (env.BRANCH_NAME == 'main') {
+				disableConcurrentBuilds()
+			}
+		}
+	}
 	environment {
 		DOCKER_REGISTRY = '192.168.0.82:5000'
 		APP_NAME = 'zipp'
@@ -72,7 +79,7 @@ pipeline {
 		}
 		stage('Try Reuse PR Image') {
 			when {
-				branch 'main'
+				expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME.startsWith('gh-readonly-queue/main/') }
 			}
 			steps {
 				script {
@@ -109,7 +116,7 @@ pipeline {
 			when {
 				not {
 					allOf {
-						branch 'main'
+						expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME.startsWith('gh-readonly-queue/main/') }
 						expression { env.IS_CACHED == 'true' }
 					}
 				}
@@ -125,7 +132,7 @@ pipeline {
 			when {
 				not {
 					allOf {
-						branch 'main'
+						expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME.startsWith('gh-readonly-queue/main/') }
 						expression { env.IS_CACHED == 'true' }
 					}
 				}
@@ -146,7 +153,7 @@ pipeline {
                     docker push ${DOCKER_IMAGE}
                 '''
 				script {
-					if (env.BRANCH_NAME == 'main') {
+					if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME.startsWith('gh-readonly-queue/main/')) {
 						sh '''
                             docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE_LATEST}
                             docker push ${DOCKER_IMAGE_LATEST}
@@ -157,7 +164,7 @@ pipeline {
 		}
 		stage('PR Deployability Check') {
 			when {
-				not { branch 'main' }
+				not { expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME.startsWith('gh-readonly-queue/main/') } }
 			}
 			steps {
 				echo "PR build successful! Docker image '${DOCKER_IMAGE}' has been built, scanned, and pushed to the registry. This PR is deployable—once merged to main, the image will be tagged as 'latest' and deployed to Kubernetes."
@@ -166,7 +173,7 @@ pipeline {
 		}
 		stage('Generate Kubernetes Manifests') {
 			when {
-				branch 'main'
+				expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME.startsWith('gh-readonly-queue/main/') }
 			}
 			steps {
 				publishChecks name: PROGRESS_CHECK_NAME, title: 'Generating manifests', status: 'IN_PROGRESS', summary: 'k8s manifest generation in progress'
@@ -302,7 +309,7 @@ spec:
 		}
 		stage('Deploy to Kubernetes via SSH') {
 			when {
-				branch 'main'
+				expression { env.BRANCH_NAME == 'main' || env.BRANCH_NAME.startsWith('gh-readonly-queue/main/') }
 			}
 			steps {
 				publishChecks name: PROGRESS_CHECK_NAME, title: 'Deploying to k8s', status: 'IN_PROGRESS', summary: 'k8s deployment in progress'
@@ -333,8 +340,9 @@ spec:
 	post {
 		always {
 			script {
-				def checkName = env.BRANCH_NAME == 'main' ? 'Deployment' : 'PR Build'
-				def summary = env.BRANCH_NAME == 'main' ? "Deployment ${currentBuild.currentResult}" : "PR build and scan successful. Image ready for deployment on merge."
+				def isMainOrMergeQueue = env.BRANCH_NAME == 'main' || env.BRANCH_NAME.startsWith('gh-readonly-queue/main/')
+				def checkName = isMainOrMergeQueue ? 'Deployment' : 'PR Build'
+				def summary = isMainOrMergeQueue ? "Deployment ${currentBuild.currentResult}" : "PR build and scan successful. Image ready for deployment on merge."
 				try {
 					publishChecks name: checkName, title: "${checkName} complete", status: 'COMPLETED', conclusion: currentBuild.resultIsBetterOrEqualTo('SUCCESS') ? 'SUCCESS' : 'FAILURE', summary: summary, detailsURL: env.BUILD_URL
 				} catch (Exception e) {
