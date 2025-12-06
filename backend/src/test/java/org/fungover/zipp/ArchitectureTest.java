@@ -10,18 +10,9 @@ public class ArchitectureTest {
 
     @Test
     void shouldFulfillArchitectureConstraints() {
-        Taikai.builder()
-            .namespace("org.fungover.zipp")
-            .java(java -> java
-                .noUsageOfDeprecatedAPIs()
-                .imports(ImportsConfigurer::shouldHaveNoCycles)
-            )
-            .spring(SpringConfigurer::noAutowiredFields)
-            .test(test -> test
-                .junit(JUnitConfigurer::methodsShouldNotBeAnnotatedWithDisabled
-                )
-            )
-            .build()
-            .check();
+        Taikai.builder().namespace("org.fungover.zipp")
+                .java(java -> java.noUsageOfDeprecatedAPIs().imports(ImportsConfigurer::shouldHaveNoCycles))
+                .spring(SpringConfigurer::noAutowiredFields)
+                .test(test -> test.junit(JUnitConfigurer::methodsShouldNotBeAnnotatedWithDisabled)).build().check();
     }
 }
