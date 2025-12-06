@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.Instant;
 import java.util.Map;
@@ -16,18 +18,25 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
     private static final int MAX_REQUESTS = 5;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String ip = request.getRemoteAddr();
-        long now = Instant.now().toEpochMilli();
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        LastRequestInfo info = requestMap.getOrDefault(ip, new LastRequestInfo(0, now));
-
-        if (now - info.windowStart > TIME_WINDOW_MS) {
-            info.count = 0;
-            info.windowStart = now;
+        if (authentication == null || !authentication.isAuthenticated()) {
+            response.setStatus(401);
+            response.getWriter().write("Unauthorized");
+            return false;
         }
 
-        info.count++;
+        String userId = authentication.getName();
+        long now = Instant.now().toEpochMilli();
+
+        LastRequestInfo info = requestMap.compute(userId, (key, existing) -> {
+            if (existing == null || now - existing.windowStart > TIME_WINDOW_MS) {
+                return new LastRequestInfo(1, now);
+            }
+            return new LastRequestInfo(existing.count + 1, existing.windowStart);
+        });
 
         if (info.count > MAX_REQUESTS) {
             response.setStatus(429);
@@ -35,13 +44,12 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        requestMap.put(ip, info);
         return true;
     }
 
     private static class LastRequestInfo {
-        int count;
-        long windowStart;
+        final int count;
+        final long windowStart;
 
         LastRequestInfo(int count, long windowStart) {
             this.count = count;
