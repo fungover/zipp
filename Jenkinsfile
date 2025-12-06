@@ -7,7 +7,6 @@ pipeline {
 	environment {
 		DOCKER_REGISTRY = '192.168.0.82:5000'
 		APP_NAME = 'zipp'
-		DOCKER_IMAGE = "${DOCKER_REGISTRY}/${APP_NAME}:${GIT_COMMIT_SHORT}"
 		DOCKER_IMAGE_LATEST = "${DOCKER_REGISTRY}/${APP_NAME}:latest"
 		GIT_REPO_URL = 'https://github.com/fungover/zipp'
 		GIT_BRANCH = 'main'
@@ -49,11 +48,17 @@ pipeline {
 
 		stage('Checkout') {
 			steps {
-				checkout scm
+				checkout([
+					$class: 'GitSCM',
+					branches: [[name: "*/${env.BRANCH_NAME}"]],
+					extensions: [[$class: 'CloneOption', shallow: false, depth: 0]],
+					userRemoteConfigs: [[url: env.GIT_REPO_URL]]
+				])
 				script {
-					env.GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+					def fullCommit = env.GIT_COMMIT ?: sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+					env.GIT_COMMIT_SHORT = fullCommit.take(7)
 					env.DOCKER_IMAGE = "${DOCKER_REGISTRY}/${APP_NAME}:${GIT_COMMIT_SHORT}"
-					env.DOCKER_IMAGE_LATEST = "${DOCKER_REGISTRY}/${APP_NAME}:latest"
+					echo "DEBUG: GIT_COMMIT=${fullCommit}, GIT_COMMIT_SHORT=${GIT_COMMIT_SHORT}, DOCKER_IMAGE=${DOCKER_IMAGE}"
 				}
 				publishChecks name: PROGRESS_CHECK_NAME, title: PROGRESS_CHECK_TITLE, status: 'QUEUED', summary: PROGRESS_CHECK_SUMMARY
 			}
@@ -117,12 +122,21 @@ pipeline {
 			}
 		}
 		stage('Scan Image for Vulnerabilities') {
+			when {
+				not {
+					allOf {
+						branch 'main'
+						expression { env.IS_CACHED == 'true' }
+					}
+				}
+			}
 			steps {
 				publishChecks name: PROGRESS_CHECK_NAME, title: 'Scanning image', status: 'IN_PROGRESS', summary: 'Vulnerability scan in progress'
 				sh '''
-                    export PATH="$HOME/bin:$PATH"
-                    trivy image --exit-code 1 --no-progress --severity HIGH,CRITICAL ${DOCKER_IMAGE}
-                '''
+            export PATH="$HOME/bin:$PATH"
+            trivy clean --scan-cache
+            trivy image --exit-code 1 --no-progress --severity HIGH,CRITICAL ${DOCKER_IMAGE}
+        '''
 			}
 		}
 		stage('Push Docker Image') {
@@ -204,7 +218,7 @@ spec:
               key: ${MYSQL_SECRET_PASSWORD_KEY}
         - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
           value: "${KAFKA_BOOTSTRAP_SERVERS}"
-				- name: GOOGLE_CLIENT_ID
+        - name: GOOGLE_CLIENT_ID
           valueFrom:
             secretKeyRef:
               name: google-oauth2-credentials
