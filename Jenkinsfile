@@ -312,7 +312,6 @@ spec:
 				withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
 					sh '''
                         set -e
-                        set -o pipefail
                         ssh -i ${SSH_KEY} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts ${SSH_USER}@${CONTROL_PLANE_IP} "
                             mkdir -p ${K8S_MANIFEST_PATH}/${K8S_MANIFEST_DIR}/{deployments,services,hpas,ingresses}
                         "
