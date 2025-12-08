@@ -9,7 +9,7 @@ spring:
             scope:
               - profile
               - email
-            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
+            redirect-uri: "https://zipp.city/login/oauth2/code/google"
             authorization-grant-type: authorization_code
 #        provider:
 #          google:
