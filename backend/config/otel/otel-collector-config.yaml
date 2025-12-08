@@ -1,0 +1,42 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "http://*"
+            - "https://*"
+
+exporters:
+  otlphttp/prometheus:
+    endpoint: "http://prometheus:9090/otlp"
+    sending_queue:
+      batch:
+
+  debug:
+    verbosity: detailed
+
+processors:
+  resourcedetection:
+    detectors: [env, docker, system]
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [resourcedetection]
+      exporters: [otlphttp/prometheus, debug]
+  telemetry:
+    metrics:
+      level: detailed
+      readers:
+        - periodic:
+            interval: 10000
+            timeout: 5000
+            exporter:
+              otlp:
+                protocol: http/protobuf
+                endpoint: "http://otel-collector:4318"

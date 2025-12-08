@@ -1,0 +1,14 @@
+global:
+  scrape_interval: 60s
+
+otlp:
+  keep_identifying_resource_attributes: true
+  promote_resource_attributes:
+    - service.instance.id
+    - service.name
+    - service.namespace
+    - service.version
+    - cloud.availability_zone
+    - cloud.region
+    - deployment.environment.name
+

@@ -59,6 +59,49 @@ services:
       retries: 5
     command: --default-authentication-plugin=mysql_native_password
 
+  otel-collector:
+    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.139.0
+    container_name: otel-collector
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    restart: unless-stopped
+    command: [ "--config=/backend/config/otel/otel-collector-config.yaml"]
+    user: 0:0
+    volumes:
+      - ./backend/config/otel/otel-collector-config.yaml:/backend/config/otel/otel-collector-config.yaml
+    networks:
+      - app-net
+    ports:
+      - ${OTEL_COLLECTOR_PORT_GRPC}:${OTEL_COLLECTOR_PORT_GRPC}
+      - ${OTEL_COLLECTOR_PORT_HTTP}:${OTEL_COLLECTOR_PORT_HTTP}
+    environment:
+      - OTEL_COLLECTOR_HOST=${OTEL_COLLECTOR_HOST}
+      - OTEL_COLLECTOR_PORT_GRPC=${OTEL_COLLECTOR_PORT_GRPC}
+      - OTEL_COLLECTOR_PORT_HTTP=${OTEL_COLLECTOR_PORT_HTTP}
+
+  prometheus:
+    image: quay.io/prometheus/prometheus:v3.7.3
+    container_name: prometheus
+    command:
+      - --config.file=/backend/config/prometheus/prometheus-config.yaml
+      - --web.enable-lifecycle
+      - --web.enable-otlp-receiver
+      - --enable-feature=exemplar-storage
+    volumes:
+      - ./backend/config/prometheus/prometheus-config.yaml:/backend/config/prometheus/prometheus-config.yaml
+    networks:
+      - app-net
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    restart: unless-stopped
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+
+
 volumes:
   kafka-data:
   mysql-data:
