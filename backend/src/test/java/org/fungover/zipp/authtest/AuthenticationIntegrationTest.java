@@ -54,17 +54,12 @@ class AuthenticationIntegrationTest {
 
         final String expectedUserName = "Test User Name";
 
-        OAuth2User mockUser = new DefaultOAuth2User(
-            List.of(new SimpleGrantedAuthority("USER")),
-            Map.of("sub", "test-id-9876", "name", expectedUserName, "email", "test@example.com"),
-            "sub"
-        );
+        OAuth2User mockUser = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("USER")),
+                Map.of("sub", "test-id-9876", "name", expectedUserName, "email", "test@example.com"), "sub");
 
-        mockMvc.perform(get("/")
-                .with(oauth2Login().oauth2User(mockUser)))
-            .andExpect(status().isOk())
-            .andExpect(content().string(containsString("isLoggedIn=true")))
-            .andExpect(content().string(containsString(expectedUserName)))
-            .andExpect(content().string(containsString("title=Zipp")));
+        mockMvc.perform(get("/").with(oauth2Login().oauth2User(mockUser))).andExpect(status().isOk())
+                .andExpect(content().string(containsString("isLoggedIn=true")))
+                .andExpect(content().string(containsString(expectedUserName)))
+                .andExpect(content().string(containsString("title=Zipp")));
     }
 }
