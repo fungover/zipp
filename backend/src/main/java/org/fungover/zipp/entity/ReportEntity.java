@@ -33,14 +33,6 @@ public class ReportEntity {
     @Column(name = "submitted_by_user_id", nullable = false)
     private Long submittedByUserId;
 
-    /*
-     * Target Implementation:
-     *
-     * @ManyToOne
-     *
-     * @JoinColumn(name = "user_id", nullable = false) private UserEntity user;
-     */
-
     @Column(nullable = false, length = 2000)
     private String description;
 
