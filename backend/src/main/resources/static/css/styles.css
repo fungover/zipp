@@ -3,7 +3,9 @@ body{
     display: flex;
     flex-direction: column;
     max-width: 1280px;
-    min-height: 100vh;
+}
+main{
+  min-height: 100vh;
 }
 .header{
     display: grid;
@@ -42,9 +44,10 @@ body{
   color:cadetblue;
 }
 
-.navigation__link:focus{
+.navigation__link:focus {
   outline: 0.25rem solid cadetblue;
   outline-offset: 0.25rem;
+}
 
 .menu__burger{
     color: white;
@@ -76,4 +79,3 @@ body{
   border-color: cadetblue;
   border-radius: 0.5rem;
 }
-
