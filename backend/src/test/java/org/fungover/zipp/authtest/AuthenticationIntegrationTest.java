@@ -36,6 +36,7 @@ class AuthenticationIntegrationTest {
     @Test
     void testPublicEndpointDoesNotRequiredAuth() throws Exception {
         mockMvc.perform(get("/")).andExpect(status().isOk());
+        mockMvc.perform(get("/login")).andExpect(status().isOk());
     }
 
     @Test
@@ -46,5 +47,24 @@ class AuthenticationIntegrationTest {
         mockMvc.perform(get("/me").with(oauth2Login().oauth2User(mockUser))).andExpect(status().isOk())
                 .andExpect(content().string(containsString("Hello Mock User")))
                 .andExpect(content().string(containsString("mock@example.com")));
+    }
+
+    @Test
+    void testIndexPageWhenLoggedIn() throws Exception {
+
+        final String expectedUserName = "Test User Name";
+
+        OAuth2User mockUser = new DefaultOAuth2User(
+            List.of(new SimpleGrantedAuthority("USER")),
+            Map.of("sub", "test-id-9876", "name", expectedUserName, "email", "test@example.com"),
+            "sub"
+        );
+
+        mockMvc.perform(get("/")
+                .with(oauth2Login().oauth2User(mockUser)))
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString("isLoggedIn=true")))
+            .andExpect(content().string(containsString(expectedUserName)))
+            .andExpect(content().string(containsString("title=Zipp")));
     }
 }
