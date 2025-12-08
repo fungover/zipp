@@ -1,4 +1,4 @@
-package org.fungover.zipp.profile.controller;
+package org.fungover.zipp.controller;
 
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.profile.service.ProfileService;
