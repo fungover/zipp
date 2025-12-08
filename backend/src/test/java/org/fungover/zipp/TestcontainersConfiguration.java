@@ -7,12 +7,11 @@ import org.testcontainers.mysql.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
-class TestcontainersConfiguration {
+public class TestcontainersConfiguration {
 
     @Bean
     @ServiceConnection
     MySQLContainer mysqlContainer() {
         return new MySQLContainer(DockerImageName.parse("mysql:latest"));
     }
-
 }

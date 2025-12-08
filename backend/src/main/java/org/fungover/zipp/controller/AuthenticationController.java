@@ -14,7 +14,8 @@ public class AuthenticationController {
     private final UserService userService;
     private final UserRepository userRepository;
 
-    public AuthenticationController(ClientRegistrationRepository repo, UserService userService, UserRepository userRepository) {
+    public AuthenticationController(ClientRegistrationRepository repo, UserService userService,
+            UserRepository userRepository) {
         this.repo = repo;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -43,5 +44,3 @@ public class AuthenticationController {
     }
 
 }
-
-

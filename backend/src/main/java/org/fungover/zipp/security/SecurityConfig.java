@@ -10,7 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private CustomOAuth2UserService co2us;
+    private final CustomOAuth2UserService co2us;
 
     public SecurityConfig(CustomOAuth2UserService co2us) {
         this.co2us = co2us;
