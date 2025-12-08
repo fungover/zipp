@@ -13,7 +13,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@Profile("dev")
 public class SecurityConfig {
 
     private final CustomOAuth2UserService co2us;
@@ -68,67 +67,3 @@ public class SecurityConfig {
         return http.build();
     }
 }
-
-@Configuration
-@EnableWebSecurity
-@Profile("prod")
-public class ProdSecurityConfig {
-
-    private final CustomOAuth2UserService co2us;
-
-    public ProdSecurityConfig(CustomOAuth2UserService co2us) {
-        this.co2us = co2us;
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/webauthn/**", "/css/**", "/js/**", "/img/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .oauth2Login(oauth2 -> oauth2
-                .userInfoEndpoint(userInfo -> userInfo.userService(co2us))
-            )
-            .webAuthn(webauthn -> webauthn
-                // ÄNDRA DETTA TILL DIN PRODUKTIONSDOMÄN
-                .rpId("minriktigadomän.se")
-                .allowedOrigins("https://minriktigadomän.se")
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .deleteCookies("JSESSIONID")
-            )
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/webauthn/register/**", "/webauthn/authenticate/**")
-            )
-            .headers(headers -> headers
-                .contentSecurityPolicy(csp -> csp
-                    .policyDirectives(
-                        "default-src 'self'; " +
-                            "script-src 'self'; " +
-                            "style-src 'self' 'unsafe-inline'; " +
-                            "img-src 'self' data:; " +
-                            "connect-src 'self'; " +
-                            "frame-ancestors 'none';"
-                    )
-                )
-                .httpStrictTransportSecurity(hsts -> hsts
-                    .maxAgeInSeconds(31536000)
-                    .includeSubDomains(true)
-                )
-                .xssProtection(xss -> xss.block(true))
-                .frameOptions(frame -> frame.deny())
-            )
-            .requiresChannel(channel ->
-                channel.anyRequest().requiresSecure()
-            );
-
-        return http.build();
-    }
-}
-
