@@ -23,9 +23,10 @@ public class SecurityConfig {
                 .permitAll().anyRequest().authenticated())
             .oauth2Login(oauth2 -> oauth2.loginPage("/login").defaultSuccessUrl("/", true)
                 .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
-            .logout(logout -> logout.logoutUrl("/logout")
-                .logoutSuccessUrl("/").invalidateHttpSession(true)//remove
-                // session
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
                 .clearAuthentication(true).deleteCookies("JSESSIONID"));//removes session cookie
         return http.build();
     }
