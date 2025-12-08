@@ -1,4 +1,8 @@
 services:
+  kafka:
+    image: apache/kafka:4.1.0
+    ports:
+      - '9092:9092'
   mysql:
     image: mysql:8.4
 
