@@ -17,8 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -58,8 +57,8 @@ class AuthenticationIntegrationTest {
                 Map.of("sub", "test-id-9876", "name", expectedUserName, "email", "test@example.com"), "sub");
 
         mockMvc.perform(get("/").with(oauth2Login().oauth2User(mockUser))).andExpect(status().isOk())
-                .andExpect(content().string(containsString("isLoggedIn=true")))
-                .andExpect(content().string(containsString(expectedUserName)))
-                .andExpect(content().string(containsString("title=Zipp")));
+                .andExpect(model().attribute("isLoggedIn", true))
+                .andExpect(model().attribute("userName", expectedUserName))
+                .andExpect(model().attribute("title", "Zipp"));
     }
 }
