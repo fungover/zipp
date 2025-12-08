@@ -20,6 +20,12 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
+
+        String uri = request.getRequestURI();
+        if (!uri.startsWith("/api/reports")) {
+            return true;
+        }
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
