@@ -22,16 +22,17 @@ public class AuthenticationController {
     }
 
     /*
-    @GetMapping("/")
-    public String publicHome(){
+     * @GetMapping("/") public String publicHome(){
+     * 
+     * return "this is public home"; }
+     */
 
-        return "this is public home";
-    }
-    */
-
-    /** Example of accessing values from OAuth2 via Controller
-     *  can be used to test user login
-     * @param principal returns String Name and email of logged-in user
+    /**
+     * Example of accessing values from OAuth2 via Controller can be used to test
+     * user login
+     * 
+     * @param principal
+     *            returns String Name and email of logged-in user
      * @return
      */
     @GetMapping("/me")

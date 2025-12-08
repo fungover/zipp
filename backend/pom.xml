@@ -152,6 +152,15 @@
             <formatAnnotations/>
           </java>
         </configuration>
+        <executions>
+          <execution>
+            <id>spotless</id>
+            <goals>
+              <goal>apply</goal>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <!-- Checkstyle -->
