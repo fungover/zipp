@@ -28,8 +28,6 @@ public class ReportEntity {
     @Column(nullable = false)
     private Long id;
 
-    // TODO: Replace this field with the proper @ManyToOne relationship once Issue
-    // #4 is ready
     @Column(name = "submitted_by_user_id", nullable = false)
     private Long submittedByUserId;
 
