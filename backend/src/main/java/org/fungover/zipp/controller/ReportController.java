@@ -25,7 +25,7 @@ public class ReportController {
     private final ReportService reportService;
     private final KafkaTemplate<String, Report> template;
 
-    public ReportController(ReportService reportService, KafkaTemplate template) {
+    public ReportController(ReportService reportService, KafkaTemplate<String, Report> template) {
         this.reportService = reportService;
         this.template = template;
     }

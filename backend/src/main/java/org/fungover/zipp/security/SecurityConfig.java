@@ -3,6 +3,7 @@ package org.fungover.zipp.security;
 import org.fungover.zipp.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,6 +23,21 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true)
                         .clearAuthentication(true).deleteCookies("JSESSIONID"));
+
+        return http.build();
+    }
+
+    @Bean
+    @Profile("dev")
+    public SecurityFilterChain securityFilterChainDev(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable()) // Disable CSRF for testing
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().permitAll() // ALLOW EVERYTHING
+            )
+            .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(
+                userInfo -> userInfo.userService(co2us)
+            ));
 
         return http.build();
     }
