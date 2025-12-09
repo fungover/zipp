@@ -2,7 +2,6 @@ package org.fungover.zipp.controller;
 
 import jakarta.validation.Valid;
 import org.fungover.zipp.dto.Report;
-import org.fungover.zipp.entity.ReportEntity;
 import org.fungover.zipp.service.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +43,7 @@ public class ReportController {
          var cf = template.send("report", newReport);
          cf.join();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(newReport);
+         return ResponseEntity.status(HttpStatus.CREATED).body(newReport);
     }
 
     @GetMapping
