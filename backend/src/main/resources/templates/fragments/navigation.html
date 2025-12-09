@@ -1,4 +1,5 @@
 <nav class="navigation" th:fragment="navigation">
     <a class="navigation__link" href="/">Home</a>
-    <a class="navigation__link" href="/login">Login</a>
+    <a class="navigation__link" th:unless="${isLoggedIn}" href="/login">Login</a>
+    <a class="navigation__link" th:if="${isLoggedIn}" href="/profilesettings">Profile</a>
 </nav>
