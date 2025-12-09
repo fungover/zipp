@@ -18,7 +18,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth.requestMatchers("/").permitAll().anyRequest().authenticated())
+        http.authorizeHttpRequests(auth -> auth
+
+                .requestMatchers("/","/actuator/prometheus").permitAll().anyRequest().authenticated())
+
                 .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true)
                         .clearAuthentication(true).deleteCookies("JSESSIONID"));

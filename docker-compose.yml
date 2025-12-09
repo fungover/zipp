@@ -101,6 +101,15 @@ services:
     ports:
       - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
 
+  grafana:
+    image: grafana/grafana:9.5.2
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    volumes:
+      - ./backend/grafana/provisioning/datasources:/backend/grafana/provisioning/datasources
+
 
 volumes:
   kafka-data:
