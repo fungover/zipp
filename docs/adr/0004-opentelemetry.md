@@ -1,4 +1,4 @@
-# ADR: Database Schema Management Strategy
+# ADR: Observability Strategy with OpenTelemetry
 
 ## Status
 
