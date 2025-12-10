@@ -24,23 +24,22 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/", "/login",
-                    "/css/**", "/js/**", "/images/**", "/img/**",
+                    "/favicon.ico", "/favicon/**",
+                    "/css/**", "/js/**",
+                    "/images/**", "/img/**",
                     "/webauthn/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-
             .oauth2Login(oauth2 -> oauth2
                 .loginPage("/login")
                 .defaultSuccessUrl("/", true)
                 .userInfoEndpoint(userInfo -> userInfo.userService(co2us))
             )
-
             .webAuthn(webauthn -> webauthn
-                .rpId("localhost")                 // ändra till din riktiga domän vid deployment
-                .allowedOrigins("https://din-domän.se") // uppdatera för produktion
+                .rpId("localhost")
+                .allowedOrigins("http://localhost:8080")
             )
-
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
@@ -48,7 +47,6 @@ public class SecurityConfig {
                 .clearAuthentication(true)
                 .deleteCookies("JSESSIONID")
             )
-
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers(
                     "/webauthn/register/**",
