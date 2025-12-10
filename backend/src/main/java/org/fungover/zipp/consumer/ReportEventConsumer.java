@@ -6,8 +6,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerMapping;
 
-import java.sql.SQLOutput;
-
 @Service
 public class ReportEventConsumer {
 

@@ -32,4 +32,3 @@ class ReportEventConsumerTest {
         assertThat(captor.getAllValues().get(1)).isEqualTo(testMessage);
     }
 }
-

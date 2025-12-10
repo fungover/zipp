@@ -27,7 +27,8 @@ public class SseService {
 
     public void send(String id, Object event) {
         var list = emitters.get(id);
-        if (list == null) return;
+        if (list == null)
+            return;
 
         for (var emitter : list) {
             try {
@@ -48,17 +49,17 @@ public class SseService {
         }
     }
 
-        @Scheduled(fixedRate = 20000)
-                public void sendKeepAlive() {
-            for (var entry : emitters.entrySet()) {
-                String id = entry.getKey();
-                for (var emitter : entry.getValue()) {
-                    try {
-                        emitter.send(SseEmitter.event().comment("keep-alive"));
-                    } catch (Exception e) {
-                        remove(id, emitter);
-                    }
+    @Scheduled(fixedRate = 20000)
+    public void sendKeepAlive() {
+        for (var entry : emitters.entrySet()) {
+            String id = entry.getKey();
+            for (var emitter : entry.getValue()) {
+                try {
+                    emitter.send(SseEmitter.event().comment("keep-alive"));
+                } catch (Exception e) {
+                    remove(id, emitter);
                 }
             }
+        }
     }
 }

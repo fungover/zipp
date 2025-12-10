@@ -3,18 +3,18 @@ package org.fungover.zipp.service;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
 
- class EventListenerServiceTest {
+class EventListenerServiceTest {
 
-     @Test
-     void listenerShouldForwardEventToSseService() {
+    @Test
+    void listenerShouldForwardEventToSseService() {
 
-         SseService sseService = mock(SseService.class);
-         EventListenerService listener = new EventListenerService(sseService);
+        SseService sseService = mock(SseService.class);
+        EventListenerService listener = new EventListenerService(sseService);
 
-         ReportEvent event = new ReportEvent("map123", "Hello World", "report", System.currentTimeMillis());
+        ReportEvent event = new ReportEvent("map123", "Hello World", "report", System.currentTimeMillis());
 
-         listener.listen(event);
+        listener.listen(event);
 
-         verify(sseService).send("map123", event);
-     }
+        verify(sseService).send("map123", event);
+    }
 }
