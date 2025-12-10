@@ -5,9 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -21,34 +18,33 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new InMemoryUserDetailsManager(
-            User.withUsername("dummy")
-                .password("{noop}dummy")
-                .roles("USER")
-                .build()
-        );
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+            // ---- Authorization rules ----
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/",
-                    "/webauthn/**",
-                    "/css/**", "/js/**", "/img/**"
+                    "/", "/login",
+                    "/css/**", "/js/**", "/images/**", "/img/**",
+                    "/webauthn/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
+
+            // ---- OAuth2 Login ----
             .oauth2Login(oauth2 -> oauth2
+                .loginPage("/login")
+                .defaultSuccessUrl("/", true)
                 .userInfoEndpoint(userInfo -> userInfo.userService(co2us))
             )
+
+            // ---- WebAuthn (Passkeys) ----
             .webAuthn(webauthn -> webauthn
-                .rpId("localhost")
-                .allowedOrigins("http://localhost:8080")
+                .rpId("localhost")                 // ändra till din riktiga domän vid deployment
+                .allowedOrigins("https://din-domän.se") // uppdatera för produktion
             )
+
+            // ---- Logout ----
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
@@ -56,6 +52,8 @@ public class SecurityConfig {
                 .clearAuthentication(true)
                 .deleteCookies("JSESSIONID")
             )
+
+            // ---- CSRF ----
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers(
                     "/webauthn/register/**",
