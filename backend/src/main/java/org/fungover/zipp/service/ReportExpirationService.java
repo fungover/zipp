@@ -26,6 +26,9 @@ public class ReportExpirationService {
     @Scheduled(cron = "0 0 * * * ?")
     @Transactional
     public void expireOldReports() {
+        if (reportConfig.getExpirationHours() <= 0) {
+            return;
+        }
         Instant expirationThreshold = Instant.now().minus(reportConfig.getExpirationHours(), ChronoUnit.HOURS);
 
         List<ReportEntity> toExpire = reportRepository.findAllByStatusAndSubmittedAtBefore(ReportStatus.ACTIVE,
