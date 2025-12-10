@@ -1,6 +1,15 @@
 package org.fungover.zipp.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import org.fungover.zipp.dto.ReportStatus;
 import org.fungover.zipp.dto.ReportType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -19,18 +28,8 @@ public class ReportEntity {
     @Column(nullable = false)
     private Long id;
 
-    // TODO: Replace this field with the proper @ManyToOne relationship once Issue
-    // #4 is ready
     @Column(name = "submitted_by_user_id", nullable = false)
     private String submittedByUserId;
-
-    /*
-     * Target Implementation:
-     * 
-     * @ManyToOne
-     * 
-     * @JoinColumn(name = "user_id", nullable = false) private UserEntity user;
-     */
 
     @Column(nullable = false, length = 2000)
     private String description;
