@@ -28,8 +28,8 @@ public class ReportEntity {
     @Column(nullable = false)
     private Long id;
 
-    @Column(name = "submitted_by_user_id", nullable = false)
-    private Long submittedByUserId;
+    @Column(name = "submitted_by_user_id", nullable = false, length = 255)
+    private String submittedByUserId;
 
     @Column(nullable = false, length = 2000)
     private String description;
@@ -55,7 +55,7 @@ public class ReportEntity {
     public ReportEntity() {
     }
 
-    public ReportEntity(Long submittedByUserId, String description, ReportType eventType, Point coordinates,
+    public ReportEntity(String submittedByUserId, String description, ReportType eventType, Point coordinates,
             Instant submittedAt, ReportStatus status, Set<ReportImageEntity> images) {
         this.submittedByUserId = submittedByUserId;
         this.description = description;
@@ -114,11 +114,11 @@ public class ReportEntity {
         this.status = status;
     }
 
-    public Long getSubmittedByUserId() {
+    public String getSubmittedByUserId() {
         return submittedByUserId;
     }
 
-    public void setSubmittedByUserId(Long submittedByUserId) {
+    public void setSubmittedByUserId(String submittedByUserId) {
         this.submittedByUserId = submittedByUserId;
     }
 

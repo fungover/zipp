@@ -1,6 +1,7 @@
 package org.fungover.zipp.service;
 
 import org.fungover.zipp.dto.Report;
+import org.fungover.zipp.dto.ReportResponse;
 import org.fungover.zipp.dto.ReportStatus;
 import org.fungover.zipp.entity.ReportEntity;
 import org.fungover.zipp.entity.ReportImageEntity;
@@ -28,12 +29,12 @@ public class ReportService {
     }
 
     @Transactional
-    public Report createReport(Report dto) {
+    public ReportResponse createReport(String userId, Report dto) {
         Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
         point.setSRID(4326);
 
-        ReportEntity entity = new ReportEntity(dto.submittedByUserId(), dto.description(), dto.eventType(), point,
-                Instant.now(), ReportStatus.ACTIVE, new HashSet<>());
+        ReportEntity entity = new ReportEntity(userId, dto.description(), dto.eventType(), point, Instant.now(),
+                ReportStatus.ACTIVE, new HashSet<>());
 
         if (dto.imageUrls() != null) {
             for (String url : dto.imageUrls()) {
@@ -58,13 +59,14 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
-    public List<Report> getAllReports() {
+    public List<ReportResponse> getAllReports() {
         return reportRepository.findAllByStatus(ReportStatus.ACTIVE).stream().map(this::toDto).toList();
     }
 
-    private Report toDto(ReportEntity savedEntity) {
-        return new Report(savedEntity.getSubmittedByUserId(), savedEntity.getDescription(), savedEntity.getEventType(),
-                savedEntity.getCoordinates().getY(), savedEntity.getCoordinates().getX(), savedEntity.getSubmittedAt(),
-                savedEntity.getStatus(), savedEntity.getImages().stream().map(ReportImageEntity::getImageUrl).toList());
+    private ReportResponse toDto(ReportEntity savedEntity) {
+        return new ReportResponse(savedEntity.getSubmittedByUserId(), savedEntity.getDescription(),
+                savedEntity.getEventType(), savedEntity.getCoordinates().getY(), savedEntity.getCoordinates().getX(),
+                savedEntity.getSubmittedAt(), savedEntity.getStatus(),
+                savedEntity.getImages().stream().map(ReportImageEntity::getImageUrl).toList());
     }
 }
