@@ -11,6 +11,10 @@ Without a standard format, we may use various styles, potentially making the cod
 All Java classes must declare their logger to use the following format:
 
 ```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+```
+```java
 private static final Logger LOG = LoggerFactory.getLogger(CurrentClassName.class);
 ```
 ```java
