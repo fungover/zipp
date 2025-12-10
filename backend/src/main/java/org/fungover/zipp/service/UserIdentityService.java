@@ -28,19 +28,19 @@ public class UserIdentityService {
 
     private String extractOAuth2UserId(OAuth2User oAuth2User) {
 
-        String userId = oAuth2User.getAttribute("sub");
-        if (userId != null) {
-            return userId;
+        Object sub = oAuth2User.getAttribute("sub");
+        if (sub != null) {
+            return sub.toString();
         }
 
-        userId = oAuth2User.getAttribute("id");
-        if (userId != null) {
-            return userId;
+        Object id = oAuth2User.getAttribute("id");
+        if (id != null) {
+            return id.toString();
         }
 
-        userId = oAuth2User.getAttribute("user_id");
+        Object userId = oAuth2User.getAttribute("user_id");
         if (userId != null) {
-            return userId;
+            return userId.toString();
         }
 
         throw new IllegalStateException("Could not extract user ID from OAuth2 principal");

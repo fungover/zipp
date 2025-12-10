@@ -28,7 +28,7 @@ public class ReportEntity {
     @Column(nullable = false)
     private Long id;
 
-    @Column(name = "submitted_by_user_id", nullable = false)
+    @Column(name = "submitted_by_user_id", nullable = false, length = 255)
     private String submittedByUserId;
 
     @Column(nullable = false, length = 2000)
