@@ -20,6 +20,6 @@ public class BackendApplication {
 
     @Bean
     public NewTopic newTopic() {
-        return new NewTopic("report", 1, (short) 1);
+        return new NewTopic("report-avro", 1, (short) 1);
     }
 }
