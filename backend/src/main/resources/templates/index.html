@@ -10,8 +10,11 @@
 <body>
 <main>
     <div class="welcome" layout:fragment="welcome">
-        <h1 class="welcome__title">Welcome</h1>
-        <p class="welcome__text"> Please log in to make a report</p>
+        <h1 class="welcome__title">
+          Welcome
+          <span th:if="${isLoggedIn}" th:text="${userName}"></span>
+        </h1>
+        <p class="welcome__text" th:unless="${isLoggedIn}"> Please log in to make a report</p>
     </div>
 </main>
 
