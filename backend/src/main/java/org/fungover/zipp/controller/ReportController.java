@@ -27,20 +27,21 @@ public class ReportController {
     }
 
     @PostMapping
-    public ResponseEntity<Report> createReport(@Valid @RequestBody Report reportRequest, Authentication authentication) {
+    public ResponseEntity<Report> createReport(@Valid @RequestBody Report reportRequest,
+            Authentication authentication) {
         log.info("Report received: {}", reportRequest);
 
         String userId = userIdentityService.getUserId(authentication);
 
         var newReport = reportService.createReport(userId, reportRequest);
 
-    /* For now the userId is provided by the client
-     later this can be replaced with SecurityContextHolder.getContext().getAuthentication()
-
-     And Spring kafka later
-     var cf = template.send("report", newReport);
-      cf.join();
-     */
+        /*
+         * For now the userId is provided by the client later this can be replaced with
+         * SecurityContextHolder.getContext().getAuthentication()
+         * 
+         * And Spring kafka later var cf = template.send("report", newReport);
+         * cf.join();
+         */
 
         return ResponseEntity.status(HttpStatus.CREATED).body(newReport);
     }
