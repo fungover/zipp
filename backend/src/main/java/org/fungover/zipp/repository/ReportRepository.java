@@ -6,11 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 public interface ReportRepository extends JpaRepository<ReportEntity, Long> {
 
-  List<ReportEntity> findAllBySubmittedByUserId(Long userId);
+    List<ReportEntity> findAllByStatus(ReportStatus status);
 
-  List<ReportEntity> findAllByStatusAndSubmittedAtBefore(ReportStatus status, Instant date);
+    List<ReportEntity> findAllByStatusAndSubmittedAtBefore(ReportStatus status, Instant date);
 }

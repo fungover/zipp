@@ -16,80 +16,55 @@ import java.util.HashSet;
 import java.util.List;
 
 @Service
-  public class ReportService {
+public class ReportService {
 
+    private static final int MAX_URL_LENGTH = 2048;
     private final GeometryFactory geometryFactory;
     private final ReportRepository reportRepository;
 
     public ReportService(GeometryFactory geometryFactory, ReportRepository reportRepository) {
-      this.geometryFactory = geometryFactory;
-      this.reportRepository = reportRepository;
+        this.geometryFactory = geometryFactory;
+        this.reportRepository = reportRepository;
     }
 
     @Transactional
     public Report createReport(Report dto) {
-      Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
-      point.setSRID(4326);
+        Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
+        point.setSRID(4326);
 
+        ReportEntity entity = new ReportEntity(dto.submittedByUserId(), dto.description(), dto.eventType(), point,
+                Instant.now(), ReportStatus.ACTIVE, new HashSet<>());
 
-      ReportEntity entity = new ReportEntity(
-              dto.submittedByUserId(),
-              dto.description(),
-              dto.eventType(),
-              point,
-              Instant.now(),
-              ReportStatus.ACTIVE,
-              new HashSet<>()
-      );
+        if (dto.imageUrls() != null) {
+            for (String url : dto.imageUrls()) {
+                if (url == null || url.isBlank()) {
+                    throw new IllegalArgumentException("Image URL cannot be null or blank");
+                }
+                if (url.length() > MAX_URL_LENGTH) {
+                    throw new IllegalArgumentException("Image URL exceeds maximum length");
+                }
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    throw new IllegalArgumentException("Image URL must use HTTP or HTTPS protocol");
+                }
 
-      if (dto.imageUrls() != null) {
-        for (String url : dto.imageUrls()) {
-          ReportImageEntity image = new ReportImageEntity();
-          image.setImageUrl(url);
-          image.setReport(entity);
-          entity.getImages().add(image);
+                ReportImageEntity image = new ReportImageEntity();
+                image.setImageUrl(url);
+                image.setReport(entity);
+                entity.getImages().add(image);
+            }
         }
-      }
 
-      return toDto(reportRepository.save(entity));
+        return toDto(reportRepository.save(entity));
     }
 
-  @Transactional(readOnly = true)
-  public List<Report> getAllReports(Long userId) {
-    List<ReportEntity> reports = reportRepository.findAllBySubmittedByUserId(userId);
-
-    if (reports.isEmpty()) {
-      return List.of();
-    } else {
-      return reports.stream().map(entity -> new Report(
-              entity.getSubmittedByUserId(),
-              entity.getDescription(),
-              entity.getEventType(),
-              entity.getCoordinates() != null ? entity.getCoordinates().getY() : 0,
-              entity.getCoordinates() != null ? entity.getCoordinates().getX() : 0,
-              entity.getSubmittedAt(),
-              entity.getStatus(),
-              entity.getImages().stream()
-                      .map(ReportImageEntity::getImageUrl)
-                      .toList()
-      )).toList();
+    @Transactional(readOnly = true)
+    public List<Report> getAllReports() {
+        return reportRepository.findAllByStatus(ReportStatus.ACTIVE).stream().map(this::toDto).toList();
     }
-  }
 
-  private Report toDto(ReportEntity savedEntity) {
-    List<String> images = savedEntity.getImages().stream()
-            .map(ReportImageEntity::getImageUrl)
-            .toList();
-
-    return new Report(
-            savedEntity.getSubmittedByUserId(),
-            savedEntity.getDescription(),
-            savedEntity.getEventType(),
-            savedEntity.getCoordinates().getY(),
-            savedEntity.getCoordinates().getX(),
-            savedEntity.getSubmittedAt(),
-            savedEntity.getStatus(),
-            images
-    );
-  }
+    private Report toDto(ReportEntity savedEntity) {
+        return new Report(savedEntity.getSubmittedByUserId(), savedEntity.getDescription(), savedEntity.getEventType(),
+                savedEntity.getCoordinates().getY(), savedEntity.getCoordinates().getX(), savedEntity.getSubmittedAt(),
+                savedEntity.getStatus(), savedEntity.getImages().stream().map(ReportImageEntity::getImageUrl).toList());
+    }
 }

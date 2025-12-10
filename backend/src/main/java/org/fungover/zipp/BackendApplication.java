@@ -8,8 +8,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class BackendApplication {
 
+    /**
+     * Entry point for the backend application.
+     *
+     * @param args
+     *            the command line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(BackendApplication.class, args);
     }
-
 }
