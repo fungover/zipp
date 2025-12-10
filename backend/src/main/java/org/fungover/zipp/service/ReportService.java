@@ -32,7 +32,7 @@ public class ReportService {
         Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
         point.setSRID(4326);
 
-        ReportEntity entity = new ReportEntity(dto.submittedByUserId(), dto.description(), dto.eventType(), point,
+        ReportEntity entity = new ReportEntity(dto.submittedBy(), dto.description(), dto.eventType(), point,
                 Instant.now(), ReportStatus.ACTIVE, new HashSet<>());
 
         if (dto.imageUrls() != null) {
@@ -62,8 +62,12 @@ public class ReportService {
         return reportRepository.findAllByStatus(ReportStatus.ACTIVE).stream().map(this::toDto).toList();
     }
 
+    public List<Report> getAllReportsForUser(String userEmail) {
+        return reportRepository.findAllBySubmittedBy_Email(userEmail).stream().map(this::toDto).toList();
+    }
+
     private Report toDto(ReportEntity savedEntity) {
-        return new Report(savedEntity.getSubmittedByUserId(), savedEntity.getDescription(), savedEntity.getEventType(),
+        return new Report(savedEntity.getSubmittedBy(), savedEntity.getDescription(), savedEntity.getEventType(),
                 savedEntity.getCoordinates().getY(), savedEntity.getCoordinates().getX(), savedEntity.getSubmittedAt(),
                 savedEntity.getStatus(), savedEntity.getImages().stream().map(ReportImageEntity::getImageUrl).toList());
     }

@@ -9,4 +9,6 @@ import java.util.List;
 public interface ReportRepository extends JpaRepository<ReportEntity, Long> {
 
     List<ReportEntity> findAllByStatus(ReportStatus status);
+
+    List<ReportEntity> findAllBySubmittedBy_Email(String email);
 }
