@@ -27,9 +27,9 @@ public class SseService {
 
     public void send(String id, Object event) {
         var list = emitters.get(id);
-        if (list == null)
+        if (list == null) {
             return;
-
+        }
         for (var emitter : list) {
             try {
                 emitter.send(SseEmitter.event().data(event));
