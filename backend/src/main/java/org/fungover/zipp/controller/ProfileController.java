@@ -1,5 +1,6 @@
 package org.fungover.zipp.controller;
 
+import org.fungover.zipp.entity.ReportEntity;
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.profile.service.ProfileService;
 import org.fungover.zipp.repository.ReportRepository;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -24,14 +26,12 @@ public class ProfileController {
 
     @GetMapping("/profilesettings")
     public String showProfile(Model model, Authentication authentication) {
-        // 1. Hämta inloggad user
+        // Inloggad user
         User user = profileService.getCurrentUser(authentication);
         model.addAttribute("user", user);
 
-        // 2. Hämta alla rapporter för användarens email
+        // Hämta alla rapporter för användarens email
         var reports = reportRepository.findAllBySubmittedBy_Email(user.getEmail());
-
-        // 3. Lägg in i modellen så Thymeleaf kan använda ${reports}
         model.addAttribute("reports", reports);
 
         return "profilesettings";
@@ -42,6 +42,27 @@ public class ProfileController {
                                 Authentication authentication) {
 
         profileService.updateProfile(authentication, formUser);
+        return "redirect:/profilesettings";
+    }
+
+    @PostMapping("/profilesettings/reports/{id}/delete")
+    public String deleteReport(@PathVariable("id") Long id,
+                               Authentication authentication) {
+
+        User currentUser = profileService.getCurrentUser(authentication);
+
+        ReportEntity report = reportRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Report not found: " + id));
+
+        // Säkerhet: bara ägaren (eller ev. admin) får ta bort
+        if (!report.getSubmittedBy().getId().equals(currentUser.getId())) {
+            // här kan du kasta AccessDeniedException om du vill
+            throw new RuntimeException("Not allowed to delete this report");
+        }
+
+        reportRepository.delete(report);
+
+        // Ladda om sidan så listan uppdateras
         return "redirect:/profilesettings";
     }
 }

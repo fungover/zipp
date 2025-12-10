@@ -105,16 +105,13 @@
     </p>
   </div>
 
-  <!-- YOUR REPORTS -->
   <div class="bg-white rounded-xl shadow-md p-6">
     <h2 class="text-xl font-semibold mb-4">Your Reports</h2>
 
-    <!-- Visa meddelande om listan är tom -->
     <div th:if="${#lists.isEmpty(reports)}">
       <p class="text-gray-500">You haven't submitted any reports yet.</p>
     </div>
 
-    <!-- Loopa igenom listan om den inte är tom -->
     <ul th:unless="${#lists.isEmpty(reports)}" class="space-y-4">
       <li th:each="report : ${reports}" class="flex items-center justify-between bg-gray-50 p-4 rounded-lg border">
         <div>
@@ -122,22 +119,22 @@
 
           <p class="text-gray-500 text-sm">
             Submitted:
-            <!-- funkar om ni har thymeleaf-extras-java8time, annars byt till bara ${report.submittedAt} -->
             <span th:text="${#temporals.format(report.submittedAt, 'yyyy-MM-dd')}">2025-01-01</span>
             <span class="ml-2 px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800"
                   th:text="${report.eventType}">
-                            TYPE
-                        </span>
+            TYPE
+          </span>
           </p>
         </div>
 
-        <!-- Delete-knappen funkar först när du har en riktig delete-endpoint -->
-        <form th:action="@{/api/reports/delete/{id}(id=${report.id})}" method="post">
+        <form th:action="@{/profilesettings/reports/{id}/delete(id=${report.id})}" method="post">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
           <button type="submit" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg">Delete</button>
         </form>
       </li>
     </ul>
   </div>
+
 
 </div>
 
