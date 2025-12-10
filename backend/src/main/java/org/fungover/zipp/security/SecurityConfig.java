@@ -22,12 +22,8 @@ public class SecurityConfig {
     @Order(1)
     @Profile("dev")
     public SecurityFilterChain securityFilterChainDev(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-            .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(
-                userInfo -> userInfo.userService(co2us)
-            ));
+        http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(co2us)));
 
         return http.build();
     }
@@ -37,23 +33,12 @@ public class SecurityConfig {
     @Profile("!dev")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/css/**", "/images/**", "/js/**")
-                .permitAll()
-                .anyRequest().authenticated()
-            )
-            .oauth2Login(oauth2 -> oauth2
-                .loginPage("/login")
-                .defaultSuccessUrl("/", true)
-                .userInfoEndpoint(userInfo -> userInfo.userService(co2us))
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .deleteCookies("JSESSIONID")
-            );
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/", "/login", "/css/**", "/images/**", "/js/**")
+                .permitAll().anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2.loginPage("/login").defaultSuccessUrl("/", true)
+                        .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
+                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true)
+                        .clearAuthentication(true).deleteCookies("JSESSIONID"));
 
         return http.build();
     }

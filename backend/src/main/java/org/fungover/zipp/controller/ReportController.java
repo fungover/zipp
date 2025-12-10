@@ -41,10 +41,10 @@ public class ReportController {
          * SecurityContextHolder.getContext().getAuthentication()
          */
 
-         var cf = template.send("report", newReport);
-         cf.join();
+        var cf = template.send("report", newReport);
+        cf.join();
 
-         return ResponseEntity.status(HttpStatus.CREATED).body(newReport);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newReport);
     }
 
     @GetMapping
