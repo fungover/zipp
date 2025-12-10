@@ -13,6 +13,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -24,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class ReportControllerTest {
 
     @Autowired
@@ -34,67 +36,52 @@ class ReportControllerTest {
 
     @Test
     void createReport() throws Exception {
-        Report firstReport = new Report(1L,"Candy paper", ReportType.DEBRIS,
-            50.0, 50.0, Instant.parse("2025-12-03T15:30:00Z"), ReportStatus.ACTIVE, null);
+        Report firstReport = new Report(1L, "Candy paper", ReportType.DEBRIS, 50.0, 50.0,
+                Instant.parse("2025-12-03T15:30:00Z"), ReportStatus.ACTIVE, null);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
-        mockMvc.perform(post("/api/reports")
-                .with(SecurityMockMvcRequestPostProcessors.oauth2Login()
-                    .attributes(user -> {
-                        user.put("name", "Test User");
-                        user.put("email", "test@gmail.com");
-                        user.put("role", "USER");
-                    }))
-                .with(csrf())
-            //POST isn't blocked by spring security with csrf
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(firstReport)))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.description").value("Candy paper"));
+        mockMvc.perform(
+                post("/api/reports").with(SecurityMockMvcRequestPostProcessors.oauth2Login().attributes(user -> {
+                    user.put("name", "Test User");
+                    user.put("email", "test@gmail.com");
+                    user.put("role", "USER");
+                })).with(csrf())
+                        // POST isn't blocked by spring security with csrf
+                        .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(firstReport)))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.description").value("Candy paper"));
     }
 
     @Test
-    void throwsErrorWhenRequestIsNotValid()throws Exception {
-        Report firstReport = new Report(1L,null, ReportType.DEBRIS,
-            50.0, 50.0, Instant.parse("2025-12-03T15:30:00Z"), ReportStatus.ACTIVE, null);
+    void throwsErrorWhenRequestIsNotValid() throws Exception {
+        Report firstReport = new Report(1L, null, ReportType.DEBRIS, 50.0, 50.0, Instant.parse("2025-12-03T15:30:00Z"),
+                ReportStatus.ACTIVE, null);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
-        mockMvc.perform(post("/api/reports")
-                .with(SecurityMockMvcRequestPostProcessors.oauth2Login()
-                    .attributes(user -> {
-                        user.put("name", "Test User");
-                        user.put("email", "test@gmail.com");
-                        user.put("role", "USER");
-                    }))
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(firstReport)))
-            .andExpect(status().isBadRequest());
-
+        mockMvc.perform(
+                post("/api/reports").with(SecurityMockMvcRequestPostProcessors.oauth2Login().attributes(user -> {
+                    user.put("name", "Test User");
+                    user.put("email", "test@gmail.com");
+                    user.put("role", "USER");
+                })).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(firstReport)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void returnsSubmittedReport() throws Exception {
-        Report firstReport = new Report(1L,"Candy paper", ReportType.DEBRIS,
-            50.0, 50.0, Instant.parse("2025-12-03T15:30:00Z"), ReportStatus.ACTIVE, null);
+        Report firstReport = new Report(1L, "Candy paper", ReportType.DEBRIS, 50.0, 50.0,
+                Instant.parse("2025-12-03T15:30:00Z"), ReportStatus.ACTIVE, null);
 
-      reportService.createReport(firstReport);
+        reportService.createReport(firstReport);
 
-        mockMvc.perform(get("/api/reports")
-                .with(SecurityMockMvcRequestPostProcessors.oauth2Login()
-                    .attributes(user -> {
-                        user.put("name", "Test User");
-                        user.put("email", "test@gmail.com");
-                        user.put("role", "USER");
-                    }))
-                .with(csrf()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].status").value("ACTIVE"));
-
-
+        mockMvc.perform(get("/api/reports").with(SecurityMockMvcRequestPostProcessors.oauth2Login().attributes(user -> {
+            user.put("name", "Test User");
+            user.put("email", "test@gmail.com");
+            user.put("role", "USER");
+        })).with(csrf())).andExpect(status().isOk()).andExpect(jsonPath("$[0].status").value("ACTIVE"));
     }
 }
