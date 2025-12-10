@@ -21,7 +21,6 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // ---- Authorization rules ----
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/", "/login",
@@ -31,20 +30,17 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
 
-            // ---- OAuth2 Login ----
             .oauth2Login(oauth2 -> oauth2
                 .loginPage("/login")
                 .defaultSuccessUrl("/", true)
                 .userInfoEndpoint(userInfo -> userInfo.userService(co2us))
             )
 
-            // ---- WebAuthn (Passkeys) ----
             .webAuthn(webauthn -> webauthn
                 .rpId("localhost")                 // ändra till din riktiga domän vid deployment
                 .allowedOrigins("https://din-domän.se") // uppdatera för produktion
             )
 
-            // ---- Logout ----
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
@@ -53,7 +49,6 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
             )
 
-            // ---- CSRF ----
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers(
                     "/webauthn/register/**",
