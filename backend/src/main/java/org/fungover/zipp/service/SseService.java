@@ -9,13 +9,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class SseService {
 
+    private static final Logger logger = LoggerFactory.getLogger(SseService.class);
     private final Map<String, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
     public SseEmitter subscribe(String id) {
-        SseEmitter emitter = new SseEmitter(0L);
+        SseEmitter emitter = new SseEmitter(300_000L);
         emitters.computeIfAbsent(id, k -> new CopyOnWriteArrayList<>()).add(emitter);
 
         emitter.onCompletion(() -> remove(id, emitter));
@@ -34,19 +38,17 @@ public class SseService {
             try {
                 emitter.send(SseEmitter.event().data(event));
             } catch (Exception e) {
+                logger.debug("Failed to send keep-alive to emitter for id {}: {}", id, e.getMessage());
                 remove(id, emitter);
             }
         }
     }
 
     private void remove(String id, SseEmitter emitter) {
-        var list = emitters.get(id);
-        if (list != null) {
+        emitters.computeIfPresent(id, (k, list) -> {
             list.remove(emitter);
-            if (list.isEmpty()) {
-                emitters.remove(id);
-            }
-        }
+            return list.isEmpty() ? null : list;
+        });
     }
 
     @Scheduled(fixedRate = 20000)
