@@ -18,8 +18,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        http.authorizeHttpRequests(auth -> auth.requestMatchers("/", "/login", "/css/**", "/images/**", "/js/**")
+        http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth
+                .requestMatchers("/", "/login", "/favicon.ico", "/favicon/**", "/css/**", "/images/**", "/js/**")
                 .permitAll().anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2.loginPage("/login").defaultSuccessUrl("/", true)
                         .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
