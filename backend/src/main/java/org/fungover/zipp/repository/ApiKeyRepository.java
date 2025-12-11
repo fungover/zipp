@@ -66,4 +66,6 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, UUID> {
      */
     @Query("SELECT COUNT(a) FROM ApiKey a WHERE a.userId = :userId AND a.status = 'ACTIVE'")
     long countActiveKeysByUserId(@Param("userId") UUID userId);
+
+    List<ApiKey> findAllByUserId(UUID userId);
 }

@@ -6,26 +6,53 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     private final CustomOAuth2UserService co2us;
+    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
 
-    public SecurityConfig(CustomOAuth2UserService co2us) {
+
+    public SecurityConfig(CustomOAuth2UserService co2us,
+                          ApiKeyAuthenticationFilter apiKeyAuthenticationFilter) {
         this.co2us = co2us;
+        this.apiKeyAuthenticationFilter = apiKeyAuthenticationFilter;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.authorizeHttpRequests(auth -> auth
+        http
+            // Lägg in vårt API-key-filter innan standard UsernamePasswordAuthenticationFilter
+            .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
+            .authorizeHttpRequests(auth -> auth
+                // publik skit
                 .requestMatchers("/", "/login", "/favicon.ico", "/favicon/**", "/css/**", "/images/**", "/js/**")
-                .permitAll().anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2.loginPage("/login").defaultSuccessUrl("/", true)
-                        .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
-                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true)
-                        .clearAuthentication(true).deleteCookies("JSESSIONID"));
+                .permitAll()
+
+                // M2M / GraphQL: kräver att man är autentiserad – kan ske via API-key-filtret
+                .requestMatchers("/api/m2m/**", "/graphql")
+                .hasRole("API_CLIENT")
+
+                // resten kräver vanlig användar-inloggning (OAuth2)
+                .anyRequest()
+                .authenticated()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .loginPage("/login")
+                .defaultSuccessUrl("/", true)
+                .userInfoEndpoint(userInfo -> userInfo.userService(co2us))
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies("JSESSIONID")
+            );
         return http.build();
     }
 
