@@ -16,12 +16,11 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * REST-controller för att hantera API-nycklar för den inloggade användaren.
- *
+ * REST-controller to handle API-keys for the logged in user.
  * Endpoints:
- *  POST   /api/me/api-keys       -> skapa ny key (returnerar ApiKeyWithSecret)
- *  GET    /api/me/api-keys       -> lista alla mina keys (returnerar ApiKeyResponse[])
- *  DELETE /api/me/api-keys/{id}  -> revoka en key
+ *  POST   /api/me/api-keys       -> Creates a new key (returns ApiKeyWithSecret)
+ *  GET    /api/me/api-keys       -> list all keys (returns ApiKeyResponse[])
+ *  DELETE /api/me/api-keys/{id}  -> revoke a key
  */
 @RestController
 @RequestMapping("/api/me/api-keys")
@@ -34,8 +33,7 @@ public class ApiKeyController {
     }
 
     /**
-     * Skapa en ny API-nyckel åt den inloggade användaren.
-     *
+     * Create a new API-key for the logged-in user.
      * Body: ApiKeyCreateRequest (name, description, scopes, expiresInDays)
      * Return: ApiKeyWithSecret (id, namn, prefix, secretKey, scopes, createdAt, expiresAt)
      */
@@ -46,7 +44,7 @@ public class ApiKeyController {
 
         UUID currentUserId = extractUserId(principal);
 
-        // Räkna ut expiresAt baserat på expiresInDays (kan vara null)
+        // Calculate expiresAt based on expiresInDays (can be null)
         Instant expiresAt = null;
         if (request.expiresInDays() != null && request.expiresInDays() > 0) {
             expiresAt = Instant.now().plus(request.expiresInDays(), ChronoUnit.DAYS);
@@ -62,13 +60,13 @@ public class ApiKeyController {
 
         ApiKey apiKey = created.apiKey();
 
-        // ApiKeyWithSecret = det du visar EN gång efter skapandet
+        // ApiKeyWithSecret = what is shown only once post creation
         return new ApiKeyWithSecret(
             apiKey.getId(),
             apiKey.getName(),
             apiKey.getDescription(),
             apiKey.getKeyPrefix(),
-            created.plainKey(),       // ⚠️ plaintext secret, bara här!
+            created.plainKey(),
             apiKey.getScopes(),
             apiKey.getCreatedAt(),
             apiKey.getExpiresAt()
@@ -76,8 +74,8 @@ public class ApiKeyController {
     }
 
     /**
-     * Lista alla API-keys som tillhör den inloggade användaren.
-     * Returnerar INTE secretKey – bara metadata.
+     * Lists all API-keys that belongs to the logged-in user
+     * Returns NOT secretKey - ONLY metadata.
      */
     @GetMapping
     public List<ApiKeyResponse> getMyApiKeys(Principal principal) {
@@ -90,7 +88,7 @@ public class ApiKeyController {
     }
 
     /**
-     * Revoka (stäng av) en API-nyckel som tillhör den inloggade användaren.
+     * Revoke an API-key that belongs the logged-in user.
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -104,9 +102,9 @@ public class ApiKeyController {
     // ------------------------
 
     /**
-     * Mappa entiteten ApiKey -> ApiKeyResponse (utan secret).
-     * Används vid listning.
+     * Map the entity ApiKey -> ApiKeyResponse (without secret).
      */
+
     private ApiKeyResponse toApiKeyResponse(ApiKey apiKey) {
         return new ApiKeyResponse(
             apiKey.getId(),
@@ -123,11 +121,10 @@ public class ApiKeyController {
     }
 
     /**
-     * Plocka ut userId (UUID) från Principal.
-     *
-     * JUSTERA DEN HÄR så den matchar hur ni lagrar användarens ID:
-     *  - Om principal.getName() ÄR ett UUID-string -> funkar direkt.
-     *  - Om ni har en custom User/Principal-typ -> byt implementation.
+     * Cherrypick userId (UUID) from Principal.
+     * ADJUST IT HERE TO MATCH USERS ID.
+     *  - If principal.getName() is a UUID-string -> works directly.
+     *  - If custom User/Principal-type -> change implementation.
      */
     private UUID extractUserId(Principal principal) {
         try {

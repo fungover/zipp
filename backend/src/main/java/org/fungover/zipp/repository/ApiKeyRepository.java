@@ -17,52 +17,52 @@ import java.util.UUID;
 public interface ApiKeyRepository extends JpaRepository<ApiKey, UUID> {
 
     /**
-     * Hitta en API-nyckel baserat på dess hash.
-     * Används vid varje API-anrop för att validera nyckeln.
+     * Find API key based on hash code.
+     * Is used every API call to validate key
      */
     Optional<ApiKey> findByKeyHash(String keyHash);
 
     /**
-     * Lista alla API-nycklar för en användare, nyaste först.
-     * Används i "Hantera API-nycklar" i användargränssnittet.
+     * List all keys for users - newest first
+     * Is used in the UI for key handling
      */
     List<ApiKey> findByUserIdOrderByCreatedAtDesc(UUID userId);
 
     /**
-     * Lista nycklar med en specifik status för en användare.
+     * List keys with specific status for a user
      */
     List<ApiKey> findByUserIdAndStatus(UUID userId, KeyStatus status);
 
     /**
-     * Hitta en specifik nyckel som tillhör en specifik användare.
-     * Säkerställer att användare bara kan se/ändra sina egna nycklar.
+     * Find a specific key - for a specific user
+     * Ensures key privacy
      */
     Optional<ApiKey> findByIdAndUserId(UUID id, UUID userId);
 
     /**
-     * Kontrollera om en nyckel-hash redan finns (för att undvika kollisioner).
+     * Control if there is already an existent key hash
      */
     boolean existsByKeyHash(String keyHash);
 
     /**
-     * Uppdatera lastUsedAt utan att ladda hela entiteten.
-     * Körs vid varje lyckat API-anrop.
+     * Update lastUsedAt in isolation
+     * Runs with every successful API call
      */
     @Modifying
     @Query("UPDATE ApiKey a SET a.lastUsedAt = :timestamp WHERE a.id = :id")
     void updateLastUsedAt(@Param("id") UUID id, @Param("timestamp") Instant timestamp);
 
     /**
-     * Markera utgångna nycklar som EXPIRED.
-     * Körs av en schemalagd bakgrundsprocess.
+     * Mark expired keys as expired
+     * A schedueled background process
      */
     @Modifying
     @Query("UPDATE ApiKey a SET a.status = 'EXPIRED' WHERE a.expiresAt < :now AND a.status = 'ACTIVE'")
     int expireOldKeys(@Param("now") Instant now);
 
     /**
-     * Räkna antal aktiva nycklar för en användare.
-     * Används för att begränsa antal nycklar per användare (max 10).
+     * Count amount of active keys for a user.
+     * Is used to limit amount of keys per user (max 10)
      */
     @Query("SELECT COUNT(a) FROM ApiKey a WHERE a.userId = :userId AND a.status = 'ACTIVE'")
     long countActiveKeysByUserId(@Param("userId") UUID userId);

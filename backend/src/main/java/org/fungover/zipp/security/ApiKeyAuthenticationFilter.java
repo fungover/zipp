@@ -21,8 +21,8 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Filter som fångar upp inkommande requests och validerar API-nycklar.
- * Letar efter nyckeln i X-API-Key headern.
+ * Filters that intercept incoming requests and validate API keys.
+ * Looking for the key in the X-API-Key header.
  */
 @Component
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
@@ -43,13 +43,13 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
         String apiKey = request.getHeader(API_KEY_HEADER);
 
-        // Endast processa om API-nyckel finns och path kräver det
+        // Only process if API key exists and path requires it
         if (apiKey != null && shouldAuthenticateWithApiKey(request)) {
             try {
-                // Validera nyckeln - kastar InvalidApiKeyException om ogiltig
+                // Validate key - throws InvalidApiKeyException if invalid
                 ApiKey validatedKey = apiKeyService.validateApiKey(apiKey);
 
-                // Skapa authentication token med scope-baserade authorities
+                // Create authentication tokens with scope-based authorities
                 ApiKeyAuthentication authentication = new ApiKeyAuthentication(
                     validatedKey.getUserId(),
                     validatedKey.getId(),
@@ -58,7 +58,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (InvalidApiKeyException e) {
-                // Ogiltig API-nyckel - returnera 401
+                // Invalid API key - return 401
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter().write(
@@ -72,16 +72,16 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Bestämmer vilka paths som ska autentiseras med API-nyckel.
+     * Determines which paths should be authenticated with API key.
      */
     private boolean shouldAuthenticateWithApiKey(HttpServletRequest request) {
         String path = request.getRequestURI();
-        // GraphQL och M2M API endpoints kräver API-nyckel
+        // GraphQL and M2M API endpoints require API key
         return path.startsWith("/graphql") || path.startsWith("/api/m2m/");
     }
 
     /**
-     * Custom authentication token för API-nyckel-autentiserade requests.
+     * Custom authentication token for API key-authenticated requests.
      */
     public static class ApiKeyAuthentication extends AbstractAuthenticationToken {
 
@@ -98,15 +98,15 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         }
 
         /**
-         * Bygger Spring Security authorities från API-scopes.
+         * Building Spring Security authorities from API scopes.
          */
         private static List<SimpleGrantedAuthority> buildAuthorities(Set<ApiScope> scopes) {
             List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-            // Alla API-nycklar får ROLE_API_CLIENT
+            // All API keys get ROLE_API_CLIENT
             authorities.add(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
 
-            // Lägg till scope-baserade authorities
+            // Add scope-based authorities
             if (scopes != null) {
                 for (ApiScope scope : scopes) {
                     authorities.add(new SimpleGrantedAuthority("SCOPE_" + scope.name()));
@@ -117,7 +117,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
         @Override
         public Object getCredentials() {
-            return null;  // API-nyckeln sparas inte efter autentisering
+            return null;  // API key is not saved after authentication
         }
 
         @Override

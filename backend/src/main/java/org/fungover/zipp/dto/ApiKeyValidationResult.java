@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Resultat från API-nyckel-validering.
+ * API key validation results.
  */
 public record ApiKeyValidationResult(
     boolean valid,

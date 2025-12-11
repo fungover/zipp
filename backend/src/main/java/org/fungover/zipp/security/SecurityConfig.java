@@ -25,19 +25,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // Lägg in vårt API-key-filter innan standard UsernamePasswordAuthenticationFilter
+            // Add our API key filter before the default UsernamePasswordAuthenticationFilter
             .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
             .authorizeHttpRequests(auth -> auth
-                // publik skit
+                // public
                 .requestMatchers("/", "/login", "/favicon.ico", "/favicon/**", "/css/**", "/images/**", "/js/**")
                 .permitAll()
 
-                // M2M / GraphQL: kräver att man är autentiserad – kan ske via API-key-filtret
+                // M2M / GraphQL: requires authentication – can be done via the API key filter
                 .requestMatchers("/api/m2m/**", "/graphql")
                 .hasRole("API_CLIENT")
 
-                // resten kräver vanlig användar-inloggning (OAuth2)
+                // the rest requires regular user login (OAuth2)
                 .anyRequest()
                 .authenticated()
             )

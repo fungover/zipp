@@ -11,7 +11,7 @@ public record ApiKeyWithSecret(
     String name,
     String description,
     String keyPrefix,
-    String secretKey,  // ⚠️ Visas endast här - kan aldrig hämtas igen!
+    String secretKey,
     Set<ApiScope> scopes,
     Instant createdAt,
     Instant expiresAt

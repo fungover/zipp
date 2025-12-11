@@ -16,11 +16,11 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Service-lager för all logik kring API-nycklar:
- * - generera starka API-nycklar
- * - hasha & spara dem i databasen
- * - validera inkommande API-nycklar
- * - lista & revoka nycklar för en användare
+ * Service layer for all logic around API keys:
+ * - generate strong API keys
+ * - hash and save them in the database
+ * - validate incoming API keys
+ * - list & revoke keys for a user
  */
 @Service
 public class ApiKeyService {
@@ -33,14 +33,14 @@ public class ApiKeyService {
     }
 
     /**
-     * Skapar en ny API-nyckel åt en användare.
+     * Creates a new API key for a user.
      *
-     * @param userId      ägarens userId
-     * @param name        användarens namn på nyckeln
-     * @param description frivillig beskrivning
-     * @param scopes      vilka scopes nyckeln ska ha (behörigheter)
-     * @param expiresAt   ev. utgångsdatum, annars null
-     * @return CreatedApiKey – både plaintext nyckel (visas EN gång) och sparad entitet
+     * @param userId      owner's userId
+     * @param name        user name on the key
+     * @param description optional description
+     * @param scopes      Change access modifier
+     * @param expiresAt   possible expiration date, otherwise null
+     * @return CreatedApiKey – both plaintext key (shown ONCE) and saved entity
      */
     @Transactional
     public CreatedApiKey createApiKey(UUID userId,
@@ -49,16 +49,16 @@ public class ApiKeyService {
                                       Set<ApiKey.ApiScope> scopes,
                                       Instant expiresAt) {
 
-        // 1) generera plaintext-nyckel
+        // 1) generate plaintext key
         String plainKey = generatePlainApiKey();
 
-        // 2) hash av plaintext-nyckeln
+        // 2) hash of the plaintext key
         String keyHash = sha256Hex(plainKey);
 
-        // 3) prefix för UI/loggar
+        // 3) prefix for UI/logs
         String keyPrefix = extractPrefix(plainKey);
 
-        // 4) bygg entitet
+        // 4) build entity
         ApiKey apiKey = new ApiKey();
         apiKey.setUserId(userId);
         apiKey.setKeyHash(keyHash);
@@ -70,15 +70,15 @@ public class ApiKeyService {
         apiKey.setExpiresAt(expiresAt);
         apiKey.setCreatedAt(Instant.now());
 
-        // 5) spara i DB
+        // 5) save in DB
         ApiKey saved = apiKeyRepository.save(apiKey);
 
-        // 6) returnera både plaintext (till klienten) och entiteten (om man vill använda den internt)
+        // 6) return both plaintext (to the client) and the entity (if you want to use it internally)
         return new CreatedApiKey(plainKey, saved);
     }
 
     /**
-     * Hämtar alla API-keys som tillhör en viss användare.
+     * Retrieves all API keys belonging to a specific user.
      */
     @Transactional(readOnly = true)
     public List<ApiKey> getApiKeysForUser(UUID userId) {
@@ -86,14 +86,14 @@ public class ApiKeyService {
     }
 
     /**
-     * Validerar en inkommande API-nyckel (från t.ex. X-API-Key header).
+     * Validates an incoming API key (from e.g. X-API-Key header).
      *
-     * - Hashar plaintext
-     * - Slår upp i DB på keyHash
-     * - Kollar status/expiry via apiKey.isValid()
-     * - Uppdaterar lastUsedAt
+     * - Hash plaintext
+     * - Looking up in DB on keyHash
+     * - Checking status/expiry via apiKey.isValid()
+     * - Updating lastUsedAt
      *
-     * Kastar InvalidApiKeyException om något är fel.
+     * Updating lastUsedAt
      */
     @Transactional
     public ApiKey validateApiKey(String rawApiKey) {
@@ -117,8 +117,8 @@ public class ApiKeyService {
     }
 
     /**
-     * Revokar (stänger av) en API-nyckel.
-     * Endast ägaren (userId) får revoka sin egen key.
+     * Revokes (turns off) an API key.
+     * Only the owner (userId) may revoke their own key.
      */
     @Transactional
     public void revokeApiKey(UUID apiKeyId, UUID currentUserId) {
@@ -139,8 +139,8 @@ public class ApiKeyService {
     // ------------------------
 
     /**
-     * Genererar en stark random API-nyckel i plaintext.
-     * Format: "zipp_live_" + base64-url-säker random-sträng.
+     * Generates a strong random API key in plaintext.
+     * Format: "zipp_live_" + base64-url-safe random string.
      */
     private String generatePlainApiKey() {
         String prefix = "zipp_live_";
@@ -156,7 +156,7 @@ public class ApiKeyService {
     }
 
     /**
-     * Tar de första 12 tecknen av plaintext-keyn för att använda som prefix i UI/loggar.
+     * Takes the first 12 characters of the plaintext key to use as a prefix in UI/logs.
      */
     private String extractPrefix(String plainKey) {
         int length = Math.min(12, plainKey.length());
@@ -164,7 +164,7 @@ public class ApiKeyService {
     }
 
     /**
-     * Hashar input-strängen med SHA-256 och returnerar hex-sträng.
+     * Hash the input string with SHA-256 and returns a hex string.
      */
     private String sha256Hex(String input) {
         try {
@@ -183,8 +183,8 @@ public class ApiKeyService {
     }
 
     /**
-     * Intern record för att returnera både plaintext och entiteten
-     * från createApiKey, utan att spara plaintext i databasen.
+     * Internal record to return both plaintext and the entity
+     * from createApiKey, without saving plaintext in the database.
      */
     public record CreatedApiKey(String plainKey, ApiKey apiKey) {
     }
