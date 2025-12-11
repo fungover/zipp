@@ -16,8 +16,8 @@ export default function getLocation(){
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 25000,
+        timeout: 5000,
+        maximumAge: 0,
       }
     )
   });
