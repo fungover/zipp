@@ -13,11 +13,8 @@
 <body>
 <main>
   <div class="login__container" layout:fragment="welcome">
-
     <a th:href="@{/oauth2/authorization/google}">
-      <img class="login__button"
-           th:src="@{/images/LoginGoogle.png}"
-           alt="Google login button">
+    <img class="login__button" th:src="@{/images/GoogleLogin.png}" alt="Google login button">
     </a>
 
     <button id="passkey-login-btn"
