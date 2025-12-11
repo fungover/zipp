@@ -36,14 +36,14 @@ public class ReportEventConsumerIntegrationTest {
         String testMessage = "Hello from EmbeddedKafka";
         template.send("reports", testMessage);
 
-        boolean messageConsumed = latch.await(45, TimeUnit.SECONDS);
+        boolean messageConsumed = latch.await(5, TimeUnit.SECONDS);
 
         assertThat(messageConsumed).isTrue();
         assertThat(receivedMessage).isEqualTo(testMessage);
     }
 
     @KafkaListener(topics = "reports", groupId = "test-group")
-    public void testConsue(String message) {
+    public void testConsume(String message) {
         this.receivedMessage = message;
         latch.countDown();
     }
