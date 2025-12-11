@@ -31,35 +31,30 @@ class SecuredReportControllerTest {
     @Test
     void createReportWithoutAuthorization() throws Exception {
         Report firstReport = new Report("Candy paper", ReportType.DEBRIS, 50.0, 50.0,
-            Instant.parse("2025-12-03T15:30:00Z"), ReportStatus.ACTIVE, null);
+                Instant.parse("2025-12-03T15:30:00Z"), ReportStatus.ACTIVE, null);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
-        mockMvc.perform(
-                post("/api/reports")
-                    .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(firstReport)))
-            .andExpect(status().is3xxRedirection());
+        mockMvc.perform(post("/api/reports").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(firstReport))).andExpect(status().is3xxRedirection());
     }
-
 
     @Test
     void createReportWithAuthorization() throws Exception {
         Report firstReport = new Report("Candy paper", ReportType.DEBRIS, 50.0, 50.0,
-            Instant.parse("2025-12-03T15:30:00Z"), ReportStatus.ACTIVE, null);
+                Instant.parse("2025-12-03T15:30:00Z"), ReportStatus.ACTIVE, null);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
         mockMvc.perform(
-                post("/api/reports").with(SecurityMockMvcRequestPostProcessors.oauth2Login().attributes(
-                        user -> {
-                            user.put("name", "Test User");
-                            user.put("email", "test@gmail.com");
-                            user.put("role", "USER");
-                        }))
-                    .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(firstReport)))
-            .andExpect(status().is2xxSuccessful());
+                post("/api/reports").with(SecurityMockMvcRequestPostProcessors.oauth2Login().attributes(user -> {
+                    user.put("name", "Test User");
+                    user.put("email", "test@gmail.com");
+                    user.put("role", "USER");
+                })).contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(firstReport)))
+                .andExpect(status().is2xxSuccessful());
     }
 
 }

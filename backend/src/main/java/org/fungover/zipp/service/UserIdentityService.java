@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserIdentityService {
     /**
-     * Extracts the user {@code ID} from the authentication object.
-     * If it doesn't find one, it throws an exception.
-     * If the principal is an {@link OAuth2User}, it tries to extract the user ID from the attributes: {@code sub}, {@code id}, {@code user_id}
-     * Currently, this only manages {@code OAuth2 authentication} but can be built further on.
+     * Extracts the user {@code ID} from the authentication object. If it doesn't
+     * find one, it throws an exception. If the principal is an {@link OAuth2User},
+     * it tries to extract the user ID from the attributes: {@code sub}, {@code id},
+     * {@code user_id} Currently, this only manages {@code OAuth2 authentication}
+     * but can be built further on.
+     * 
      * @param authentication
      * @return the extracted {@code ID} as a {@code String}
      */
@@ -34,9 +36,11 @@ public class UserIdentityService {
     }
 
     /**
-     * This method attempts to extract the user {@code ID} from the {@code OAuth2 principal}.
-     * If it doesn't find one, it throws an exception.
-     * The potential attributes are: {@code sub}, {@code id}, {@code user_id}, can be extended in the future.
+     * This method attempts to extract the user {@code ID} from the
+     * {@code OAuth2 principal}. If it doesn't find one, it throws an exception. The
+     * potential attributes are: {@code sub}, {@code id}, {@code user_id}, can be
+     * extended in the future.
+     * 
      * @param oAuth2User
      * @return the extracted {@code ID} as a {@code String}
      */
