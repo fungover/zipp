@@ -1,9 +1,4 @@
 spring:
-  kafka:
-    bootstrap-servers: ${spring.embedded.kafka.brokers}
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
   security:
     oauth2:
       client:
@@ -16,12 +11,6 @@ spring:
               - email
             redirect-uri: "https://zipp.city/login/oauth2/code/google"
             authorization-grant-type: authorization_code
-
-  datasource:
-    url: jdbc:mysql://localhost:3306/tobiasdb-exercise8
-    username: root
-    password: root
-
   jpa:
     hibernate:
       ddl-auto: update
