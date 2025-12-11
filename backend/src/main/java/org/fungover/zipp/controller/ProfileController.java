@@ -28,7 +28,7 @@ public class ProfileController {
         User user = profileService.getCurrentUser(authentication);
         model.addAttribute("user", user);
 
-        var reports = reportRepository.findAllBySubmittedBy_Email(user.getEmail());
+        var reports = reportRepository.findAllBySubmittedByEmail(user.getEmail());
         model.addAttribute("reports", reports);
 
         return "profilesettings";

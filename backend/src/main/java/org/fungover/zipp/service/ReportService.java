@@ -63,7 +63,7 @@ public class ReportService {
     }
 
     public List<Report> getAllReportsForUser(String userEmail) {
-        return reportRepository.findAllBySubmittedBy_Email(userEmail).stream().map(this::toDto).toList();
+        return reportRepository.findAllBySubmittedByEmail(userEmail).stream().map(this::toDto).toList();
     }
 
     private Report toDto(ReportEntity savedEntity) {
