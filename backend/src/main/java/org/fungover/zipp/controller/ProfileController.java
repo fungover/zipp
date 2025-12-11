@@ -2,7 +2,7 @@ package org.fungover.zipp.controller;
 
 import org.fungover.zipp.entity.ReportEntity;
 import org.fungover.zipp.entity.User;
-import org.fungover.zipp.profile.service.ProfileService;
+import org.fungover.zipp.service.ProfileService;
 import org.fungover.zipp.repository.ReportRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;

@@ -1,4 +1,4 @@
-package org.fungover.zipp.profile.service;
+package org.fungover.zipp.service;
 
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.repository.UserRepository;
