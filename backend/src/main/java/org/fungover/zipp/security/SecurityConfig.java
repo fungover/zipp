@@ -23,7 +23,8 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/", "/login",
+                    "/",
+                    "/login", "/login/**",
                     "/favicon.ico", "/favicon/**",
                     "/css/**", "/js/**",
                     "/images/**", "/img/**",
@@ -50,7 +51,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers(
                     "/webauthn/register/**",
-                    "/webauthn/authenticate/**"
+                    "/webauthn/authenticate/**",
+                    "/login/webauthn"
                 )
             );
 

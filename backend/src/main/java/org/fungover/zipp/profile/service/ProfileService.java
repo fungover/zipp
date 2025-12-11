@@ -16,11 +16,26 @@ public class ProfileService {
     }
 
     public User getCurrentUser(Authentication authentication) {
-        OAuth2User oauth = (OAuth2User) authentication.getPrincipal();
-        String email = oauth.getAttribute("email");
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("No authenticated user");
+        }
 
-        return userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found in DB"));
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof OAuth2User oauth) {
+            String email = oauth.getAttribute("email");
+            if (email == null) {
+                throw new RuntimeException("OAuth2 user has no email");
+            }
+
+            return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found by email: " + email));
+        }
+
+        String username = authentication.getName();
+
+        return userRepository.findByProviderId(username)
+            .orElseThrow(() -> new RuntimeException("User not found by providerId: " + username));
     }
 
     public User updateProfile(Authentication authentication, User formUser) {
