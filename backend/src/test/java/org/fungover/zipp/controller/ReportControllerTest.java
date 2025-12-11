@@ -34,7 +34,7 @@ class ReportControllerTest {
     }
 
     @Test
-    void createReport_ShouldReturnCreatedReport_WithStatus201() {
+    void createReportShouldReturnCreatedReportWithStatus201() {
         Report inputReport = new Report(mockUser, "Test description", ReportType.ACCIDENT, 59.3293, 18.0686, null, null,
                 null);
 
@@ -51,7 +51,7 @@ class ReportControllerTest {
     }
 
     @Test
-    void createReport_WithImages_ShouldReturnCreatedReport() {
+    void createReportWithImagesShouldReturnCreatedReport() {
         Report inputReport = new Report(mockUser, "Report with images", ReportType.DEBRIS, 59.3293, 18.0686, null, null,
                 List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg"));
 
@@ -70,7 +70,7 @@ class ReportControllerTest {
     }
 
     @Test
-    void getAllReports_ShouldReturnAllActiveReports() {
+    void getAllReportsShouldReturnAllActiveReports() {
         List<Report> expectedReports = List.of(
                 new Report(mockUser, "Report 1", ReportType.OTHER, 59.3293, 18.0686, Instant.now(), ReportStatus.ACTIVE,
                         List.of()),
@@ -89,7 +89,7 @@ class ReportControllerTest {
     }
 
     @Test
-    void getAllReports_ShouldReturnEmptyList_WhenNoReportsExist() {
+    void getAllReportsShouldReturnEmptyListWhenNoReportsExist() {
         when(reportService.getAllReports()).thenReturn(List.of());
 
         ResponseEntity<List<Report>> response = controller.getAllReports();
@@ -101,7 +101,7 @@ class ReportControllerTest {
     }
 
     @Test
-    void getAllReportsForUser_ShouldReturnReportsForSpecificUser() {
+    void getAllReportsForUserShouldReturnReportsForSpecificUser() {
         String userEmail = "user@example.com";
 
         List<Report> expectedReports = List.of(
@@ -122,7 +122,7 @@ class ReportControllerTest {
     }
 
     @Test
-    void getAllReportsForUser_ShouldReturnEmptyList_WhenUserHasNoReports() {
+    void getAllReportsForUserShouldReturnEmptyListWhenUserHasNoReports() {
         String userEmail = "no-reports-user@example.com";
 
         when(reportService.getAllReportsForUser(userEmail)).thenReturn(List.of());

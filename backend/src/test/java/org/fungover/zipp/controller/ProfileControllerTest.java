@@ -36,7 +36,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void showProfile_ShouldReturnProfileSettingsView_WithUserAndReports() {
+    void showProfileShouldReturnProfileSettingsViewWithUserAndReports() {
         Authentication auth = mock(Authentication.class);
         Model model = mock(Model.class);
 
@@ -51,7 +51,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void updateProfile_ShouldCallService_AndRedirect() {
+    void updateProfileShouldCallServiceAndRedirect() {
         Authentication auth = mock(Authentication.class);
         User formUser = new User();
         formUser.setEmail("new@example.com");
@@ -63,7 +63,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void deleteReport_ShouldDelete_WhenUserOwnsReport() {
+    void deleteReportShouldDeleteWhenUserOwnsReport() {
         Authentication auth = mock(Authentication.class);
 
         ReportEntity report = new ReportEntity();
@@ -80,7 +80,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void deleteReport_ShouldThrow_WhenUserIsNotOwner() {
+    void deleteReportShouldThrowWhenUserIsNotOwner() {
         Authentication auth = mock(Authentication.class);
 
         User otherUser = new User();
@@ -99,7 +99,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void deleteReport_ShouldFail_WhenReportMissing() {
+    void deleteReportShouldFailWhenReportMissing() {
         Authentication auth = mock(Authentication.class);
 
         when(profileService.getCurrentUser(any())).thenReturn(mockUser);
