@@ -76,8 +76,8 @@
 
 
   <script async defer
-          onerror="onGoogleMapsLoadError()"
-          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3bAuAPQVLrNhzQ-xDZ_xFpKoYj6HQAf4&callback=initMap">
+          th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${googleApiKey} + '&callback=initMap'}"
+          onerror="onGoogleMapsLoadError()">
   </script>
 </div>
 
