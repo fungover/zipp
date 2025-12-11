@@ -1,8 +1,6 @@
 package org.fungover.zipp.entity;
 
 import jakarta.persistence.*;
-import org.fungover.zipp.dto.ReportStatus;
-import org.fungover.zipp.dto.ReportType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;

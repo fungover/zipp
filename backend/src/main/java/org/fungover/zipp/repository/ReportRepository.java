@@ -1,6 +1,6 @@
 package org.fungover.zipp.repository;
 
-import org.fungover.zipp.dto.ReportStatus;
+import org.fungover.zipp.entity.ReportStatus;
 import org.fungover.zipp.entity.ReportEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 

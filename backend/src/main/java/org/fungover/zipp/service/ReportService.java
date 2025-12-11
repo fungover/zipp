@@ -1,7 +1,7 @@
 package org.fungover.zipp.service;
 
 import org.fungover.zipp.dto.Report;
-import org.fungover.zipp.dto.ReportStatus;
+import org.fungover.zipp.entity.ReportStatus;
 import org.fungover.zipp.entity.ReportEntity;
 import org.fungover.zipp.entity.ReportImageEntity;
 import org.fungover.zipp.repository.ReportRepository;
