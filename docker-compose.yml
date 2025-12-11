@@ -60,7 +60,7 @@ services:
     command: --default-authentication-plugin=mysql_native_password
 
   otel-collector:
-    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.139.0
+    image: otel/opentelemetry-collector-contrib:latest
     container_name: otel-collector
     deploy:
       resources:
@@ -78,6 +78,7 @@ services:
       - ${OTEL_COLLECTOR_PORT_HTTP}:${OTEL_COLLECTOR_PORT_HTTP}
       - ${OTEL_COLLECTOR_PORT_PROM}:${OTEL_COLLECTOR_PORT_PROM}
     environment:
+      - OTEL_LOGS_EXPORTER=otlp
       - OTEL_COLLECTOR_HOST=${OTEL_COLLECTOR_HOST}
       - OTEL_COLLECTOR_PORT_GRPC=${OTEL_COLLECTOR_PORT_GRPC}
       - OTEL_COLLECTOR_PORT_HTTP=${OTEL_COLLECTOR_PORT_HTTP}
@@ -118,6 +119,7 @@ services:
       - ./backend/config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./backend/config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./backend/config/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./backend/config/grafana/grafana.ini:/etc/grafana/grafana.ini
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -137,6 +139,16 @@ services:
       - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($|/)"'
       - '--path.rootfs=/rootfs'
 
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "${OTEL_COLLECTOR_PORT_LOKI}:${OTEL_COLLECTOR_PORT_LOKI}"
+    command: --config.file=/backend/config/loki/loki-config.yaml
+    volumes:
+      - ./backend/config/loki/loki-config.yaml:/backend/config/loki/loki-config.yaml
+    networks:
+      - app-net
 
 volumes:
   kafka-data:

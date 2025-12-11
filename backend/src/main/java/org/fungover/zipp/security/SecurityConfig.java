@@ -20,7 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
 
-                .requestMatchers("/","/actuator/prometheus").permitAll().anyRequest().authenticated())
+                .requestMatchers("/","/actuator/prometheus", "/loki").permitAll().anyRequest().authenticated())
 
                 .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true)

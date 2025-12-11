@@ -26,6 +26,8 @@ receivers:
 exporters:
   prometheus:
     endpoint: "0.0.0.0:${OTEL_COLLECTOR_PORT_PROM}"
+  otlphttp:
+    endpoint: http://loki:3100/loki/api/v1/push
   debug:
     verbosity: detailed
 
@@ -40,6 +42,10 @@ service:
       receivers: [otlp, hostmetrics]
       processors: [resourcedetection]
       exporters: [prometheus, debug]
+    logs:
+      receivers: [ otlp ]
+      processors: [ resourcedetection ]
+      exporters: [ otlphttp ]
 
 
   telemetry:
