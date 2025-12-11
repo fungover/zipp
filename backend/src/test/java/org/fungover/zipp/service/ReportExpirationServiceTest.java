@@ -1,8 +1,8 @@
 package org.fungover.zipp.service;
 
 import org.fungover.zipp.config.ReportConfig;
-import org.fungover.zipp.dto.ReportStatus;
 import org.fungover.zipp.entity.ReportEntity;
+import org.fungover.zipp.entity.ReportStatus;
 import org.fungover.zipp.repository.ReportRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,10 +22,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReportExpirationServiceTest {
