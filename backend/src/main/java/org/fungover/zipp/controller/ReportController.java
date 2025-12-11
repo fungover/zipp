@@ -41,9 +41,14 @@ public class ReportController {
          * SecurityContextHolder.getContext().getAuthentication()
          */
 
-        var cf = template.send("report", newReport);
-        cf.join();
-
+        template.send("report", newReport)
+            .whenComplete((result, ex) -> {
+                if (ex != null) {
+                    LOG.error("Failed to publish report to Kafka: {}", newReport, ex);
+                } else {
+                    LOG.debug("Report published to Kafka: {}", newReport);
+                }
+            });
         return ResponseEntity.status(HttpStatus.CREATED).body(newReport);
     }
 
