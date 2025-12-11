@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface WebAuthnCredentialEntityRepository extends JpaRepository<WebAuthnCredentialEntity, byte[]> {
 
-    List<WebAuthnCredentialEntity> findAllByUser_Id(UUID userId);
+    List<WebAuthnCredentialEntity> findAllByUserId(UUID userId);
 }

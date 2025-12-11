@@ -81,7 +81,7 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
     @Override
     public List<CredentialRecord> findByUserId(Bytes userId) {
         UUID uuid = bytesToUuid(userId.getBytes());
-        return credRepo.findAllByUser_Id(uuid).stream().map(this::mapToRecord).collect(Collectors.toList());
+        return credRepo.findAllByUserId(uuid).stream().map(this::mapToRecord).collect(Collectors.toList());
     }
 
     @Override
