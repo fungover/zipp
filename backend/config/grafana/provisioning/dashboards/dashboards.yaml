@@ -1,0 +1,10 @@
+
+
+providers:
+  - name: 'default'
+    folder: ''
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

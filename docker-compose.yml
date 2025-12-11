@@ -76,10 +76,12 @@ services:
     ports:
       - ${OTEL_COLLECTOR_PORT_GRPC}:${OTEL_COLLECTOR_PORT_GRPC}
       - ${OTEL_COLLECTOR_PORT_HTTP}:${OTEL_COLLECTOR_PORT_HTTP}
+      - ${OTEL_COLLECTOR_PORT_PROM}:${OTEL_COLLECTOR_PORT_PROM}
     environment:
       - OTEL_COLLECTOR_HOST=${OTEL_COLLECTOR_HOST}
       - OTEL_COLLECTOR_PORT_GRPC=${OTEL_COLLECTOR_PORT_GRPC}
       - OTEL_COLLECTOR_PORT_HTTP=${OTEL_COLLECTOR_PORT_HTTP}
+      - OTEL_COLLECTOR_PORT_PROM=${OTEL_COLLECTOR_PORT_PROM}
 
   prometheus:
     image: quay.io/prometheus/prometheus:v3.7.3
@@ -91,6 +93,9 @@ services:
       - --enable-feature=exemplar-storage
     volumes:
       - ./backend/config/prometheus/prometheus-config.yaml:/backend/config/prometheus/prometheus-config.yaml
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc:/host/etc:ro
     networks:
       - app-net
     deploy:
@@ -102,13 +107,35 @@ services:
       - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
 
   grafana:
-    image: grafana/grafana:9.5.2
+    image: grafana/grafana:12.2.0
     container_name: grafana
     ports:
       - "3000:3000"
     restart: unless-stopped
+    networks:
+      - app-net
     volumes:
-      - ./backend/grafana/provisioning/datasources:/backend/grafana/provisioning/datasources
+      - ./backend/config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./backend/config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./backend/config/grafana/dashboards:/var/lib/grafana/dashboards
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - app-net
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($|/)"'
+      - '--path.rootfs=/rootfs'
 
 
 volumes:
