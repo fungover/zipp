@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 @Service
 public class SseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SseService.class);
+    private static final Logger Logger = LoggerFactory.getLogger(SseService.class);
     private final Map<String, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
     public SseEmitter subscribe(String id) {
@@ -38,7 +38,7 @@ public class SseService {
             try {
                 emitter.send(SseEmitter.event().data(event));
             } catch (Exception e) {
-                logger.debug("Failed to send keep-alive to emitter for id {}: {}", id, e.getMessage());
+                Logger.debug("Failed to send keep-alive to emitter for id {}: {}", id, e.getMessage());
                 remove(id, emitter);
             }
         }

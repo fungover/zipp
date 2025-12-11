@@ -41,6 +41,7 @@ public class ReportEventConsumerIntegrationTest {
         assertThat(messageConsumed).isTrue();
         assertThat(receivedMessage).isEqualTo(testMessage);
     }
+
     @KafkaListener(topics = "reports", groupId = "test-group")
     public void testConsue(String message) {
         this.receivedMessage = message;
