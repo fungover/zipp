@@ -26,11 +26,9 @@ public class ProfileController {
 
     @GetMapping("/profilesettings")
     public String showProfile(Model model, Authentication authentication) {
-        // Inloggad user
         User user = profileService.getCurrentUser(authentication);
         model.addAttribute("user", user);
 
-        // Hämta alla rapporter för användarens email
         var reports = reportRepository.findAllBySubmittedBy_Email(user.getEmail());
         model.addAttribute("reports", reports);
 

@@ -6,7 +6,7 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>4.0.0</version>
-    <relativePath/> <!-- lookup parent from repository -->
+    <relativePath/>
   </parent>
   <groupId>org.fungover</groupId>
   <artifactId>backend</artifactId>
@@ -193,8 +193,6 @@
           </dependency>
         </dependencies>
       </plugin>
-
-      <!-- PMD - Static code analysis (Java 25 compatible) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>

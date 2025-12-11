@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <title>User Profile</title>
 
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -13,7 +12,6 @@
 
 <div class="max-w-3xl mx-auto px-4 py-10 space-y-8">
 
-  <!-- Profile Overview -->
   <div class="bg-white rounded-xl shadow-md p-8 text-center">
 
     <img th:src="${user.profileImageUrl != null ? user.profileImageUrl : 'https://i.pravatar.cc/200'}"
@@ -25,7 +23,6 @@
 
   </div>
 
-  <!-- GOOGLE ACCOUNT INFO -->
   <div class="bg-white rounded-xl shadow-md p-6">
     <h2 class="text-xl font-semibold mb-4">Google Account Info</h2>
 
@@ -53,7 +50,6 @@
     </div>
   </div>
 
-  <!-- PROFILE EDIT FORM -->
   <form th:action="@{/profilesettings}" method="post" th:object="${user}">
     <div class="bg-white rounded-xl shadow-md p-6 mb-4">
       <h2 class="text-xl font-semibold mb-4">About yourself</h2>
@@ -90,7 +86,6 @@
     </div>
   </form>
 
-  <!-- SECURITY CARD -->
   <div class="bg-white rounded-xl shadow-md p-6">
     <h2 class="text-xl font-semibold mb-4">Security</h2>
 
@@ -139,7 +134,6 @@
 </div>
 
 <script>
-  // din befintliga JS för passkeys – orörd
   function base64urlToUint8Array(base64url) {
     const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
     const pad = '='.repeat((4 - (base64.length % 4)) % 4);

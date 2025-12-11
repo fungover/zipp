@@ -19,7 +19,7 @@ public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserE
         this.userRepository = userRepository;
     }
 
-    // === helpers: UUID <-> byte[] ===
+
 
     private static byte[] uuidToBytes(UUID uuid) {
         ByteBuffer bb = ByteBuffer.allocate(16);
@@ -41,9 +41,7 @@ public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserE
             : u.getName();
 
         return ImmutablePublicKeyCredentialUserEntity.builder()
-            // WebAuthn userHandle = UUID som bytes
             .id(new Bytes(uuidToBytes(u.getId())))
-            // WebAuthn "name" = providerId (Google-ID:et, t.ex. "1034673...")
             .name(u.getProviderId())
             .displayName(displayName)
             .build();
@@ -59,7 +57,6 @@ public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserE
 
     @Override
     public PublicKeyCredentialUserEntity findByUsername(String username) {
-        // username = authentication.getName() = providerId vid Google OAuth
         return userRepository.findByProviderId(username)
             .map(this::mapToUserEntity)
             .orElse(null);
@@ -67,13 +64,10 @@ public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserE
 
     @Override
     public void save(PublicKeyCredentialUserEntity userEntity) {
-        // Vi skapar inte nya users här – de kommer från OAuth2-flödet.
-        // Du kan ev. synca displayName om du vill.
         UUID uuid;
         try {
             uuid = bytesToUuid(userEntity.getId().getBytes());
         } catch (Exception ex) {
-            // Om det inte går att tolka som UUID: skit i det.
             return;
         }
 
@@ -89,7 +83,5 @@ public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserE
 
     @Override
     public void delete(Bytes id) {
-        // Vi raderar inte riktiga users via WebAuthn.
-        // Här gör vi ingenting.
     }
 }

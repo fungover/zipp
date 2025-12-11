@@ -28,7 +28,6 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
         this.userRepo = userRepo;
     }
 
-    // === helpers: UUID <-> byte[] ===
 
     private static byte[] uuidToBytes(UUID uuid) {
         ByteBuffer bb = ByteBuffer.allocate(16);
@@ -49,7 +48,6 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
 
         return ImmutableCredentialRecord.builder()
             .credentialId(new Bytes(c.getCredentialId()))
-            // userEntityUserId = samma userHandle som i PublicKeyCredentialUserEntity (UUID -> bytes)
             .userEntityUserId(new Bytes(uuidToBytes(userId)))
             .publicKey(new ImmutablePublicKeyCose(c.getPublicKey()))
             .signatureCount(c.getSignatureCount())
@@ -84,7 +82,7 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
         return new WebAuthnCredentialEntity(
             credentialId,
             user,
-            record.getPublicKey().getBytes(),   // du lagrar public key som raw bytes
+            record.getPublicKey().getBytes(),
             record.getSignatureCount(),
             transports,
             attestationObject,

@@ -35,7 +35,6 @@ public class WebAuthnCredentialEntity {
     private byte[] clientDataJSON;
 
     protected WebAuthnCredentialEntity() {
-        // JPA
     }
 
     public WebAuthnCredentialEntity(
@@ -84,7 +83,6 @@ public class WebAuthnCredentialEntity {
         return clientDataJSON;
     }
 
-    // === Hjälpmetoder för transports ===
 
     public Set<AuthenticatorTransport> getTransportsAsSet() {
         if (transports == null || transports.isBlank()) {

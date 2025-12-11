@@ -35,8 +35,6 @@ class ProfileControllerTest {
         mockUser.setEmail("test@example.com");
     }
 
-
-    // GET /profilesettings
     @Test
     void showProfile_ShouldReturnProfileSettingsView_WithUserAndReports() {
         Authentication auth = mock(Authentication.class);
@@ -53,8 +51,6 @@ class ProfileControllerTest {
         verify(model).addAttribute(eq("reports"), any());
     }
 
-
-    // POST /profilesettings
     @Test
     void updateProfile_ShouldCallService_AndRedirect() {
         Authentication auth = mock(Authentication.class);
@@ -67,8 +63,6 @@ class ProfileControllerTest {
         verify(profileService).updateProfile(auth, formUser);
     }
 
-
-    // POST /profilesettings/reports/{id}/delete (success)
     @Test
     void deleteReport_ShouldDelete_WhenUserOwnsReport() {
         Authentication auth = mock(Authentication.class);
@@ -86,8 +80,6 @@ class ProfileControllerTest {
         verify(reportRepository).delete(report);
     }
 
-
-    // POST /profilesettings/reports/{id}/delete (user not owner)
     @Test
     void deleteReport_ShouldThrow_WhenUserIsNotOwner() {
         Authentication auth = mock(Authentication.class);
@@ -107,8 +99,6 @@ class ProfileControllerTest {
         verify(reportRepository, never()).delete(any());
     }
 
-
-    // POST /profilesettings/reports/{id}/delete (missing)
     @Test
     void deleteReport_ShouldFail_WhenReportMissing() {
         Authentication auth = mock(Authentication.class);

@@ -33,8 +33,6 @@ class ReportControllerTest {
         mockUser.setEmail("test@example.com");
     }
 
-
-    // POST /api/reports
     @Test
     void createReport_ShouldReturnCreatedReport_WithStatus201() {
         Report inputReport = new Report(
@@ -102,7 +100,6 @@ class ReportControllerTest {
         verify(reportService).createReport(inputReport);
     }
 
-    // GET /api/reports
     @Test
     void getAllReports_ShouldReturnAllActiveReports() {
         List<Report> expectedReports = List.of(
@@ -135,8 +132,6 @@ class ReportControllerTest {
         verify(reportService).getAllReports();
     }
 
-
-    // GET /api/reports/{userId}
     @Test
     void getAllReportsForUser_ShouldReturnReportsForSpecificUser() {
         String userEmail = "user@example.com";
