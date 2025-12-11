@@ -15,6 +15,7 @@ button.forEach(button => {
 
     const input = document.getElementById("report__description");
     const imageUrl = document.getElementById("report__url");
+    const result = document.getElementById("report__result");
 
     try {
       const location = await getLocation();
@@ -36,10 +37,11 @@ button.forEach(button => {
       })
         .then(response => response.json())
         .then(data => {
-          console.log(data);
+          result.innerText = "Success sending report for: "+ data.eventType;
+
         })
     } catch (error) {
-      console.log(error);
+      console.error(error);
       alert("Couldn't send report");
     }
   })
