@@ -41,7 +41,7 @@ class ProfileControllerTest {
         Model model = mock(Model.class);
 
         when(profileService.getCurrentUser(any())).thenReturn(mockUser);
-        when(reportRepository.findAllBySubmittedBy_Email("test@example.com")).thenReturn(List.of(new ReportEntity()));
+        when(reportRepository.findAllBySubmittedByEmail("test@example.com")).thenReturn(List.of(new ReportEntity()));
 
         String viewName = controller.showProfile(model, auth);
 
