@@ -37,15 +37,8 @@ public class WebAuthnCredentialEntity {
     protected WebAuthnCredentialEntity() {
     }
 
-    public WebAuthnCredentialEntity(
-        byte[] credentialId,
-        User user,
-        byte[] publicKey,
-        long signatureCount,
-        String transports,
-        byte[] attestationObject,
-        byte[] clientDataJSON
-    ) {
+    public WebAuthnCredentialEntity(byte[] credentialId, User user, byte[] publicKey, long signatureCount,
+            String transports, byte[] attestationObject, byte[] clientDataJSON) {
         this.credentialId = credentialId;
         this.user = user;
         this.publicKey = publicKey;
@@ -83,25 +76,19 @@ public class WebAuthnCredentialEntity {
         return clientDataJSON;
     }
 
-
     public Set<AuthenticatorTransport> getTransportsAsSet() {
         if (transports == null || transports.isBlank()) {
             return Set.of();
         }
-        return java.util.Arrays.stream(transports.split(","))
-            .map(String::trim)
-            .filter(s -> !s.isEmpty())
-            .map(AuthenticatorTransport::valueOf)
-            .collect(Collectors.toSet());
+        return java.util.Arrays.stream(transports.split(",")).map(String::trim).filter(s -> !s.isEmpty())
+                .map(AuthenticatorTransport::valueOf).collect(Collectors.toSet());
     }
 
     public static String transportsToString(Set<AuthenticatorTransport> transports) {
         if (transports == null || transports.isEmpty()) {
             return null;
         }
-        return transports.stream()
-            .map(AuthenticatorTransport::getValue) // "internal", "usb", "hybrid" etc
-            .sorted()
-            .collect(Collectors.joining(","));
+        return transports.stream().map(AuthenticatorTransport::getValue) // "internal", "usb", "hybrid" etc
+                .sorted().collect(Collectors.joining(","));
     }
 }

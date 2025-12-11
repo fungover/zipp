@@ -72,5 +72,3 @@ public class ReportService {
                 savedEntity.getStatus(), savedEntity.getImages().stream().map(ReportImageEntity::getImageUrl).toList());
     }
 }
-
-

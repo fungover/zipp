@@ -35,27 +35,11 @@ class ReportControllerTest {
 
     @Test
     void createReport_ShouldReturnCreatedReport_WithStatus201() {
-        Report inputReport = new Report(
-            mockUser,
-            "Test description",
-            ReportType.ACCIDENT,
-            59.3293,
-            18.0686,
-            null,
-            null,
-            null
-        );
+        Report inputReport = new Report(mockUser, "Test description", ReportType.ACCIDENT, 59.3293, 18.0686, null, null,
+                null);
 
-        Report savedReport = new Report(
-            mockUser,
-            "Test description",
-            ReportType.ACCIDENT,
-            59.3293,
-            18.0686,
-            Instant.now(),
-            ReportStatus.ACTIVE,
-            List.of()
-        );
+        Report savedReport = new Report(mockUser, "Test description", ReportType.ACCIDENT, 59.3293, 18.0686,
+                Instant.now(), ReportStatus.ACTIVE, List.of());
 
         when(reportService.createReport(inputReport)).thenReturn(savedReport);
 
@@ -68,27 +52,12 @@ class ReportControllerTest {
 
     @Test
     void createReport_WithImages_ShouldReturnCreatedReport() {
-        Report inputReport = new Report(
-            mockUser,
-            "Report with images",
-            ReportType.DEBRIS,
-            59.3293,
-            18.0686,
-            null,
-            null,
-            List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg")
-        );
+        Report inputReport = new Report(mockUser, "Report with images", ReportType.DEBRIS, 59.3293, 18.0686, null, null,
+                List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg"));
 
-        Report savedReport = new Report(
-            mockUser,
-            "Report with images",
-            ReportType.DEBRIS,
-            59.3293,
-            18.0686,
-            Instant.now(),
-            ReportStatus.ACTIVE,
-            List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg")
-        );
+        Report savedReport = new Report(mockUser, "Report with images", ReportType.DEBRIS, 59.3293, 18.0686,
+                Instant.now(), ReportStatus.ACTIVE,
+                List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg"));
 
         when(reportService.createReport(inputReport)).thenReturn(savedReport);
 
@@ -103,11 +72,10 @@ class ReportControllerTest {
     @Test
     void getAllReports_ShouldReturnAllActiveReports() {
         List<Report> expectedReports = List.of(
-            new Report(mockUser, "Report 1", ReportType.OTHER, 59.3293, 18.0686,
-                      Instant.now(), ReportStatus.ACTIVE, List.of()),
-            new Report(mockUser, "Report 2", ReportType.OTHER, 59.3294, 18.0687,
-                      Instant.now(), ReportStatus.ACTIVE, List.of())
-        );
+                new Report(mockUser, "Report 1", ReportType.OTHER, 59.3293, 18.0686, Instant.now(), ReportStatus.ACTIVE,
+                        List.of()),
+                new Report(mockUser, "Report 2", ReportType.OTHER, 59.3294, 18.0687, Instant.now(), ReportStatus.ACTIVE,
+                        List.of()));
 
         when(reportService.getAllReports()).thenReturn(expectedReports);
 
@@ -137,11 +105,10 @@ class ReportControllerTest {
         String userEmail = "user@example.com";
 
         List<Report> expectedReports = List.of(
-            new Report(mockUser, "User report 1", ReportType.ACCIDENT, 59.3293, 18.0686,
-                      Instant.now(), ReportStatus.ACTIVE, List.of()),
-            new Report(mockUser, "User report 2", ReportType.ACCIDENT, 59.3294, 18.0687,
-                      Instant.now(), ReportStatus.ACTIVE, List.of())
-        );
+                new Report(mockUser, "User report 1", ReportType.ACCIDENT, 59.3293, 18.0686, Instant.now(),
+                        ReportStatus.ACTIVE, List.of()),
+                new Report(mockUser, "User report 2", ReportType.ACCIDENT, 59.3294, 18.0687, Instant.now(),
+                        ReportStatus.ACTIVE, List.of()));
 
         when(reportService.getAllReportsForUser(userEmail)).thenReturn(expectedReports);
 

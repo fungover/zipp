@@ -19,8 +19,6 @@ public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserE
         this.userRepository = userRepository;
     }
 
-
-
     private static byte[] uuidToBytes(UUID uuid) {
         ByteBuffer bb = ByteBuffer.allocate(16);
         bb.putLong(uuid.getMostSignificantBits());
@@ -37,29 +35,22 @@ public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserE
 
     private PublicKeyCredentialUserEntity mapToUserEntity(User u) {
         String displayName = u.getDisplayName() != null && !u.getDisplayName().isBlank()
-            ? u.getDisplayName()
-            : u.getName();
+                ? u.getDisplayName()
+                : u.getName();
 
-        return ImmutablePublicKeyCredentialUserEntity.builder()
-            .id(new Bytes(uuidToBytes(u.getId())))
-            .name(u.getProviderId())
-            .displayName(displayName)
-            .build();
+        return ImmutablePublicKeyCredentialUserEntity.builder().id(new Bytes(uuidToBytes(u.getId())))
+                .name(u.getProviderId()).displayName(displayName).build();
     }
 
     @Override
     public PublicKeyCredentialUserEntity findById(Bytes id) {
         UUID uuid = bytesToUuid(id.getBytes());
-        return userRepository.findById(uuid)
-            .map(this::mapToUserEntity)
-            .orElse(null);
+        return userRepository.findById(uuid).map(this::mapToUserEntity).orElse(null);
     }
 
     @Override
     public PublicKeyCredentialUserEntity findByUsername(String username) {
-        return userRepository.findByProviderId(username)
-            .map(this::mapToUserEntity)
-            .orElse(null);
+        return userRepository.findByProviderId(username).map(this::mapToUserEntity).orElse(null);
     }
 
     @Override
@@ -74,7 +65,7 @@ public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserE
         userRepository.findById(uuid).ifPresent(user -> {
             String displayName = userEntity.getDisplayName();
             if (displayName != null && !displayName.isBlank()
-                && (user.getDisplayName() == null || !user.getDisplayName().equals(displayName))) {
+                    && (user.getDisplayName() == null || !user.getDisplayName().equals(displayName))) {
                 user.setDisplayName(displayName);
                 userRepository.save(user);
             }

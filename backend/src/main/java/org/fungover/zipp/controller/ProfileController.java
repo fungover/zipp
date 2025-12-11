@@ -18,8 +18,7 @@ public class ProfileController {
     private final ProfileService profileService;
     private final ReportRepository reportRepository;
 
-    public ProfileController(ProfileService profileService,
-                             ReportRepository reportRepository) {
+    public ProfileController(ProfileService profileService, ReportRepository reportRepository) {
         this.profileService = profileService;
         this.reportRepository = reportRepository;
     }
@@ -36,21 +35,19 @@ public class ProfileController {
     }
 
     @PostMapping("/profilesettings")
-    public String updateProfile(@ModelAttribute("user") User formUser,
-                                Authentication authentication) {
+    public String updateProfile(@ModelAttribute("user") User formUser, Authentication authentication) {
 
         profileService.updateProfile(authentication, formUser);
         return "redirect:/profilesettings";
     }
 
     @PostMapping("/profilesettings/reports/{id}/delete")
-    public String deleteReport(@PathVariable("id") Long id,
-                               Authentication authentication) {
+    public String deleteReport(@PathVariable("id") Long id, Authentication authentication) {
 
         User currentUser = profileService.getCurrentUser(authentication);
 
         ReportEntity report = reportRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Report not found: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Report not found: " + id));
 
         // Säkerhet: bara ägaren (eller ev. admin) får ta bort
         if (!report.getSubmittedBy().getId().equals(currentUser.getId())) {

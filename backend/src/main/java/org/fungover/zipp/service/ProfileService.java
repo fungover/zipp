@@ -29,13 +29,13 @@ public class ProfileService {
             }
 
             return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found by email: " + email));
+                    .orElseThrow(() -> new RuntimeException("User not found by email: " + email));
         }
 
         String username = authentication.getName();
 
         return userRepository.findByProviderId(username)
-            .orElseThrow(() -> new RuntimeException("User not found by providerId: " + username));
+                .orElseThrow(() -> new RuntimeException("User not found by providerId: " + username));
     }
 
     public User updateProfile(Authentication authentication, User formUser) {
