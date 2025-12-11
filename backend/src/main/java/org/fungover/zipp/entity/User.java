@@ -49,6 +49,8 @@ public class User {
     @Column(name = "city")
     private String city;
 
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
 
     @PrePersist
     protected void onCreate() {
@@ -56,6 +58,14 @@ public class User {
     }
 
     public User() {
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
     }
 
     public String getCity() {

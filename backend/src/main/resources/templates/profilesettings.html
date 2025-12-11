@@ -16,7 +16,7 @@
   <!-- Profile Overview -->
   <div class="bg-white rounded-xl shadow-md p-8 text-center">
 
-    <img src="https://i.pravatar.cc/200"
+    <img th:src="${user.profileImageUrl != null ? user.profileImageUrl : 'https://i.pravatar.cc/200'}"
          alt="User avatar"
          class="w-32 h-32 rounded-full mx-auto object-cover shadow">
 
