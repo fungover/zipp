@@ -21,8 +21,8 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Filters that intercept incoming requests and validate API keys.
- * Looking for the key in the X-API-Key header.
+ * Filters that intercept incoming requests and validate API keys. Looking for
+ * the key in the X-API-Key header.
  */
 @Component
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
@@ -36,10 +36,8 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
         String apiKey = request.getHeader(API_KEY_HEADER);
 
@@ -50,20 +48,15 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
                 ApiKey validatedKey = apiKeyService.validateApiKey(apiKey);
 
                 // Create authentication tokens with scope-based authorities
-                ApiKeyAuthentication authentication = new ApiKeyAuthentication(
-                    validatedKey.getUserId(),
-                    validatedKey.getId(),
-                    validatedKey.getScopes()
-                );
+                ApiKeyAuthentication authentication = new ApiKeyAuthentication(validatedKey.getUserId(),
+                        validatedKey.getId(), validatedKey.getScopes());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (InvalidApiKeyException e) {
                 // Invalid API key - return 401
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
-                response.getWriter().write(
-                    "{\"error\": \"Unauthorized\", \"message\": \"" + e.getMessage() + "\"}"
-                );
+                response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"" + e.getMessage() + "\"}");
                 return;
             }
         }
@@ -117,7 +110,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
         @Override
         public Object getCredentials() {
-            return null;  // API key is not saved after authentication
+            return null; // API key is not saved after authentication
         }
 
         @Override

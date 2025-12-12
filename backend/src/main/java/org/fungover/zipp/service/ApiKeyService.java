@@ -18,11 +18,9 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Service layer for all logic around API keys:
- * - generate strong API keys
- * - hash and save them in the database
- * - validate incoming API keys
- * - list & revoke keys for a user
+ * Service layer for all logic around API keys: - generate strong API keys -
+ * hash and save them in the database - validate incoming API keys - list &
+ * revoke keys for a user
  */
 @Service
 public class ApiKeyService {
@@ -37,28 +35,26 @@ public class ApiKeyService {
     /**
      * Creates a new API key for a user.
      *
-     * @param userId      owner's userId
-     * @param name        user name on the key
-     * @param description optional description
-     * @param scopes      Change access modifier
-     * @param expiresAt   possible expiration date, otherwise null
+     * @param userId
+     *            owner's userId
+     * @param name
+     *            user name on the key
+     * @param description
+     *            optional description
+     * @param scopes
+     *            Change access modifier
+     * @param expiresAt
+     *            possible expiration date, otherwise null
      * @return CreatedApiKey – both plaintext key (shown ONCE) and saved entity
      */
     @Transactional
-    public CreatedApiKey createApiKey(UUID userId,
-                                      String name,
-                                      String description,
-                                      Set<ApiKey.ApiScope> scopes,
-                                      Instant expiresAt) {
+    public CreatedApiKey createApiKey(UUID userId, String name, String description, Set<ApiKey.ApiScope> scopes,
+            Instant expiresAt) {
 
         long activeKeys = apiKeyRepository.countActiveKeysByUserId(userId);
         if (activeKeys >= 10) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Maximum number of active API keys reached (10)"
-            );
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Maximum number of active API keys reached (10)");
         }
-
 
         // 1) generate plaintext key
         String plainKey = generatePlainApiKey();
@@ -79,12 +75,14 @@ public class ApiKeyService {
         apiKey.setScopes(scopes != null ? scopes : Set.of());
         apiKey.setStatus(ApiKey.KeyStatus.ACTIVE);
         apiKey.setExpiresAt(expiresAt);
-        // apiKey.setCreatedAt(Instant.now()); I don´t believe this is needed, since java does it automatically thanks to @PrePersist in the ApiKey entity
+        // apiKey.setCreatedAt(Instant.now()); I don´t believe this is needed, since
+        // java does it automatically thanks to @PrePersist in the ApiKey entity
 
         // 5) save in DB
         ApiKey saved = apiKeyRepository.save(apiKey);
 
-        // 6) return both plaintext (to the client) and the entity (if you want to use it internally)
+        // 6) return both plaintext (to the client) and the entity (if you want to use
+        // it internally)
         return new CreatedApiKey(plainKey, saved);
     }
 
@@ -99,10 +97,8 @@ public class ApiKeyService {
     /**
      * Validates an incoming API key (from e.g. X-API-Key header).
      *
-     * - Hash plaintext
-     * - Looking up in DB on keyHash
-     * - Checking status/expiry via apiKey.isValid()
-     * - Updating lastUsedAt
+     * - Hash plaintext - Looking up in DB on keyHash - Checking status/expiry via
+     * apiKey.isValid() - Updating lastUsedAt
      *
      * Updating lastUsedAt
      */
@@ -115,7 +111,7 @@ public class ApiKeyService {
         String hash = sha256Hex(rawApiKey);
 
         ApiKey apiKey = apiKeyRepository.findByKeyHash(hash)
-            .orElseThrow(() -> new InvalidApiKeyException("Invalid API key"));
+                .orElseThrow(() -> new InvalidApiKeyException("Invalid API key"));
 
         if (!apiKey.isValid()) {
             throw new InvalidApiKeyException("API key is not active or has expired");
@@ -128,13 +124,13 @@ public class ApiKeyService {
     }
 
     /**
-     * Revokes (turns off) an API key.
-     * Only the owner (userId) may revoke their own key.
+     * Revokes (turns off) an API key. Only the owner (userId) may revoke their own
+     * key.
      */
     @Transactional
     public void revokeApiKey(UUID apiKeyId, UUID currentUserId) {
         ApiKey apiKey = apiKeyRepository.findById(apiKeyId)
-            .orElseThrow(() -> new InvalidApiKeyException("API key not found"));
+                .orElseThrow(() -> new InvalidApiKeyException("API key not found"));
 
         if (!apiKey.getUserId().equals(currentUserId)) {
             throw new InvalidApiKeyException("You are not allowed to revoke this API key");
@@ -150,8 +146,8 @@ public class ApiKeyService {
     // ------------------------
 
     /**
-     * Generates a strong random API key in plaintext.
-     * Format: "zipp_live_" + base64-url-safe random string.
+     * Generates a strong random API key in plaintext. Format: "zipp_live_" +
+     * base64-url-safe random string.
      */
     private String generatePlainApiKey() {
         String prefix = "zipp_live_";
@@ -159,15 +155,14 @@ public class ApiKeyService {
         byte[] randomBytes = new byte[32]; // 256 bitar
         secureRandom.nextBytes(randomBytes);
 
-        String randomPart = Base64.getUrlEncoder()
-            .withoutPadding()
-            .encodeToString(randomBytes);
+        String randomPart = Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
 
         return prefix + randomPart;
     }
 
     /**
-     * Takes the first 12 characters of the plaintext key to use as a prefix in UI/logs.
+     * Takes the first 12 characters of the plaintext key to use as a prefix in
+     * UI/logs.
      */
     private String extractPrefix(String plainKey) {
         int length = Math.min(12, plainKey.length());
@@ -194,8 +189,8 @@ public class ApiKeyService {
     }
 
     /**
-     * Internal record to return both plaintext and the entity
-     * from createApiKey, without saving plaintext in the database.
+     * Internal record to return both plaintext and the entity from createApiKey,
+     * without saving plaintext in the database.
      */
     public record CreatedApiKey(String plainKey, ApiKey apiKey) {
     }

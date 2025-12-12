@@ -8,13 +8,8 @@ import java.util.UUID;
 /**
  * API key validation results.
  */
-public record ApiKeyValidationResult(
-    boolean valid,
-    UUID userId,
-    UUID keyId,
-    Set<ApiScope> scopes,
-    String errorMessage
-) {
+public record ApiKeyValidationResult(boolean valid, UUID userId, UUID keyId, Set<ApiScope> scopes,
+        String errorMessage) {
     public static ApiKeyValidationResult valid(UUID userId, UUID keyId, Set<ApiScope> scopes) {
         return new ApiKeyValidationResult(true, userId, keyId, scopes, null);
     }

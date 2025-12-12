@@ -7,15 +7,6 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-public record ApiKeyResponse(
-    UUID id,
-    String name,
-    String description,
-    String keyPrefix,
-    Set<ApiScope> scopes,
-    KeyStatus status,
-    Instant createdAt,
-    Instant lastUsedAt,
-    Instant expiresAt,
-    Instant revokedAt
-) {}
+public record ApiKeyResponse(UUID id, String name, String description, String keyPrefix, Set<ApiScope> scopes,
+        KeyStatus status, Instant createdAt, Instant lastUsedAt, Instant expiresAt, Instant revokedAt) {
+}

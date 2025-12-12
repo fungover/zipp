@@ -16,11 +16,10 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * REST-controller to handle API-keys for the logged in user.
- * Endpoints:
- *  POST   /api/me/api-keys       -> Creates a new key (returns ApiKeyWithSecret)
- *  GET    /api/me/api-keys       -> list all keys (returns ApiKeyResponse[])
- *  DELETE /api/me/api-keys/{id}  -> revoke a key
+ * REST-controller to handle API-keys for the logged in user. Endpoints: POST
+ * /api/me/api-keys -> Creates a new key (returns ApiKeyWithSecret) GET
+ * /api/me/api-keys -> list all keys (returns ApiKeyResponse[]) DELETE
+ * /api/me/api-keys/{id} -> revoke a key
  */
 @RestController
 @RequestMapping("/api/me/api-keys")
@@ -33,14 +32,13 @@ public class ApiKeyController {
     }
 
     /**
-     * Create a new API-key for the logged-in user.
-     * Body: ApiKeyCreateRequest (name, description, scopes, expiresInDays)
-     * Return: ApiKeyWithSecret (id, namn, prefix, secretKey, scopes, createdAt, expiresAt)
+     * Create a new API-key for the logged-in user. Body: ApiKeyCreateRequest (name,
+     * description, scopes, expiresInDays) Return: ApiKeyWithSecret (id, namn,
+     * prefix, secretKey, scopes, createdAt, expiresAt)
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiKeyWithSecret createApiKey(@Valid @RequestBody ApiKeyCreateRequest request,
-                                         Principal principal) {
+    public ApiKeyWithSecret createApiKey(@Valid @RequestBody ApiKeyCreateRequest request, Principal principal) {
 
         UUID currentUserId = extractUserId(principal);
 
@@ -50,41 +48,25 @@ public class ApiKeyController {
             expiresAt = Instant.now().plus(request.expiresInDays(), ChronoUnit.DAYS);
         }
 
-        var created = apiKeyService.createApiKey(
-            currentUserId,
-            request.name(),
-            request.description(),
-            request.scopes(),
-            expiresAt
-        );
+        var created = apiKeyService.createApiKey(currentUserId, request.name(), request.description(), request.scopes(),
+                expiresAt);
 
         ApiKey apiKey = created.apiKey();
 
         // ApiKeyWithSecret = what is shown only once post creation
-        return new ApiKeyWithSecret(
-            apiKey.getId(),
-            apiKey.getName(),
-            apiKey.getDescription(),
-            apiKey.getKeyPrefix(),
-            created.plainKey(),
-            apiKey.getScopes(),
-            apiKey.getCreatedAt(),
-            apiKey.getExpiresAt()
-        );
+        return new ApiKeyWithSecret(apiKey.getId(), apiKey.getName(), apiKey.getDescription(), apiKey.getKeyPrefix(),
+                created.plainKey(), apiKey.getScopes(), apiKey.getCreatedAt(), apiKey.getExpiresAt());
     }
 
     /**
-     * Lists all API-keys that belongs to the logged-in user
-     * Returns NOT secretKey - ONLY metadata.
+     * Lists all API-keys that belongs to the logged-in user Returns NOT secretKey -
+     * ONLY metadata.
      */
     @GetMapping
     public List<ApiKeyResponse> getMyApiKeys(Principal principal) {
         UUID currentUserId = extractUserId(principal);
 
-        return apiKeyService.getApiKeysForUser(currentUserId)
-            .stream()
-            .map(this::toApiKeyResponse)
-            .toList();
+        return apiKeyService.getApiKeysForUser(currentUserId).stream().map(this::toApiKeyResponse).toList();
     }
 
     /**
@@ -98,7 +80,7 @@ public class ApiKeyController {
     }
 
     // ------------------------
-    //   HJÄLP-METODER
+    // HJÄLP-METODER
     // ------------------------
 
     /**
@@ -106,25 +88,15 @@ public class ApiKeyController {
      */
 
     private ApiKeyResponse toApiKeyResponse(ApiKey apiKey) {
-        return new ApiKeyResponse(
-            apiKey.getId(),
-            apiKey.getName(),
-            apiKey.getDescription(),
-            apiKey.getKeyPrefix(),
-            apiKey.getScopes(),
-            apiKey.getStatus(),
-            apiKey.getCreatedAt(),
-            apiKey.getLastUsedAt(),
-            apiKey.getExpiresAt(),
-            apiKey.getRevokedAt()
-        );
+        return new ApiKeyResponse(apiKey.getId(), apiKey.getName(), apiKey.getDescription(), apiKey.getKeyPrefix(),
+                apiKey.getScopes(), apiKey.getStatus(), apiKey.getCreatedAt(), apiKey.getLastUsedAt(),
+                apiKey.getExpiresAt(), apiKey.getRevokedAt());
     }
 
     /**
-     * Cherrypick userId (UUID) from Principal.
-     * ADJUST IT HERE TO MATCH USERS ID.
-     *  - If principal.getName() is a UUID-string -> works directly.
-     *  - If custom User/Principal-type -> change implementation.
+     * Cherrypick userId (UUID) from Principal. ADJUST IT HERE TO MATCH USERS ID. -
+     * If principal.getName() is a UUID-string -> works directly. - If custom
+     * User/Principal-type -> change implementation.
      */
     private UUID extractUserId(Principal principal) {
         try {

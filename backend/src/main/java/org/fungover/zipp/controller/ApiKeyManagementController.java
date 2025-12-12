@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * REST controller for API key management.
- * Requires OAuth2 authentication (user must be logged in via Google).
+ * REST controller for API key management. Requires OAuth2 authentication (user
+ * must be logged in via Google).
  */
 @RestController
 @RequestMapping("/api/keys")
@@ -32,54 +32,40 @@ public class ApiKeyManagementController {
     }
 
     /**
-     * Create a new API key.
-     * The secret is returned only in this response and cannot be retrieved again.
+     * Create a new API key. The secret is returned only in this response and cannot
+     * be retrieved again.
      */
     @PostMapping
-    public ResponseEntity<ApiKeyWithSecret> createApiKey(
-        @AuthenticationPrincipal OAuth2User principal,
-        @Valid @RequestBody ApiKeyCreateRequest request) {
+    public ResponseEntity<ApiKeyWithSecret> createApiKey(@AuthenticationPrincipal OAuth2User principal,
+            @Valid @RequestBody ApiKeyCreateRequest request) {
 
         UUID userId = extractUserId(principal);
 
-        ApiKeyService.CreatedApiKey created = apiKeyService.createApiKey(
-            userId,
-            request.name(),
-            request.description(),
-            request.scopes(),
-            request.expiresInDays() != null
-                ? java.time.Instant.now().plusSeconds(request.expiresInDays() * 86400L)
-                : null
-        );
+        ApiKeyService.CreatedApiKey created = apiKeyService.createApiKey(userId, request.name(), request.description(),
+                request.scopes(),
+                request.expiresInDays() != null
+                        ? java.time.Instant.now().plusSeconds(request.expiresInDays() * 86400L)
+                        : null);
 
-        ApiKeyWithSecret response = new ApiKeyWithSecret(
-            created.apiKey().getId(),
-            created.apiKey().getName(),
-            created.apiKey().getDescription(),
-            created.apiKey().getKeyPrefix(),
-            created.plainKey(),  // Secret - shown only once!
-            created.apiKey().getScopes(),
-            created.apiKey().getCreatedAt(),
-            created.apiKey().getExpiresAt()
-        );
+        ApiKeyWithSecret response = new ApiKeyWithSecret(created.apiKey().getId(), created.apiKey().getName(),
+                created.apiKey().getDescription(), created.apiKey().getKeyPrefix(), created.plainKey(), // Secret -
+                                                                                                        // shown only
+                                                                                                        // once!
+                created.apiKey().getScopes(), created.apiKey().getCreatedAt(), created.apiKey().getExpiresAt());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
-     * List all API keys for the current user.
-     * Does not include the secret keys.
+     * List all API keys for the current user. Does not include the secret keys.
      */
     @GetMapping
-    public ResponseEntity<List<ApiKeyResponse>> listApiKeys(
-        @AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<List<ApiKeyResponse>> listApiKeys(@AuthenticationPrincipal OAuth2User principal) {
 
         UUID userId = extractUserId(principal);
         List<ApiKey> keys = apiKeyService.getApiKeysForUser(userId);
 
-        List<ApiKeyResponse> response = keys.stream()
-            .map(this::toResponse)
-            .toList();
+        List<ApiKeyResponse> response = keys.stream().map(this::toResponse).toList();
 
         return ResponseEntity.ok(response);
     }
@@ -88,17 +74,14 @@ public class ApiKeyManagementController {
      * Get details of a specific API key.
      */
     @GetMapping("/{keyId}")
-    public ResponseEntity<ApiKeyResponse> getApiKey(
-        @AuthenticationPrincipal OAuth2User principal,
-        @PathVariable UUID keyId) {
+    public ResponseEntity<ApiKeyResponse> getApiKey(@AuthenticationPrincipal OAuth2User principal,
+            @PathVariable UUID keyId) {
 
         UUID userId = extractUserId(principal);
         List<ApiKey> keys = apiKeyService.getApiKeysForUser(userId);
 
-        ApiKey key = keys.stream()
-            .filter(k -> k.getId().equals(keyId))
-            .findFirst()
-            .orElseThrow(() -> new InvalidApiKeyException("API key not found"));
+        ApiKey key = keys.stream().filter(k -> k.getId().equals(keyId)).findFirst()
+                .orElseThrow(() -> new InvalidApiKeyException("API key not found"));
 
         return ResponseEntity.ok(toResponse(key));
     }
@@ -107,9 +90,8 @@ public class ApiKeyManagementController {
      * Revoke an API key.
      */
     @DeleteMapping("/{keyId}")
-    public ResponseEntity<Map<String, String>> revokeApiKey(
-        @AuthenticationPrincipal OAuth2User principal,
-        @PathVariable UUID keyId) {
+    public ResponseEntity<Map<String, String>> revokeApiKey(@AuthenticationPrincipal OAuth2User principal,
+            @PathVariable UUID keyId) {
 
         UUID userId = extractUserId(principal);
         apiKeyService.revokeApiKey(keyId, userId);
@@ -123,15 +105,14 @@ public class ApiKeyManagementController {
     @GetMapping("/scopes")
     public ResponseEntity<List<ScopeInfo>> getAvailableScopes() {
         List<ScopeInfo> scopes = java.util.Arrays.stream(ApiKey.ApiScope.values())
-            .map(scope -> new ScopeInfo(scope.name(), getScopeDescription(scope)))
-            .toList();
+                .map(scope -> new ScopeInfo(scope.name(), getScopeDescription(scope))).toList();
 
         return ResponseEntity.ok(scopes);
     }
 
     /**
-     * Extract user ID from OAuth2 principal.
-     * Adjust this based on your User entity and how you store users.
+     * Extract user ID from OAuth2 principal. Adjust this based on your User entity
+     * and how you store users.
      */
     private UUID extractUserId(OAuth2User principal) {
         // Option 1: If you store Google's 'sub' claim as UUID
@@ -160,18 +141,9 @@ public class ApiKeyManagementController {
     }
 
     private ApiKeyResponse toResponse(ApiKey apiKey) {
-        return new ApiKeyResponse(
-            apiKey.getId(),
-            apiKey.getName(),
-            apiKey.getDescription(),
-            apiKey.getKeyPrefix(),
-            apiKey.getScopes(),
-            apiKey.getStatus(),
-            apiKey.getCreatedAt(),
-            apiKey.getLastUsedAt(),
-            apiKey.getExpiresAt(),
-            apiKey.getRevokedAt()
-        );
+        return new ApiKeyResponse(apiKey.getId(), apiKey.getName(), apiKey.getDescription(), apiKey.getKeyPrefix(),
+                apiKey.getScopes(), apiKey.getStatus(), apiKey.getCreatedAt(), apiKey.getLastUsedAt(),
+                apiKey.getExpiresAt(), apiKey.getRevokedAt());
     }
 
     private String getScopeDescription(ApiKey.ApiScope scope) {
@@ -185,7 +157,8 @@ public class ApiKeyManagementController {
         };
     }
 
-    record ScopeInfo(String name, String description) {}
+    record ScopeInfo(String name, String description) {
+    }
 
     @ExceptionHandler(InvalidApiKeyException.class)
     public ResponseEntity<Map<String, String>> handleApiKeyException(InvalidApiKeyException ex) {

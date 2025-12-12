@@ -8,14 +8,12 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * This is supposed to use User.
- * This is the actual key. This will behold the model for an API-key in the db
+ * This is supposed to use User. This is the actual key. This will behold the
+ * model for an API-key in the db
  **/
 @Entity
-@Table(name = "api_keys", indexes = {
-    @Index(name = "idx_api_key_hash", columnList = "keyHash"),
-    @Index(name = "idx_api_key_user", columnList = "userId")
-})
+@Table(name = "api_keys", indexes = {@Index(name = "idx_api_key_hash", columnList = "keyHash"),
+        @Index(name = "idx_api_key_user", columnList = "userId")})
 public class ApiKey {
 
     @Id
@@ -23,16 +21,16 @@ public class ApiKey {
     private UUID id;
 
     @Column(nullable = false)
-    private UUID userId;  // References the user with passkey auth
+    private UUID userId; // References the user with passkey auth
 
     @Column(nullable = false, unique = true)
-    private String keyHash;  // SHA-256 hash of the actual key
+    private String keyHash; // SHA-256 hash of the actual key
 
     @Column(nullable = false, length = 12)
-    private String keyPrefix;  // First 12 chars for identification (e.g., "zipp_live_ab")
+    private String keyPrefix; // First 12 chars for identification (e.g., "zipp_live_ab")
 
     @Column(nullable = false, length = 100)
-    private String name;  // User-defined name for the key
+    private String name; // User-defined name for the key
 
     @Column(length = 500)
     private String description;
@@ -186,20 +184,18 @@ public class ApiKey {
     }
 
     public enum KeyStatus {
-        ACTIVE,
-        REVOKED,
-        EXPIRED
+        ACTIVE, REVOKED, EXPIRED
     }
 
     /**
      * API scopes control what operations an API key can perform.
      */
     public enum ApiScope {
-        REPORTS_READ,      // Read location reports
-        REPORTS_WRITE,     // Create new reports
-        REPORTS_DELETE,    // Delete reports
-        CATEGORIES_READ,   // Read report categories
-        USERS_READ,        // Read user info (limited)
-        STATS_READ         // Read statistics
+        REPORTS_READ, // Read location reports
+        REPORTS_WRITE, // Create new reports
+        REPORTS_DELETE, // Delete reports
+        CATEGORIES_READ, // Read report categories
+        USERS_READ, // Read user info (limited)
+        STATS_READ // Read statistics
     }
 }

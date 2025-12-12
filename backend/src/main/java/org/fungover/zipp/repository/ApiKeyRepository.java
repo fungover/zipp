@@ -17,14 +17,12 @@ import java.util.UUID;
 public interface ApiKeyRepository extends JpaRepository<ApiKey, UUID> {
 
     /**
-     * Find API key based on hash code.
-     * Is used every API call to validate key
+     * Find API key based on hash code. Is used every API call to validate key
      */
     Optional<ApiKey> findByKeyHash(String keyHash);
 
     /**
-     * List all keys for users - newest first
-     * Is used in the UI for key handling
+     * List all keys for users - newest first Is used in the UI for key handling
      */
     List<ApiKey> findByUserIdOrderByCreatedAtDesc(UUID userId);
 
@@ -34,8 +32,7 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, UUID> {
     List<ApiKey> findByUserIdAndStatus(UUID userId, KeyStatus status);
 
     /**
-     * Find a specific key - for a specific user
-     * Ensures key privacy
+     * Find a specific key - for a specific user Ensures key privacy
      */
     Optional<ApiKey> findByIdAndUserId(UUID id, UUID userId);
 
@@ -45,24 +42,22 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, UUID> {
     boolean existsByKeyHash(String keyHash);
 
     /**
-     * Update lastUsedAt in isolation
-     * Runs with every successful API call
+     * Update lastUsedAt in isolation Runs with every successful API call
      */
     @Modifying
     @Query("UPDATE ApiKey a SET a.lastUsedAt = :timestamp WHERE a.id = :id")
     void updateLastUsedAt(@Param("id") UUID id, @Param("timestamp") Instant timestamp);
 
     /**
-     * Mark expired keys as expired
-     * A schedueled background process
+     * Mark expired keys as expired A schedueled background process
      */
     @Modifying
     @Query("UPDATE ApiKey a SET a.status = 'EXPIRED' WHERE a.expiresAt < :now AND a.status = 'ACTIVE'")
     int expireOldKeys(@Param("now") Instant now);
 
     /**
-     * Count amount of active keys for a user.
-     * Is used to limit amount of keys per user (max 10)
+     * Count amount of active keys for a user. Is used to limit amount of keys per
+     * user (max 10)
      */
     @Query("SELECT COUNT(a) FROM ApiKey a WHERE a.userId = :userId AND a.status = 'ACTIVE'")
     long countActiveKeysByUserId(@Param("userId") UUID userId);
