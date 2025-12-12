@@ -79,3 +79,9 @@ main{
   border-color: cadetblue;
   border-radius: 0.5rem;
 }
+
+ #map {
+   height: 600px;
+   width: 100%;
+   margin-top: 20px;
+ }

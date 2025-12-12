@@ -1,22 +1,41 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{layouts/layout}"
->
+      layout:decorate="~{layouts/layout}">
 <head>
-    <meta charset="UTF-8">
-    <title th:text="${title}"></title>
+  <meta charset="UTF-8">
+  <title th:text="${title}">Zipp</title>
+
+
 </head>
+
 <body>
 <main>
-    <div class="welcome" layout:fragment="welcome">
-        <h1 class="welcome__title">
-          Welcome
-          <span th:if="${isLoggedIn}" th:text="${userName}"></span>
-        </h1>
-        <p class="welcome__text" th:unless="${isLoggedIn}"> Please log in to make a report</p>
-    </div>
+
+  <div class="welcome" layout:fragment="welcome">
+    <h1 class="welcome__title">
+      Welcome
+      <span th:if="${isLoggedIn}" th:text="${userName}"></span>
+    </h1>
+    <p class="welcome__text" th:unless="${isLoggedIn}"> Please log in to make a report</p>
+
+
+    <div id="map"></div>
+  </div>
 </main>
+
+<div layout:fragment="scripts">
+
+  <script th:src="@{/js/map.js}"></script>
+
+  <script async defer
+          th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${googleApiKey} + '&callback=initMap'}"
+          onerror="onGoogleMapsLoadError()">
+  </script>
+</div>
 
 </body>
 </html>
+
+
+
