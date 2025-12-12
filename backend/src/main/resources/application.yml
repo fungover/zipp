@@ -29,3 +29,5 @@ zipp:
   security:
     graphql-open: false
 
+report:
+  expiration-hours: 12
