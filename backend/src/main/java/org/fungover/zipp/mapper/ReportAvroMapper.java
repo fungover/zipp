@@ -1,5 +1,6 @@
 package org.fungover.zipp.mapper;
 
+import org.fungover.zipp.dto.ReportResponse;
 import org.fungover.zipp.kafka.ReportAvro;
 import org.fungover.zipp.kafka.ReportStatus;
 import org.fungover.zipp.kafka.ReportType;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public final class ReportAvroMapper {
 
-    public ReportAvro toAvro(Report r) {
+    public ReportAvro toAvro(ReportResponse r) {
 
         var b = ReportAvro.newBuilder()
             .setSubmittedByUserId(r.submittedByUserId())

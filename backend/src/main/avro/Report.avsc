@@ -3,7 +3,7 @@
   "name": "ReportAvro",
   "namespace": "org.fungover.zipp.kafka",
   "fields": [
-    { "name": "submittedByUserId", "type": "long" },
+    { "name": "submittedByUserId", "type": "string" },
     { "name": "description", "type": "string"
     },
 
