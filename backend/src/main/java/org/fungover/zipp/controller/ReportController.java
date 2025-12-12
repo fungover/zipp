@@ -49,19 +49,22 @@ public class ReportController {
          * For now the userId is provided by the client later this can be replaced with
          * SecurityContextHolder.getContext().getAuthentication()
          */
-
-        template.send("report", newReport).whenComplete((result, ex) -> {
-            if (ex != null) {
-                LOG.error("Failed to publish report to Kafka: {}", newReport, ex);
-            } else {
-                LOG.debug("Report published to Kafka: {}", newReport);
-            }
-        });
+        sendReport("report", newReport);
         return ResponseEntity.status(HttpStatus.CREATED).body(newReport);
     }
 
     @GetMapping
     public ResponseEntity<List<ReportResponse>> getAllReports() {
         return ResponseEntity.ok(reportService.getAllReports());
+    }
+
+    public void sendReport(String report, ReportResponse newReport) {
+        template.send(report, newReport).whenComplete((result, ex) -> {
+            if (ex != null) {
+                LOG.error("Failed to publish report to Kafka: {}", newReport, ex);
+            } else {
+                LOG.debug("Report published to Kafka: {}", newReport);
+            }
+        });
     }
 }
