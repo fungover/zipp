@@ -24,7 +24,6 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChainDev(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userService(co2us)));
-
         return http.build();
     }
 

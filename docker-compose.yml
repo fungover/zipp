@@ -36,6 +36,22 @@ services:
       timeout: 5s
       retries: 5
 
+  schema-registry:
+    image: confluentinc/cp-schema-registry:8.1.0
+    container_name: schema-registry
+    hostname: schema-registry
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka:29092"
+      SCHEMA_REGISTRY_HOST_NAME: "schema-registry"
+      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - app-net
+
   mysql:
     image: mysql:8.0  # Matches InnoDBCluster compatibility
     hostname: mysql
