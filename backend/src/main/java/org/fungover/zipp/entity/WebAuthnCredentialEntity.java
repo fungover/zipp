@@ -110,10 +110,12 @@ public class WebAuthnCredentialEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof WebAuthnCredentialEntity other))
+        }
+        if (!(o instanceof WebAuthnCredentialEntity other)) {
             return false;
+        }
         return Arrays.equals(this.credentialId, other.credentialId);
     }
 
