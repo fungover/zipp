@@ -1,6 +1,7 @@
 package org.fungover.zipp.service;
 
 import org.fungover.zipp.dto.Report;
+import org.fungover.zipp.dto.ReportResponse;
 import org.fungover.zipp.entity.ReportEntity;
 import org.fungover.zipp.entity.ReportImageEntity;
 import org.fungover.zipp.entity.ReportStatus;
@@ -30,7 +31,7 @@ public class ReportService {
     }
 
     @Transactional
-    public Report createReport(User currentUser, Report dto) {
+    public ReportResponse createReport(User currentUser, Report dto) {
         Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
         point.setSRID(4326);
 
@@ -48,17 +49,18 @@ public class ReportService {
             }
         }
 
-        return toDto(reportRepository.save(entity));
+        ReportEntity saved = reportRepository.save(entity);
+        return toResponse(saved);
     }
 
     @Transactional(readOnly = true)
-    public List<Report> getAllReports() {
-        return reportRepository.findAllByStatus(ReportStatus.ACTIVE).stream().map(this::toDto).toList();
+    public List<ReportResponse> getAllReports() {
+        return reportRepository.findAllByStatus(ReportStatus.ACTIVE).stream().map(this::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Report> getAllReportsForUser(String userEmail) {
-        return reportRepository.findAllBySubmittedByEmail(userEmail).stream().map(this::toDto).toList();
+    public List<ReportResponse> getAllReportsForUser(String userEmail) {
+        return reportRepository.findAllBySubmittedByEmail(userEmail).stream().map(this::toResponse).toList();
     }
 
     private void validateImageUrl(String url) {
@@ -73,11 +75,11 @@ public class ReportService {
         }
     }
 
-    private Report toDto(ReportEntity entity) {
-        return new Report(entity.getSubmittedBy(), entity.getDescription(), entity.getEventType(),
-                entity.getCoordinates().getY(), // latitude
-                entity.getCoordinates().getX(), // longitude
+    private ReportResponse toResponse(ReportEntity entity) {
+        return new ReportResponse(entity.getSubmittedBy().getProviderId(), entity.getDescription(),
+                entity.getEventType(), entity.getCoordinates().getY(), entity.getCoordinates().getX(),
                 entity.getSubmittedAt(), entity.getStatus(),
                 entity.getImages().stream().map(ReportImageEntity::getImageUrl).toList());
     }
+
 }
