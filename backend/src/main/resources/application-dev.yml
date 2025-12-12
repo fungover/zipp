@@ -22,3 +22,9 @@ spring:
 #            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
 #            user-name-attribute: sub
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
