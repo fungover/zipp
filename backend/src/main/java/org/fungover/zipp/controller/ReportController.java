@@ -29,7 +29,8 @@ public class ReportController {
     private final KafkaTemplate<String, ReportResponse> template;
     private final UserIdentityService userIdentityService;
 
-    public ReportController(ReportService reportService, KafkaTemplate<String, ReportResponse> template, UserIdentityService userIdentityService) {
+    public ReportController(ReportService reportService, KafkaTemplate<String, ReportResponse> template,
+            UserIdentityService userIdentityService) {
         this.reportService = reportService;
         this.template = template;
         this.userIdentityService = userIdentityService;
@@ -49,14 +50,13 @@ public class ReportController {
          * SecurityContextHolder.getContext().getAuthentication()
          */
 
-        template.send("report", newReport)
-            .whenComplete((result, ex) -> {
-                if (ex != null) {
-                    LOG.error("Failed to publish report to Kafka: {}", newReport, ex);
-                } else {
-                    LOG.debug("Report published to Kafka: {}", newReport);
-                }
-            });
+        template.send("report", newReport).whenComplete((result, ex) -> {
+            if (ex != null) {
+                LOG.error("Failed to publish report to Kafka: {}", newReport, ex);
+            } else {
+                LOG.debug("Report published to Kafka: {}", newReport);
+            }
+        });
         return ResponseEntity.status(HttpStatus.CREATED).body(newReport);
     }
 
