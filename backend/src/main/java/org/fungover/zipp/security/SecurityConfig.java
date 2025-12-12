@@ -63,14 +63,6 @@ public class SecurityConfig {
                 })
             );
 
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/favicon.ico", "/favicon/**", "/css/**", "/images/**", "/js/**")
-                .permitAll().anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2.loginPage("/login").defaultSuccessUrl("/", true)
-                        .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
-                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true)
-                        .clearAuthentication(true).deleteCookies("JSESSIONID"));
         return http.build();
     }
 
