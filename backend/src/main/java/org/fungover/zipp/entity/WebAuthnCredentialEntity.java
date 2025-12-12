@@ -42,7 +42,6 @@ public class WebAuthnCredentialEntity {
     private byte[] clientDataJSON;
 
     protected WebAuthnCredentialEntity() {
-
     }
 
     public WebAuthnCredentialEntity(byte[] credentialId, User user, byte[] publicKey, long signatureCount,
@@ -88,21 +87,38 @@ public class WebAuthnCredentialEntity {
         if (transports == null || transports.isBlank()) {
             return Set.of();
         }
+
         return Arrays.stream(transports.split(",")).map(String::trim).filter(s -> !s.isEmpty())
-                .map(AuthenticatorTransport::valueOf).collect(Collectors.toSet());
+                .map(AuthenticatorTransport::fromValue).collect(Collectors.toSet());
     }
 
     public static String transportsToString(Set<AuthenticatorTransport> transports) {
         if (transports == null || transports.isEmpty()) {
             return "";
         }
+
         return transports.stream().map(AuthenticatorTransport::getValue).sorted().collect(Collectors.joining(","));
     }
 
+    @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
     private static byte[] copy(byte[] in) {
         if (in == null) {
             return null;
         }
         return Arrays.copyOf(in, in.length);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof WebAuthnCredentialEntity other))
+            return false;
+        return Arrays.equals(this.credentialId, other.credentialId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(credentialId);
     }
 }
