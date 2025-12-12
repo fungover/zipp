@@ -22,3 +22,8 @@ spring:
 #            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
 #            user-name-attribute: sub
 
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/tobiasdb-exercise8
+    username: root
+    password: root
