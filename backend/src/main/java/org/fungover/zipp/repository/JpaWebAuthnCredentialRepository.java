@@ -22,10 +22,7 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
     private final WebAuthnCredentialEntityRepository credRepo;
     private final UserRepository userRepo;
 
-    public JpaWebAuthnCredentialRepository(
-        WebAuthnCredentialEntityRepository credRepo,
-        UserRepository userRepo
-    ) {
+    public JpaWebAuthnCredentialRepository(WebAuthnCredentialEntityRepository credRepo, UserRepository userRepo) {
         this.credRepo = credRepo;
         this.userRepo = userRepo;
     }
@@ -33,19 +30,13 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
     private CredentialRecord mapToRecord(WebAuthnCredentialEntity c) {
         UUID userId = c.getUser().getId();
 
-        return ImmutableCredentialRecord.builder()
-            .credentialId(new Bytes(c.getCredentialId()))
-            .userEntityUserId(new Bytes(uuidToBytes(userId)))
-            .publicKey(new ImmutablePublicKeyCose(c.getPublicKey()))
-            .signatureCount(c.getSignatureCount())
-            .transports(c.getTransportsAsSet())
-            .attestationObject(
-                c.getAttestationObject() != null ? new Bytes(c.getAttestationObject()) : null
-            )
-            .attestationClientDataJSON(
-                c.getClientDataJSON() != null ? new Bytes(c.getClientDataJSON()) : null
-            )
-            .build();
+        return ImmutableCredentialRecord.builder().credentialId(new Bytes(c.getCredentialId()))
+                .userEntityUserId(new Bytes(uuidToBytes(userId)))
+                .publicKey(new ImmutablePublicKeyCose(c.getPublicKey())).signatureCount(c.getSignatureCount())
+                .transports(c.getTransportsAsSet())
+                .attestationObject(c.getAttestationObject() != null ? new Bytes(c.getAttestationObject()) : null)
+                .attestationClientDataJSON(c.getClientDataJSON() != null ? new Bytes(c.getClientDataJSON()) : null)
+                .build();
     }
 
     private WebAuthnCredentialEntity mapToEntity(CredentialRecord record, User user) {
@@ -59,38 +50,26 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
         String transports = WebAuthnCredentialEntity.transportsToString(record.getTransports());
 
         byte[] attestationObject = record.getAttestationObject() != null
-            ? record.getAttestationObject().getBytes()
-            : null;
+                ? record.getAttestationObject().getBytes()
+                : null;
 
         byte[] clientDataJSON = record.getAttestationClientDataJSON() != null
-            ? record.getAttestationClientDataJSON().getBytes()
-            : null;
+                ? record.getAttestationClientDataJSON().getBytes()
+                : null;
 
-        return new WebAuthnCredentialEntity(
-            credentialId,
-            user,
-            record.getPublicKey().getBytes(),
-            record.getSignatureCount(),
-            transports,
-            attestationObject,
-            clientDataJSON
-        );
+        return new WebAuthnCredentialEntity(credentialId, user, record.getPublicKey().getBytes(),
+                record.getSignatureCount(), transports, attestationObject, clientDataJSON);
     }
 
     @Override
     public CredentialRecord findByCredentialId(Bytes credentialId) {
-        return credRepo.findById(credentialId.getBytes())
-            .map(this::mapToRecord)
-            .orElse(null);
+        return credRepo.findById(credentialId.getBytes()).map(this::mapToRecord).orElse(null);
     }
 
     @Override
     public List<CredentialRecord> findByUserId(Bytes userId) {
         UUID uuid = bytesToUuid(userId.getBytes());
-        return credRepo.findAllByUserId(uuid)
-            .stream()
-            .map(this::mapToRecord)
-            .collect(Collectors.toList());
+        return credRepo.findAllByUserId(uuid).stream().map(this::mapToRecord).collect(Collectors.toList());
     }
 
     @Override
@@ -98,7 +77,7 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
         UUID uuid = bytesToUuid(credentialRecord.getUserEntityUserId().getBytes());
 
         User user = userRepo.findById(uuid)
-            .orElseThrow(() -> new IllegalStateException("User not found for WebAuthn credential"));
+                .orElseThrow(() -> new IllegalStateException("User not found for WebAuthn credential"));
 
         WebAuthnCredentialEntity entity = mapToEntity(credentialRecord, user);
         credRepo.save(entity);

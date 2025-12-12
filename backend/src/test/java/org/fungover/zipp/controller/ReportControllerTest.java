@@ -57,27 +57,11 @@ class ReportControllerTest {
         attacker.setId(UUID.randomUUID());
         attacker.setEmail("attacker@example.com");
 
-        Report inputReport = new Report(
-            attacker,
-            "Test description",
-            ReportType.ACCIDENT,
-            59.3293,
-            18.0686,
-            null,
-            null,
-            null
-        );
+        Report inputReport = new Report(attacker, "Test description", ReportType.ACCIDENT, 59.3293, 18.0686, null, null,
+                null);
 
-        Report savedReport = new Report(
-            dbUser,
-            "Test description",
-            ReportType.ACCIDENT,
-            59.3293,
-            18.0686,
-            Instant.now(),
-            ReportStatus.ACTIVE,
-            List.of()
-        );
+        Report savedReport = new Report(dbUser, "Test description", ReportType.ACCIDENT, 59.3293, 18.0686,
+                Instant.now(), ReportStatus.ACTIVE, List.of());
 
         when(reportService.createReport(eq(dbUser), eq(inputReport))).thenReturn(savedReport);
 
@@ -96,27 +80,12 @@ class ReportControllerTest {
         attacker.setId(UUID.randomUUID());
         attacker.setEmail("attacker@example.com");
 
-        Report inputReport = new Report(
-            attacker,
-            "Report with images",
-            ReportType.DEBRIS,
-            59.3293,
-            18.0686,
-            null,
-            null,
-            List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg")
-        );
+        Report inputReport = new Report(attacker, "Report with images", ReportType.DEBRIS, 59.3293, 18.0686, null, null,
+                List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg"));
 
-        Report savedReport = new Report(
-            dbUser,
-            "Report with images",
-            ReportType.DEBRIS,
-            59.3293,
-            18.0686,
-            Instant.now(),
-            ReportStatus.ACTIVE,
-            List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg")
-        );
+        Report savedReport = new Report(dbUser, "Report with images", ReportType.DEBRIS, 59.3293, 18.0686,
+                Instant.now(), ReportStatus.ACTIVE,
+                List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg"));
 
         when(reportService.createReport(eq(dbUser), eq(inputReport))).thenReturn(savedReport);
 
@@ -133,11 +102,10 @@ class ReportControllerTest {
     @Test
     void getAllReportsShouldReturnAllActiveReports() {
         List<Report> expectedReports = List.of(
-            new Report(dbUser, "Report 1", ReportType.OTHER, 59.3293, 18.0686,
-                Instant.now(), ReportStatus.ACTIVE, List.of()),
-            new Report(dbUser, "Report 2", ReportType.OTHER, 59.3294, 18.0687,
-                Instant.now(), ReportStatus.ACTIVE, List.of())
-        );
+                new Report(dbUser, "Report 1", ReportType.OTHER, 59.3293, 18.0686, Instant.now(), ReportStatus.ACTIVE,
+                        List.of()),
+                new Report(dbUser, "Report 2", ReportType.OTHER, 59.3294, 18.0687, Instant.now(), ReportStatus.ACTIVE,
+                        List.of()));
 
         when(reportService.getAllReports()).thenReturn(expectedReports);
 
@@ -169,11 +137,10 @@ class ReportControllerTest {
         String userEmail = "user@example.com";
 
         List<Report> expectedReports = List.of(
-            new Report(dbUser, "User report 1", ReportType.ACCIDENT, 59.3293, 18.0686,
-                Instant.now(), ReportStatus.ACTIVE, List.of()),
-            new Report(dbUser, "User report 2", ReportType.ACCIDENT, 59.3294, 18.0687,
-                Instant.now(), ReportStatus.ACTIVE, List.of())
-        );
+                new Report(dbUser, "User report 1", ReportType.ACCIDENT, 59.3293, 18.0686, Instant.now(),
+                        ReportStatus.ACTIVE, List.of()),
+                new Report(dbUser, "User report 2", ReportType.ACCIDENT, 59.3294, 18.0687, Instant.now(),
+                        ReportStatus.ACTIVE, List.of()));
 
         when(reportService.getAllReportsForUser(userEmail)).thenReturn(expectedReports);
 

@@ -31,20 +31,11 @@ public class ReportService {
 
     @Transactional
     public Report createReport(User currentUser, Report dto) {
-        Point point = geometryFactory.createPoint(
-            new Coordinate(dto.longitude(), dto.latitude())
-        );
+        Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
         point.setSRID(4326);
 
-        ReportEntity entity = new ReportEntity(
-            currentUser,
-            dto.description(),
-            dto.eventType(),
-            point,
-            Instant.now(),
-            ReportStatus.ACTIVE,
-            new HashSet<>()
-        );
+        ReportEntity entity = new ReportEntity(currentUser, dto.description(), dto.eventType(), point, Instant.now(),
+                ReportStatus.ACTIVE, new HashSet<>());
 
         if (dto.imageUrls() != null) {
             for (String url : dto.imageUrls()) {
@@ -62,22 +53,13 @@ public class ReportService {
 
     @Transactional(readOnly = true)
     public List<Report> getAllReports() {
-        return reportRepository
-            .findAllByStatus(ReportStatus.ACTIVE)
-            .stream()
-            .map(this::toDto)
-            .toList();
+        return reportRepository.findAllByStatus(ReportStatus.ACTIVE).stream().map(this::toDto).toList();
     }
 
     @Transactional(readOnly = true)
     public List<Report> getAllReportsForUser(String userEmail) {
-        return reportRepository
-            .findAllBySubmittedByEmail(userEmail)
-            .stream()
-            .map(this::toDto)
-            .toList();
+        return reportRepository.findAllBySubmittedByEmail(userEmail).stream().map(this::toDto).toList();
     }
-
 
     private void validateImageUrl(String url) {
         if (url == null || url.isBlank()) {
@@ -92,18 +74,10 @@ public class ReportService {
     }
 
     private Report toDto(ReportEntity entity) {
-        return new Report(
-            entity.getSubmittedBy(),
-            entity.getDescription(),
-            entity.getEventType(),
-            entity.getCoordinates().getY(), // latitude
-            entity.getCoordinates().getX(), // longitude
-            entity.getSubmittedAt(),
-            entity.getStatus(),
-            entity.getImages()
-                .stream()
-                .map(ReportImageEntity::getImageUrl)
-                .toList()
-        );
+        return new Report(entity.getSubmittedBy(), entity.getDescription(), entity.getEventType(),
+                entity.getCoordinates().getY(), // latitude
+                entity.getCoordinates().getX(), // longitude
+                entity.getSubmittedAt(), entity.getStatus(),
+                entity.getImages().stream().map(ReportImageEntity::getImageUrl).toList());
     }
 }

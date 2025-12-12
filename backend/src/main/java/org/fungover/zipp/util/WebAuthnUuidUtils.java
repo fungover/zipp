@@ -5,7 +5,8 @@ import java.util.UUID;
 
 public final class WebAuthnUuidUtils {
 
-    private WebAuthnUuidUtils() {}
+    private WebAuthnUuidUtils() {
+    }
 
     public static byte[] uuidToBytes(UUID uuid) {
         ByteBuffer bb = ByteBuffer.allocate(16);

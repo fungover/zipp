@@ -32,7 +32,7 @@ public class ReportController {
 
     @PostMapping
     public ResponseEntity<Report> createReport(@Valid @RequestBody Report reportRequest,
-                                               Authentication authentication) {
+            Authentication authentication) {
         LOG.info("Report received: {}", reportRequest);
 
         User currentUser = resolveCurrentUser(authentication);
@@ -65,13 +65,13 @@ public class ReportController {
                 throw new RuntimeException("OAuth2 user has no email");
             }
             return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found by email: " + email));
+                    .orElseThrow(() -> new RuntimeException("User not found by email: " + email));
         }
 
         if (principal instanceof UserDetails ud) {
             String providerId = ud.getUsername(); // ni kör providerId som username
             return userRepository.findByProviderId(providerId)
-                .orElseThrow(() -> new RuntimeException("User not found by providerId: " + providerId));
+                    .orElseThrow(() -> new RuntimeException("User not found by providerId: " + providerId));
         }
 
         throw new RuntimeException("Unsupported principal type: " + principal.getClass());
