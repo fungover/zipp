@@ -28,10 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ReportEventConsumerIntegrationTest {
 
     @Container
-    static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
-        .withDatabaseName("testdb")
-        .withUsername("testuser")
-        .withPassword("testpass");
+    static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0").withDatabaseName("testdb")
+            .withUsername("testuser").withPassword("testpass");
 
     @DynamicPropertySource
     static void props(DynamicPropertyRegistry registry) {
