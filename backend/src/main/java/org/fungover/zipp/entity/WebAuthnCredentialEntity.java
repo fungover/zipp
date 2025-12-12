@@ -94,10 +94,14 @@ public class WebAuthnCredentialEntity {
 
     public static String transportsToString(Set<AuthenticatorTransport> transports) {
         if (transports == null || transports.isEmpty()) {
-            return null;
+            return "";
         }
-        return transports.stream().map(AuthenticatorTransport::getValue).sorted().collect(Collectors.joining(","));
+        return transports.stream()
+            .map(AuthenticatorTransport::getValue)
+            .sorted()
+            .collect(Collectors.joining(","));
     }
+
 
     private static byte[] copy(byte[] in) {
         if (in == null) {
