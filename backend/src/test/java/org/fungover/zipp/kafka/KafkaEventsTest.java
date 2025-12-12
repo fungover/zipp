@@ -1,45 +1,24 @@
 package org.fungover.zipp.kafka;
 
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-//import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.fungover.zipp.TestLogAppender;
 import org.fungover.zipp.controller.ReportController;
-import org.fungover.zipp.dto.Report;
 import org.fungover.zipp.dto.ReportResponse;
-import org.fungover.zipp.entity.ReportEntity;
 import org.fungover.zipp.service.ReportService;
 import org.fungover.zipp.service.UserIdentityService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.test.annotation.DirtiesContext;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.springframework.security.core.Authentication;
-
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
-
-import static javax.management.Query.eq;
 import static org.fungover.zipp.dto.ReportStatus.ACTIVE;
 import static org.fungover.zipp.dto.ReportType.OTHER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -84,6 +63,25 @@ public class KafkaEventsTest {
 
     @Test
     void kafkaReportFailedToSendGivesError(){
+        ReportResponse incomingReport = new ReportResponse("user1", "test report", OTHER, 0.0, 0.0, Instant.now(), ACTIVE, null);
 
+        CompletableFuture<SendResult<String, ReportResponse>> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new RuntimeException());
+        when(kafkaTemplate.send(anyString(), any())).thenReturn(failedFuture);
+
+        ch.qos.logback.classic.Logger LOG = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(ReportController.class);
+
+        TestLogAppender appender = new TestLogAppender();
+        LOG.addAppender(appender);
+        appender.start();
+
+        reportController.sendReport("report", incomingReport);
+
+        boolean hasError = appender.getLogs().stream()
+            .anyMatch(event ->
+                event.getLevel() == ch.qos.logback.classic.Level.ERROR &&
+                event.getFormattedMessage().contains("Failed to publish report"));
+
+        assertTrue(hasError);
     }
 }
