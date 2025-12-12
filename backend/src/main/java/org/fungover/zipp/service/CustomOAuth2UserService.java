@@ -27,6 +27,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String name = oAuth2User.getAttribute("name");
         String email = oAuth2User.getAttribute("email");
         String provider = userRequest.getClientRegistration().getRegistrationId();
+        String picture = oAuth2User.getAttribute("picture");
 
         User existing = userRepository.findByProviderAndProviderId(provider, providerId).orElse(null);
 
@@ -37,10 +38,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             newUser.setName(name);
             newUser.setEmail(email);
             newUser.setRole(Role.USER);
+
+            if (picture != null && !picture.isBlank()) {
+                newUser.setProfileImageUrl(picture);
+            }
+
             userRepository.save(newUser);
+        } else {
+            if (picture != null && !picture.isBlank()) {
+                existing.setProfileImageUrl(picture);
+                userRepository.save(existing);
+            }
         }
 
         return oAuth2User;
     }
-
 }

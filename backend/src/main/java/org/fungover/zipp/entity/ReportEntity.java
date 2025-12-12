@@ -1,17 +1,17 @@
 package org.fungover.zipp.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import org.fungover.zipp.dto.ReportStatus;
-import org.fungover.zipp.dto.ReportType;
+import jakarta.persistence.CascadeType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
@@ -28,8 +28,9 @@ public class ReportEntity {
     @Column(nullable = false)
     private Long id;
 
-    @Column(name = "submitted_by_user_id", nullable = false, length = 255)
-    private String submittedByUserId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "submitted_by_user_id", nullable = false)
+    private User submittedBy;
 
     @Column(nullable = false, length = 2000)
     private String description;
@@ -55,9 +56,9 @@ public class ReportEntity {
     public ReportEntity() {
     }
 
-    public ReportEntity(String submittedByUserId, String description, ReportType eventType, Point coordinates,
+    public ReportEntity(User submittedBy, String description, ReportType eventType, Point coordinates,
             Instant submittedAt, ReportStatus status, Set<ReportImageEntity> images) {
-        this.submittedByUserId = submittedByUserId;
+        this.submittedBy = submittedBy;
         this.description = description;
         this.eventType = eventType;
         this.coordinates = coordinates;
@@ -114,12 +115,12 @@ public class ReportEntity {
         this.status = status;
     }
 
-    public String getSubmittedByUserId() {
-        return submittedByUserId;
+    public User getSubmittedBy() {
+        return submittedBy;
     }
 
-    public void setSubmittedByUserId(String submittedByUserId) {
-        this.submittedByUserId = submittedByUserId;
+    public void setSubmittedBy(User submittedBy) {
+        this.submittedBy = submittedBy;
     }
 
     public Set<ReportImageEntity> getImages() {

@@ -1,8 +1,8 @@
 package org.fungover.zipp.service;
 
 import org.fungover.zipp.config.ReportConfig;
-import org.fungover.zipp.dto.ReportStatus;
 import org.fungover.zipp.entity.ReportEntity;
+import org.fungover.zipp.entity.ReportStatus;
 import org.fungover.zipp.repository.ReportRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

@@ -2,9 +2,10 @@ package org.fungover.zipp.service;
 
 import org.fungover.zipp.dto.Report;
 import org.fungover.zipp.dto.ReportResponse;
-import org.fungover.zipp.dto.ReportStatus;
 import org.fungover.zipp.entity.ReportEntity;
 import org.fungover.zipp.entity.ReportImageEntity;
+import org.fungover.zipp.entity.ReportStatus;
+import org.fungover.zipp.entity.User;
 import org.fungover.zipp.repository.ReportRepository;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ReportService {
 
     private static final int MAX_URL_LENGTH = 2048;
+
     private final GeometryFactory geometryFactory;
     private final ReportRepository reportRepository;
 
@@ -29,24 +31,16 @@ public class ReportService {
     }
 
     @Transactional
-    public ReportResponse createReport(String userId, Report dto) {
+    public ReportResponse createReport(User currentUser, Report dto) {
         Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
         point.setSRID(4326);
 
-        ReportEntity entity = new ReportEntity(userId, dto.description(), dto.eventType(), point, Instant.now(),
+        ReportEntity entity = new ReportEntity(currentUser, dto.description(), dto.eventType(), point, Instant.now(),
                 ReportStatus.ACTIVE, new HashSet<>());
 
         if (dto.imageUrls() != null) {
             for (String url : dto.imageUrls()) {
-                if (url == null || url.isBlank()) {
-                    throw new IllegalArgumentException("Image URL cannot be null or blank");
-                }
-                if (url.length() > MAX_URL_LENGTH) {
-                    throw new IllegalArgumentException("Image URL exceeds maximum length");
-                }
-                if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                    throw new IllegalArgumentException("Image URL must use HTTP or HTTPS protocol");
-                }
+                validateImageUrl(url);
 
                 ReportImageEntity image = new ReportImageEntity();
                 image.setImageUrl(url);
@@ -55,18 +49,37 @@ public class ReportService {
             }
         }
 
-        return toDto(reportRepository.save(entity));
+        ReportEntity saved = reportRepository.save(entity);
+        return toResponse(saved);
     }
 
     @Transactional(readOnly = true)
     public List<ReportResponse> getAllReports() {
-        return reportRepository.findAllByStatus(ReportStatus.ACTIVE).stream().map(this::toDto).toList();
+        return reportRepository.findAllByStatus(ReportStatus.ACTIVE).stream().map(this::toResponse).toList();
     }
 
-    private ReportResponse toDto(ReportEntity savedEntity) {
-        return new ReportResponse(savedEntity.getSubmittedByUserId(), savedEntity.getDescription(),
-                savedEntity.getEventType(), savedEntity.getCoordinates().getY(), savedEntity.getCoordinates().getX(),
-                savedEntity.getSubmittedAt(), savedEntity.getStatus(),
-                savedEntity.getImages().stream().map(ReportImageEntity::getImageUrl).toList());
+    @Transactional(readOnly = true)
+    public List<ReportResponse> getAllReportsForUser(String userEmail) {
+        return reportRepository.findAllBySubmittedByEmail(userEmail).stream().map(this::toResponse).toList();
     }
+
+    private void validateImageUrl(String url) {
+        if (url == null || url.isBlank()) {
+            throw new IllegalArgumentException("Image URL cannot be null or blank");
+        }
+        if (url.length() > MAX_URL_LENGTH) {
+            throw new IllegalArgumentException("Image URL exceeds maximum length");
+        }
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            throw new IllegalArgumentException("Image URL must use HTTP or HTTPS protocol");
+        }
+    }
+
+    private ReportResponse toResponse(ReportEntity entity) {
+        return new ReportResponse(entity.getSubmittedBy().getProviderId(), entity.getDescription(),
+                entity.getEventType(), entity.getCoordinates().getY(), entity.getCoordinates().getX(),
+                entity.getSubmittedAt(), entity.getStatus(),
+                entity.getImages().stream().map(ReportImageEntity::getImageUrl).toList());
+    }
+
 }

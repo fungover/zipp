@@ -8,3 +8,4 @@ out/
 backend/.env
 .env.local
 .env
+.env.*
