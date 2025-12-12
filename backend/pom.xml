@@ -84,19 +84,6 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-validation</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate.orm</groupId>
-      <artifactId>hibernate-spatial</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.locationtech.jts</groupId>
-      <artifactId>jts-core</artifactId>
-      <version>1.19.0</version>
-    </dependency>
-    <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
@@ -249,9 +236,6 @@
           <targetClasses>
             <param>org.fungover.zipp.*</param>
           </targetClasses>
-          <targetTests>
-            <param>org.fungover.zipp.*</param>
-          </targetTests>
           <threads>4</threads>
         </configuration>
       </plugin>
