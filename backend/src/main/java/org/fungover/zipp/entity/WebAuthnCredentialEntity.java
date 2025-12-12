@@ -12,6 +12,7 @@ import org.springframework.security.web.webauthn.api.AuthenticatorTransport;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Locale;
 
 @Entity
 @Table(name = "webauthn_credentials")
@@ -89,7 +90,7 @@ public class WebAuthnCredentialEntity {
         }
 
         return Arrays.stream(transports.split(",")).map(String::trim).filter(s -> !s.isEmpty())
-                .map(s -> AuthenticatorTransport.valueOf(s.toUpperCase())).collect(Collectors.toSet());
+                .map(s -> AuthenticatorTransport.valueOf(s.toUpperCase(Locale.ROOT))).collect(Collectors.toSet());
     }
 
     public static String transportsToString(Set<AuthenticatorTransport> transports) {
