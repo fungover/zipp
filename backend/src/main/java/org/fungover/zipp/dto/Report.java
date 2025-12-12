@@ -14,5 +14,5 @@ public record Report(@NotBlank String description, @NotNull ReportType eventType
 
         @DecimalMin(value = "-180.0") @DecimalMax(value = "180.0") @NotNull Double longitude,
 
-        Instant submittedAt, ReportStatus status, List<String> imageUrls) {
+        Instant submittedAt, ReportStatus status, List<@NotBlank String> imageUrls) {
 }
