@@ -88,13 +88,9 @@ public class WebAuthnCredentialEntity {
             return Set.of();
         }
 
-        return Arrays.stream(transports.split(","))
-            .map(String::trim)
-            .filter(s -> !s.isEmpty())
-            .map(s -> AuthenticatorTransport.valueOf(s.toUpperCase()))
-            .collect(Collectors.toSet());
+        return Arrays.stream(transports.split(",")).map(String::trim).filter(s -> !s.isEmpty())
+                .map(s -> AuthenticatorTransport.valueOf(s.toUpperCase())).collect(Collectors.toSet());
     }
-
 
     public static String transportsToString(Set<AuthenticatorTransport> transports) {
         if (transports == null || transports.isEmpty()) {
