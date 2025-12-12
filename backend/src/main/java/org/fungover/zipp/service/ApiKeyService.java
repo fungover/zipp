@@ -3,8 +3,10 @@ package org.fungover.zipp.service;
 import org.fungover.zipp.entity.ApiKey;
 import org.fungover.zipp.exception.InvalidApiKeyException;
 import org.fungover.zipp.repository.ApiKeyRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -49,6 +51,15 @@ public class ApiKeyService {
                                       Set<ApiKey.ApiScope> scopes,
                                       Instant expiresAt) {
 
+        long activeKeys = apiKeyRepository.countActiveKeysByUserId(userId);
+        if (activeKeys >= 10) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Maximum number of active API keys reached (10)"
+            );
+        }
+
+
         // 1) generate plaintext key
         String plainKey = generatePlainApiKey();
 
@@ -68,7 +79,7 @@ public class ApiKeyService {
         apiKey.setScopes(scopes != null ? scopes : Set.of());
         apiKey.setStatus(ApiKey.KeyStatus.ACTIVE);
         apiKey.setExpiresAt(expiresAt);
-        apiKey.setCreatedAt(Instant.now());
+        // apiKey.setCreatedAt(Instant.now()); I don´t believe this is needed, since java does it automatically thanks to @PrePersist in the ApiKey entity
 
         // 5) save in DB
         ApiKey saved = apiKeyRepository.save(apiKey);

@@ -58,11 +58,14 @@ public class ApiKey {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = Instant.now();
+        if (createdAt == null) {
+            createdAt = Instant.now();
+        }
     }
 
     // Constructors
-    public ApiKey() {}
+    public ApiKey() {
+    }
 
     public ApiKey(UUID userId, String keyHash, String keyPrefix, String name) {
         this.userId = userId;
@@ -179,7 +182,7 @@ public class ApiKey {
     }
 
     public boolean hasScope(ApiScope scope) {
-        return scopes.contains(scope);
+        return scopes != null && scopes.contains(scope);
     }
 
     public enum KeyStatus {

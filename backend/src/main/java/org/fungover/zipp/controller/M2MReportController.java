@@ -3,6 +3,7 @@ package org.fungover.zipp.controller;
 import org.fungover.zipp.entity.ApiKey.ApiScope;
 import org.fungover.zipp.security.ApiKeyAuthenticationFilter;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -95,10 +96,7 @@ class M2MController {
         if (authentication instanceof ApiKeyAuthenticationFilter.ApiKeyAuthentication apiAuth) {
             return apiAuth;
         }
-        throw new IllegalStateException(
-            "Unexpected authentication type: " +
-                (authentication != null ? authentication.getClass() : "null")
-        );
+        throw new AuthenticationCredentialsNotFoundException("Missing API key authentication");
     }
 
     /**
@@ -107,7 +105,7 @@ class M2MController {
      */
     private void requireScope(ApiKeyAuthenticationFilter.ApiKeyAuthentication apiAuth, ApiScope requiredScope) {
         Set<ApiScope> scopes = apiAuth.getScopes();
-        if (!scopes.contains(requiredScope)) {
+        if (scopes == null || !scopes.contains(requiredScope)) {
             throw new AccessDeniedException("Missing required scope: " + requiredScope.name());
         }
     }

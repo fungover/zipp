@@ -44,7 +44,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         String apiKey = request.getHeader(API_KEY_HEADER);
 
         // Only process if API key exists and path requires it
-        if (apiKey != null && shouldAuthenticateWithApiKey(request)) {
+        if (apiKey != null && !apiKey.isBlank() && shouldAuthenticateWithApiKey(request)) {
             try {
                 // Validate key - throws InvalidApiKeyException if invalid
                 ApiKey validatedKey = apiKeyService.validateApiKey(apiKey);
@@ -75,9 +75,9 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
      * Determines which paths should be authenticated with API key.
      */
     private boolean shouldAuthenticateWithApiKey(HttpServletRequest request) {
-        String path = request.getRequestURI();
+        String path = request.getServletPath();
         // GraphQL and M2M API endpoints require API key
-        return path.startsWith("/graphql") || path.startsWith("/api/m2m/");
+        return path.startsWith("/graphql") || path.startsWith("/api/m2m");
     }
 
     /**

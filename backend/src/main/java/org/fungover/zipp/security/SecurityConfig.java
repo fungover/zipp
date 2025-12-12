@@ -29,6 +29,10 @@ public class SecurityConfig {
         this.apiKeyAuthenticationFilter = apiKeyAuthenticationFilter;
     }
 
+    /**
+     * Security filter chain for M2M API (API key authentication).
+     * Runs first for /graphql and /api/m2m/** endpoints.
+     */
     @Bean
     @Order(1)
     public SecurityFilterChain apiKeySecurityChain(HttpSecurity http) throws Exception {
@@ -40,7 +44,6 @@ public class SecurityConfig {
             )
             .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> {
-                // I dev-läge: tillåt GraphQL utan nyckel
                 if (graphqlOpen) {
                     auth.requestMatchers("/graphql/**").permitAll();
                 } else {
@@ -63,14 +66,21 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Security filter chain for regular users (OAuth2).
+     * Handles all other endpoints.
+     */
     @Bean
     @Order(2)
     public SecurityFilterChain oauthSecurityChain(HttpSecurity http) throws Exception {
         http
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/keys/**")
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/login", "/favicon.ico", "/favicon/**", "/css/**", "/images/**", "/js/**")
                 .permitAll()
-                .requestMatchers("/graphiql/**").permitAll()  // GraphiQL UI alltid öppet
+                .requestMatchers("/graphiql/**").permitAll()
                 .requestMatchers("/api/keys/**").authenticated()
                 .anyRequest().authenticated()
             )

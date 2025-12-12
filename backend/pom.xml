@@ -121,12 +121,6 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-graphql</artifactId>
     </dependency>
-    <!-- GraphQL-stöd för utökade scalar-typer (DateTime, JSON etc) -->
-    <dependency>
-      <groupId>com.graphql-java</groupId>
-      <artifactId>graphql-java-extended-scalars</artifactId>
-      <version>22.0</version>
-    </dependency>
   </dependencies>
 
   <build>
