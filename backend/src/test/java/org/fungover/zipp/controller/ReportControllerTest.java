@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.fungover.zipp.TestcontainersConfiguration;
 import org.fungover.zipp.dto.Report;
+import org.fungover.zipp.dto.ReportResponse;
 import org.fungover.zipp.dto.ReportStatus;
 import org.fungover.zipp.dto.ReportType;
 import org.fungover.zipp.service.ReportService;
@@ -13,12 +14,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,13 +46,19 @@ class ReportControllerTest {
     @Autowired
     private ReportService reportService;
 
+    @MockitoBean
+    private KafkaTemplate<String, ReportResponse> template;
+
     @Test
     void createReport() throws Exception {
-        Report firstReport = new Report(1L, "Candy paper", ReportType.DEBRIS, 50.0, 50.0,
+        Report firstReport = new Report("Candy paper", ReportType.DEBRIS, 50.0, 50.0,
                 Instant.parse("2025-12-03T15:30:00Z"), ReportStatus.ACTIVE, null);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
+
+        CompletableFuture<SendResult<String, ReportResponse>> future = new CompletableFuture<>();
+        when(template.send(anyString(), any())).thenReturn(future);
 
         mockMvc.perform(
                 post("/api/reports").with(SecurityMockMvcRequestPostProcessors.oauth2Login().attributes(user -> {
@@ -58,7 +73,7 @@ class ReportControllerTest {
 
     @Test
     void throwsErrorWhenRequestIsNotValid() throws Exception {
-        Report firstReport = new Report(1L, null, ReportType.DEBRIS, 50.0, 50.0, Instant.parse("2025-12-03T15:30:00Z"),
+        Report firstReport = new Report(null, ReportType.DEBRIS, 50.0, 50.0, Instant.parse("2025-12-03T15:30:00Z"),
                 ReportStatus.ACTIVE, null);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -76,10 +91,10 @@ class ReportControllerTest {
 
     @Test
     void returnsSubmittedReport() throws Exception {
-        Report firstReport = new Report(1L, "Candy paper", ReportType.DEBRIS, 50.0, 50.0,
+        Report firstReport = new Report("Candy paper", ReportType.DEBRIS, 50.0, 50.0,
                 Instant.parse("2025-12-03T15:30:00Z"), ReportStatus.ACTIVE, null);
 
-        reportService.createReport(firstReport);
+        reportService.createReport("123", firstReport);
 
         mockMvc.perform(get("/api/reports").with(SecurityMockMvcRequestPostProcessors.oauth2Login().attributes(user -> {
             user.put("name", "Test User");
