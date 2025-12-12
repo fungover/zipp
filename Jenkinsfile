@@ -5,7 +5,7 @@ pipeline {
 		jdk 'jdk-25'
 	}
 	options {
-		disableConcurrentBuilds() // Disables concurrent builds
+		disableConcurrentBuilds() // Disables concurrent buildss
 	}
 	environment {
 		DOCKER_REGISTRY = '192.168.0.82:5000'
