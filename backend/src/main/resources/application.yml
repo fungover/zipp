@@ -18,4 +18,14 @@ spring:
 #            user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
 #            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
 #            user-name-attribute: sub
+  config:
+    activate:
+      on-profile: prod
+  graphql:
+    graphiql:
+      enabled: false
+
+zipp:
+  security:
+    graphql-open: false
 

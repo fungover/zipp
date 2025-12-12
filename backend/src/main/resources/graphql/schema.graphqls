@@ -1,0 +1,13 @@
+type Query {
+    hello: String!
+    reports: [Report!]!
+}
+
+type Report {
+    id: ID!
+    title: String!
+    description: String
+    createdAt: DateTime
+}
+
+scalar DateTime
