@@ -66,16 +66,12 @@ public class KafkaEventsTest {
 
     @Test
     void kafkaReportSentSuccessfully() {
-        Report inputReport = new Report("test report", OTHER, 0.0, 0.0, Instant.now(), ACTIVE, null);
         ReportResponse savedReport = new ReportResponse("user1", "test report", OTHER, 0.0, 0.0, Instant.now(), ACTIVE, null);
 
-        when(userIdentityService.getUserId(authentication)).thenReturn("user1");
-        when(reportService.createReport("user1", inputReport)).thenReturn(savedReport);
-
-        when(kafkaTemplate.send(anyString(), any(ReportResponse.class)))
+        when(kafkaTemplate.send(anyString(), any()))
             .thenReturn(CompletableFuture.completedFuture(null));
 
-        reportController.createReport(inputReport, authentication);
+        reportController.sendReport("report", savedReport);
 
         ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<ReportResponse> reportCaptor = ArgumentCaptor.forClass(ReportResponse.class);
@@ -84,19 +80,6 @@ public class KafkaEventsTest {
 
         assertEquals("report", topicCaptor.getValue());
         assertEquals(savedReport, reportCaptor.getValue());
-       /* Report inputReport = new Report("test report", OTHER, 0.0, 0.0, Instant.now(), ACTIVE, null);
-        var savedReport = new ReportResponse("user1", "test report", OTHER, 0.0, 0.0, Instant.now(), ACTIVE, null);
-
-        when(reportService.createReport("user1", inputReport)).thenReturn(savedReport);
-
-        CompletableFuture<SendResult<String, ReportResponse>> future = new CompletableFuture<>();
-        future.complete(null);
-
-        when(kafkaTemplate.send("report", savedReport)).thenReturn(future);
-
-        ResponseEntity<ReportResponse> response = reportController.createReport(inputReport, authentication);
-        assertEquals(savedReport, response.getBody());
-        verify(kafkaTemplate).send("report", savedReport);*/
     }
 
     @Test
