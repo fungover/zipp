@@ -38,7 +38,9 @@ public class SseService {
             try {
                 emitter.send(SseEmitter.event().data(event));
             } catch (Exception e) {
-                LOGGER.debug("Failed to send keep-alive to emitter for id {}: {}", id, e.getMessage());
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Failed to send keep-alive to emitter for id {}: {}", id, e.getMessage());
+                }
                 remove(id, emitter);
             }
         }
