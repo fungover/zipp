@@ -1,14 +1,9 @@
 package org.fungover.zipp.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
+import jakarta.persistence.*;
 import org.springframework.security.web.webauthn.api.AuthenticatorTransport;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,7 +16,7 @@ public class WebAuthnCredentialEntity {
     private byte[] credentialId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false) // FK -> users.id (UUID)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Lob
@@ -32,7 +27,7 @@ public class WebAuthnCredentialEntity {
     private long signatureCount;
 
     @Column
-    private String transports; // komma-separerad lista tex "internal,hybrid"
+    private String transports;
 
     @Lob
     private byte[] attestationObject;
@@ -41,21 +36,22 @@ public class WebAuthnCredentialEntity {
     private byte[] clientDataJSON;
 
     protected WebAuthnCredentialEntity() {
+
     }
 
     public WebAuthnCredentialEntity(byte[] credentialId, User user, byte[] publicKey, long signatureCount,
             String transports, byte[] attestationObject, byte[] clientDataJSON) {
-        this.credentialId = credentialId;
+        this.credentialId = copy(credentialId);
         this.user = user;
-        this.publicKey = publicKey;
+        this.publicKey = copy(publicKey);
         this.signatureCount = signatureCount;
         this.transports = transports;
-        this.attestationObject = attestationObject;
-        this.clientDataJSON = clientDataJSON;
+        this.attestationObject = copy(attestationObject);
+        this.clientDataJSON = copy(clientDataJSON);
     }
 
     public byte[] getCredentialId() {
-        return credentialId;
+        return copy(credentialId);
     }
 
     public User getUser() {
@@ -63,7 +59,7 @@ public class WebAuthnCredentialEntity {
     }
 
     public byte[] getPublicKey() {
-        return publicKey;
+        return copy(publicKey);
     }
 
     public long getSignatureCount() {
@@ -75,18 +71,18 @@ public class WebAuthnCredentialEntity {
     }
 
     public byte[] getAttestationObject() {
-        return attestationObject;
+        return copy(attestationObject);
     }
 
     public byte[] getClientDataJSON() {
-        return clientDataJSON;
+        return copy(clientDataJSON);
     }
 
     public Set<AuthenticatorTransport> getTransportsAsSet() {
         if (transports == null || transports.isBlank()) {
             return Set.of();
         }
-        return java.util.Arrays.stream(transports.split(",")).map(String::trim).filter(s -> !s.isEmpty())
+        return Arrays.stream(transports.split(",")).map(String::trim).filter(s -> !s.isEmpty())
                 .map(AuthenticatorTransport::valueOf).collect(Collectors.toSet());
     }
 
@@ -94,7 +90,13 @@ public class WebAuthnCredentialEntity {
         if (transports == null || transports.isEmpty()) {
             return null;
         }
-        return transports.stream().map(AuthenticatorTransport::getValue) // "internal", "usb", "hybrid" etc
-                .sorted().collect(Collectors.joining(","));
+        return transports.stream().map(AuthenticatorTransport::getValue).sorted().collect(Collectors.joining(","));
+    }
+
+    private static byte[] copy(byte[] in) {
+        if (in == null) {
+            return null;
+        }
+        return Arrays.copyOf(in, in.length);
     }
 }

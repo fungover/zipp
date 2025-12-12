@@ -13,6 +13,21 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final String ROOT = "/";
+    private static final String LOGIN = "/login";
+    private static final String LOGIN_ALL = "/login/**";
+    private static final String OAUTH2_ALL = "/oauth2/**";
+    private static final String FAVICON = "/favicon.ico";
+    private static final String FAVICON_ALL = "/favicon/**";
+    private static final String CSS_ALL = "/css/**";
+    private static final String IMAGES_ALL = "/images/**";
+    private static final String JS_ALL = "/js/**";
+    private static final String WEBAUTHN_ALL = "/webauthn/**";
+
+    private static final String WEBAUTHN_REGISTER_ALL = "/webauthn/register/**";
+    private static final String WEBAUTHN_AUTHENTICATE_ALL = "/webauthn/authenticate/**";
+    private static final String LOGIN_WEBAUTHN = "/login/webauthn";
+
     private final CustomOAuth2UserService co2us;
 
     public SecurityConfig(CustomOAuth2UserService co2us) {
@@ -23,13 +38,12 @@ public class SecurityConfig {
     @Order(1)
     @Profile("dev")
     public SecurityFilterChain securityFilterChainDev(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(
-                auth -> auth.requestMatchers("/", "/login", "/login/**", "/oauth2/**", "/favicon.ico", "/favicon/**",
-                        "/css/**", "/images/**", "/js/**", "/webauthn/**").permitAll().anyRequest().permitAll())
-                .oauth2Login(oauth2 -> oauth2.loginPage("/login").defaultSuccessUrl("/", true)
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(ROOT, LOGIN, LOGIN_ALL, OAUTH2_ALL, FAVICON,
+                FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL, WEBAUTHN_ALL).permitAll().anyRequest().permitAll())
+                .oauth2Login(oauth2 -> oauth2.loginPage(LOGIN).defaultSuccessUrl(ROOT, true)
                         .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
                 .webAuthn(webauthn -> webauthn.rpId("localhost").allowedOrigins("http://localhost:8080"))
-                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true)
+                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl(ROOT).invalidateHttpSession(true)
                         .clearAuthentication(true).deleteCookies("JSESSIONID"))
                 .csrf(csrf -> csrf.disable());
 
@@ -40,19 +54,15 @@ public class SecurityConfig {
     @Order(2)
     @Profile("!dev")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(
-                auth -> auth
-                        .requestMatchers("/", "/login", "/login/**", "/oauth2/**", "/favicon.ico", "/favicon/**",
-                                "/css/**", "/images/**", "/js/**", "/webauthn/**")
-                        .permitAll().anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2.loginPage("/login").defaultSuccessUrl("/", true)
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(ROOT, LOGIN, LOGIN_ALL, OAUTH2_ALL, FAVICON,
+                FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL, WEBAUTHN_ALL).permitAll().anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2.loginPage(LOGIN).defaultSuccessUrl(ROOT, true)
                         .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
                 .webAuthn(webauthn -> webauthn.rpId("localhost").allowedOrigins("http://localhost:8080"))
-                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true)
+                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl(ROOT).invalidateHttpSession(true)
                         .clearAuthentication(true).deleteCookies("JSESSIONID"))
-                // Prod: behåll CSRF men ignorera WebAuthn JSON-postar
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/webauthn/register/**", "/webauthn/authenticate/**",
-                        "/login/webauthn"));
+                .csrf(csrf -> csrf.ignoringRequestMatchers(WEBAUTHN_REGISTER_ALL, WEBAUTHN_AUTHENTICATE_ALL,
+                        LOGIN_WEBAUTHN));
 
         return http.build();
     }
