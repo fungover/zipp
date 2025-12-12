@@ -39,13 +39,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.enofex</groupId>
-      <artifactId>taikai</artifactId>
-      <version>1.46.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>

@@ -7,51 +7,48 @@
   <meta charset="UTF-8">
   <title th:text="${title}">Login</title>
 
-  <meta name="_csrf" th:content="${_csrf.token}"/>
-  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
+  <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}"/>
 </head>
 <body>
 <main>
   <div class="login__container" layout:fragment="welcome">
     <a th:href="@{/oauth2/authorization/google}">
-    <img class="login__button" th:src="@{/images/GoogleLogin.png}" alt="Google login button">
+      <img class="login__button" th:src="@{/images/GoogleLogin.png}" alt="Google login button">
     </a>
 
     <button id="passkey-login-btn"
             class="login__button login__button--passkey"
             type="button">
-      Logga in med passkey
+      Log in with passkey
     </button>
 
     <p id="passkey-message" class="login__message" hidden></p>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
-        console.log('Passkey script körs');
+        console.log('Passkey script running');
 
         const passkeyBtn = document.getElementById('passkey-login-btn');
         const msgEl = document.getElementById('passkey-message');
 
-        if (!passkeyBtn) {
-          console.error('Hittar inte passkey-knappen i DOM');
-          return;
-        }
+
 
         const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
         const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
         const csrfToken = csrfTokenMeta ? csrfTokenMeta.content : null;
         const csrfHeaderName = csrfHeaderMeta ? csrfHeaderMeta.content : 'X-CSRF-TOKEN';
 
-        if (!window.PublicKeyCredential) {
-          console.warn('PublicKeyCredential saknas – döljer passkey-knappen');
+        if (!window.PublicKeyCredential || !window.isSecureContext) {
+          console.warn('WebAuthn missing');
           passkeyBtn.style.display = 'none';
           return;
         }
 
         passkeyBtn.addEventListener('click', async () => {
-          console.log('Passkey-knapp klickad');
+          console.log('Passkey-button pressed');
           msgEl.hidden = false;
-          msgEl.textContent = 'Förbereder passkey-inloggning...';
+          msgEl.textContent = 'Preparing login...';
 
           try {
             const optionsResp = await fetch('/webauthn/authenticate/options', {
@@ -67,17 +64,16 @@
             console.log('optionsResp status:', optionsResp.status);
 
             if (optionsResp.status === 404 || optionsResp.status === 204) {
-              msgEl.textContent = 'Ingen passkey registrerad. Använd Google-inloggning istället.';
+              msgEl.textContent = 'No passkey registered. Use Google instead.';
               return;
             }
 
             if (!optionsResp.ok) {
-              msgEl.textContent = 'Kunde inte hämta passkey-utmaning.';
+              msgEl.textContent = 'Cannot get passkey.';
               return;
             }
 
             const options = await optionsResp.json();
-            console.log('options:', options);
 
             options.challenge = base64urlToArrayBuffer(options.challenge);
 
@@ -91,7 +87,7 @@
             const assertion = await navigator.credentials.get({ publicKey: options });
 
             if (!assertion) {
-              msgEl.textContent = 'Passkey-inloggning avbröts.';
+              msgEl.textContent = 'Passkey login canceled.';
               return;
             }
 
@@ -109,8 +105,6 @@
               }
             };
 
-            console.log('skickar assertion-resultat till backend');
-
             const finishResp = await fetch('/login/webauthn', {
               method: 'POST',
               headers: {
@@ -126,20 +120,19 @@
             if (finishResp.ok) {
               window.location.replace('/');
             } else if (finishResp.status === 404) {
-              msgEl.textContent = 'Ingen passkey hittades. Testa Google-login istället.';
+              msgEl.textContent = 'No passkey found. Try Google-login instead.';
             } else if (finishResp.status === 401) {
-              msgEl.textContent = 'Passkey-verifiering misslyckades.';
+              msgEl.textContent = 'Passkey verification failed.';
             } else {
-              msgEl.textContent = 'Passkey-inloggning misslyckades (serverfel).';
+              msgEl.textContent = 'Passkey login failed.';
             }
 
           } catch (e) {
             console.error(e);
-            msgEl.textContent = 'Tekniskt fel vid passkey-inloggning.';
+            msgEl.textContent = 'Technical error.';
           }
         });
       });
-
 
       function base64urlToArrayBuffer(base64url) {
         let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
