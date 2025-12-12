@@ -36,3 +36,6 @@ zipp:
     # Allow /graphql without API key in dev
     graphql-open: true
 
+report:
+  expiration-hours: 12
+

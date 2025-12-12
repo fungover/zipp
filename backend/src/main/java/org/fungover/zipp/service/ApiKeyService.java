@@ -146,7 +146,7 @@ public class ApiKeyService {
     }
 
     // ------------------------
-    // PRIVATA HJÄLP-METODER
+    // PRIVAT HELP-METODS
     // ------------------------
 
     /**

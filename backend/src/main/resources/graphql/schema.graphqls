@@ -14,5 +14,3 @@ type Report {
     description: String
     createdAt: DateTime
 }
-
-scalar DateTime
