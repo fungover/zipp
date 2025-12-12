@@ -7,8 +7,10 @@ import org.springframework.security.web.webauthn.api.PublicKeyCredentialUserEnti
 import org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository;
 import org.springframework.stereotype.Component;
 
-import java.nio.ByteBuffer;
 import java.util.UUID;
+
+import static org.fungover.zipp.util.WebAuthnUuidUtils.bytesToUuid;
+import static org.fungover.zipp.util.WebAuthnUuidUtils.uuidToBytes;
 
 @Component
 public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserEntityRepository {
@@ -19,38 +21,31 @@ public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserE
         this.userRepository = userRepository;
     }
 
-    private static byte[] uuidToBytes(UUID uuid) {
-        ByteBuffer bb = ByteBuffer.allocate(16);
-        bb.putLong(uuid.getMostSignificantBits());
-        bb.putLong(uuid.getLeastSignificantBits());
-        return bb.array();
-    }
-
-    private static UUID bytesToUuid(byte[] bytes) {
-        ByteBuffer bb = ByteBuffer.wrap(bytes);
-        long most = bb.getLong();
-        long least = bb.getLong();
-        return new UUID(most, least);
-    }
-
     private PublicKeyCredentialUserEntity mapToUserEntity(User u) {
         String displayName = u.getDisplayName() != null && !u.getDisplayName().isBlank()
-                ? u.getDisplayName()
-                : u.getName();
+            ? u.getDisplayName()
+            : u.getName();
 
-        return ImmutablePublicKeyCredentialUserEntity.builder().id(new Bytes(uuidToBytes(u.getId())))
-                .name(u.getProviderId()).displayName(displayName).build();
+        return ImmutablePublicKeyCredentialUserEntity.builder()
+            .id(new Bytes(uuidToBytes(u.getId())))
+            .name(u.getProviderId())
+            .displayName(displayName)
+            .build();
     }
 
     @Override
     public PublicKeyCredentialUserEntity findById(Bytes id) {
         UUID uuid = bytesToUuid(id.getBytes());
-        return userRepository.findById(uuid).map(this::mapToUserEntity).orElse(null);
+        return userRepository.findById(uuid)
+            .map(this::mapToUserEntity)
+            .orElse(null);
     }
 
     @Override
     public PublicKeyCredentialUserEntity findByUsername(String username) {
-        return userRepository.findByProviderId(username).map(this::mapToUserEntity).orElse(null);
+        return userRepository.findByProviderId(username)
+            .map(this::mapToUserEntity)
+            .orElse(null);
     }
 
     @Override
@@ -65,7 +60,7 @@ public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserE
         userRepository.findById(uuid).ifPresent(user -> {
             String displayName = userEntity.getDisplayName();
             if (displayName != null && !displayName.isBlank()
-                    && (user.getDisplayName() == null || !user.getDisplayName().equals(displayName))) {
+                && (user.getDisplayName() == null || !user.getDisplayName().equals(displayName))) {
                 user.setDisplayName(displayName);
                 userRepository.save(user);
             }

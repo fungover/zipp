@@ -89,7 +89,7 @@ class ProfileControllerTest {
         Authentication auth = mock(Authentication.class);
 
         User otherUser = new User();
-        otherUser.setId(UUID.randomUUID()); // annan UUID
+        otherUser.setId(UUID.randomUUID());
 
         ReportEntity report = new ReportEntity();
         report.setId(10L);

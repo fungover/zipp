@@ -4,6 +4,7 @@ import org.fungover.zipp.entity.ReportEntity;
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.service.ProfileService;
 import org.fungover.zipp.repository.ReportRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,15 +50,13 @@ public class ProfileController {
         ReportEntity report = reportRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Report not found: " + id));
 
-        // Säkerhet: bara ägaren (eller ev. admin) får ta bort
         if (!report.getSubmittedBy().getId().equals(currentUser.getId())) {
-            // här kan du kasta AccessDeniedException om du vill
-            throw new RuntimeException("Not allowed to delete this report");
+            throw new AccessDeniedException("Not allowed to delete this report");
+
         }
 
         reportRepository.delete(report);
 
-        // Ladda om sidan så listan uppdateras
         return "redirect:/profilesettings";
     }
 }
