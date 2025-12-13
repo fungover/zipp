@@ -13,13 +13,19 @@ export default async function getLocation() {
 function getGpsLocation(){
 
   return new Promise((resolve, reject) => {
+
+    if(!navigator.geolocation){
+      reject("Geolocation is not supported!");
+      return;
+    }
+
     navigator.geolocation.getCurrentPosition(
       position => {
         resolve({latitude: position.coords.latitude, longitude: position.coords.longitude});
       },
       error=>{
         console.warn(error.code);
-        reject(new Error("Location with IP address failed"));
+        reject(new Error("GPS location unavailable"));
       },
       {
         enableHighAccuracy: true,
