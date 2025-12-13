@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- Header Fragment -->
+<div th:fragment="header">
+    <header class="navbar">
+        <div class="navbar-left">
+            <img src="/images/zipplogo.png" alt="Zipp logo" class="logo" />
+            <div class="brand">Zipp</div>
+        </div>
+        <nav class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/login}">Login</a>
+        </nav>
+    </header>
+</div>
+
+<!-- Footer Fragment -->
+<div th:fragment="footer">
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2025 Zipp. Alla rättigheter förbehållna.</p>
+            <p>Adress: <span id="footer-address">[lägg till senare]</span></p>
+            <div class="socials">
+                <span>[Sociala medier kommer här]</span>
+            </div>
+        </div>
+    </footer>
+</div>
+
+</body>
+</html>
