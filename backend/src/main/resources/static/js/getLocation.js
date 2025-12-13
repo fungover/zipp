@@ -1,26 +1,35 @@
-export default function getLocation(){
+export default async function getLocation() {
 
-  return new Promise(async(resolve, reject) => {
+  try {
+    return await getGpsLocation();
+  } catch(error) {
+    console.error(error);
+    alert("GPS isn't available, attempt with IP address will be made to get estimated position");
+    return await getIpLocation();
+  }
 
+}
+
+function getGpsLocation(){
+
+  return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(
       position => {
         resolve({latitude: position.coords.latitude, longitude: position.coords.longitude});
       },
-      async ()=>{
-        alert("GPS isn't available, attempt with IP address will be made to get estimated position");
-        try{
-          resolve (await getIpLocation());
-        }catch(error){
-          reject(new Error("Location with IP address failed: " + error.message));
-        }
+      error=>{
+        console.warn(error.code);
+        reject(new Error("Location with IP address failed"));
       },
       {
         enableHighAccuracy: true,
         timeout: 5000,
         maximumAge: 0,
-      }
-    )
-  });
+      });
+  })
+
+
+
 }
 
 async function getIpLocation() {

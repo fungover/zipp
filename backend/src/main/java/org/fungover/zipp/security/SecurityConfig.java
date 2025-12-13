@@ -34,7 +34,7 @@ public class SecurityConfig {
     @Profile("!dev")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(AbstractHttpConfigurer::disable)
+        http.csrf(csrf -> csrf.ignoringRequestMatchers("/api/reports"))
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/api/reports").authenticated()
                         .requestMatchers("/", "/login", "/css/**", "/images/**", "/js/**").permitAll().anyRequest()
                         .authenticated())

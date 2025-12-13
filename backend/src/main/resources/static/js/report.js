@@ -25,7 +25,6 @@ button.forEach(button => {
         credentials: "same-origin",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
-          submittedByUserId: 1000,
           description: input.value,
           eventType: report,
           latitude: location.latitude,
