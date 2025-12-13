@@ -24,7 +24,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 @ExtendWith(MockitoExtension.class)
 public class KafkaEventsTest {
 
@@ -45,10 +44,10 @@ public class KafkaEventsTest {
 
     @Test
     void kafkaReportSentSuccessfully() {
-        ReportResponse savedReport = new ReportResponse("user1", "test report", OTHER, 0.0, 0.0, Instant.now(), ACTIVE, null);
+        ReportResponse savedReport = new ReportResponse("user1", "test report", OTHER, 0.0, 0.0, Instant.now(), ACTIVE,
+                null);
 
-        when(kafkaTemplate.send(anyString(), any()))
-            .thenReturn(CompletableFuture.completedFuture(null));
+        when(kafkaTemplate.send(anyString(), any())).thenReturn(CompletableFuture.completedFuture(null));
 
         reportController.sendReport("report", savedReport);
 
@@ -62,14 +61,16 @@ public class KafkaEventsTest {
     }
 
     @Test
-    void kafkaReportFailedToSendGivesError(){
-        ReportResponse incomingReport = new ReportResponse("user1", "test report", OTHER, 0.0, 0.0, Instant.now(), ACTIVE, null);
+    void kafkaReportFailedToSendGivesError() {
+        ReportResponse incomingReport = new ReportResponse("user1", "test report", OTHER, 0.0, 0.0, Instant.now(),
+                ACTIVE, null);
 
         CompletableFuture<SendResult<String, ReportResponse>> failedFuture = new CompletableFuture<>();
         failedFuture.completeExceptionally(new RuntimeException());
         when(kafkaTemplate.send(anyString(), any())).thenReturn(failedFuture);
 
-        ch.qos.logback.classic.Logger LOG = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(ReportController.class);
+        ch.qos.logback.classic.Logger LOG = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory
+                .getLogger(ReportController.class);
 
         TestLogAppender appender = new TestLogAppender();
         LOG.addAppender(appender);
@@ -78,9 +79,8 @@ public class KafkaEventsTest {
         reportController.sendReport("report", incomingReport);
 
         boolean hasError = appender.getLogs().stream()
-            .anyMatch(event ->
-                event.getLevel() == ch.qos.logback.classic.Level.ERROR &&
-                event.getFormattedMessage().contains("Failed to publish report"));
+                .anyMatch(event -> event.getLevel() == ch.qos.logback.classic.Level.ERROR
+                        && event.getFormattedMessage().contains("Failed to publish report"));
 
         assertTrue(hasError);
     }
