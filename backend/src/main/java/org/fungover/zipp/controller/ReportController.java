@@ -58,8 +58,8 @@ public class ReportController {
         return ResponseEntity.ok(reportService.getAllReports());
     }
 
-    public void sendReport(String report, ReportResponse newReport) {
-        template.send(report, newReport).whenComplete((result, ex) -> {
+    public void sendReport(String topic, ReportResponse newReport) {
+        template.send(topic, newReport).whenComplete((result, ex) -> {
             if (ex != null) {
                 LOG.error("Failed to publish report to Kafka: {}", newReport, ex);
             } else {
