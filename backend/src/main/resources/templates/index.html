@@ -15,6 +15,9 @@
           <span th:if="${isLoggedIn}" th:text="${userName}"></span>
         </h1>
         <p class="welcome__text" th:unless="${isLoggedIn}"> Please log in to make a report</p>
+      <div th:if="${isLoggedIn}" >
+        <form th:replace="~{fragments/report :: report}"></form>
+      </div>
     </div>
 </main>
 

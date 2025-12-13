@@ -32,9 +32,11 @@ public class SecurityConfig {
     @Order(2)
     @Profile("!dev")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/favicon.ico", "/favicon/**", "/css/**", "/images/**", "/js/**")
-                .permitAll().anyRequest().authenticated())
+
+        http.csrf(csrf -> csrf.ignoringRequestMatchers("/api/reports"))
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/reports").authenticated()
+                        .requestMatchers("/", "/login", "/css/**", "/images/**", "/js/**").permitAll().anyRequest()
+                        .authenticated())
                 .oauth2Login(oauth2 -> oauth2.loginPage("/login").defaultSuccessUrl("/", true)
                         .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true)
