@@ -9,6 +9,7 @@ import java.util.List;
 public class TestLogAppender extends AppenderBase<ILoggingEvent> {
 
     private final List<ILoggingEvent> logs = new ArrayList<ILoggingEvent>();
+
     @Override
     protected void append(ILoggingEvent iLoggingEvent) {
         logs.add(iLoggingEvent);

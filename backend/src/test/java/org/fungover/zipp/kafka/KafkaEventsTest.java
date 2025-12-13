@@ -18,7 +18,8 @@ import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import static org.fungover.zipp.dto.ReportStatus.ACTIVE;
 import static org.fungover.zipp.dto.ReportType.OTHER;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -69,11 +70,11 @@ public class KafkaEventsTest {
         failedFuture.completeExceptionally(new RuntimeException());
         when(kafkaTemplate.send(anyString(), any())).thenReturn(failedFuture);
 
-        ch.qos.logback.classic.Logger LOG = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory
+        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory
                 .getLogger(ReportController.class);
 
         TestLogAppender appender = new TestLogAppender();
-        LOG.addAppender(appender);
+        logger.addAppender(appender);
         appender.start();
 
         reportController.sendReport("report", incomingReport);
