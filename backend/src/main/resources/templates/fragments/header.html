@@ -1,4 +1,4 @@
 <header class="header" th:fragment="header">
   <img class="header__image" th:src="@{/images/ZippLogo.png}" alt="Zipp logo">
-  <nav th:replace="~{fragments/navigation :: navigation}" class="header__nav"></nav>
+  <div class="header__nav" th:replace="~{fragments/navigation :: navigation}"></div>
 </header>

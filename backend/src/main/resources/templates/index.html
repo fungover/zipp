@@ -18,7 +18,7 @@
     </p>
 
     <div class="main__actions">
-      <a href="/login" class="btn btn-primary">Log In</a>
+      <a th:href="@{/login}" class="btn btn-primary">Log In</a>
     </div>
   </section>
   <section class="features">
@@ -35,7 +35,7 @@
       </div>
       <div class="feature">
         <h3>Real-time updates</h3>
-        <p>Receive live notifications of new reports via Kafka and SSE.</p>
+        <p>New reports are processed and distributed using Kafka.</p>
       </div>
       <div class="feature">
         <h3>Secure accounts</h3>
