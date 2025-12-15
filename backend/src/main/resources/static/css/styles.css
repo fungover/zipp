@@ -1,0 +1,165 @@
+body{
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    max-width: 1280px;
+    min-height: 100vh;
+}
+main{
+    flex: 1;
+}
+.header{
+    display: flex;
+    grid-template-columns: 1fr 1fr 2fr;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 0.5rem;
+    background-color: #1E1E1E;
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+.header__image{
+    margin-left: 1rem;
+}
+
+.header__title{
+    text-align: center;
+}
+
+.navigation{
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-right: 1rem;
+}
+.navigation__link{
+    color: white;
+    text-decoration: none;
+}
+.navigation__link:hover{
+    font-weight: bold;
+    color:cadetblue;
+}
+.navigation__link:active{
+  font-weight: bold;
+  color:cadetblue;
+}
+
+.navigation__link:focus {
+  outline: 0.25rem solid cadetblue;
+  outline-offset: 0.25rem;
+}
+
+.menu__burger{
+    color: white;
+}
+
+.footer{
+    font-size: 1rem;
+    min-height: 50px;
+    background-color: #1E1E1E;
+    border-radius: 0.5rem;
+    text-align: center;
+    color: white;
+    box-shadow: 0 -4px 6px rgba(0,0,0,0.3);
+}
+
+.login__container{
+  display: block;
+  width: 192px;
+  margin: 2rem auto;
+  min-height: 300px;
+}
+
+.login__button{
+  border-radius: 0.5rem;
+}
+
+.login__button:hover{
+  border: 3px solid;
+  border-color: cadetblue;
+  border-radius: 0.5rem;
+}
+
+.main__intro {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f0f4f8;
+  border-radius: 8px;
+  margin-bottom: 40px;
+}
+
+.main__title {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.main__subtitle {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.main__actions .btn {
+  display: inline-block;
+  padding: 12px 24px;
+  margin: 5px;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.btn-primary {
+  background-color: cadetblue;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #417072;
+}
+
+.features {
+  max-width: 1000px;
+  margin: 0 auto 60px;
+  padding: 0 20px;
+}
+
+.features h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2rem;
+  color: #2c3e50;
+}
+
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+}
+
+.feature {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feature h3 {
+  margin-bottom: 15px;
+  color: #34495e;
+}
+
+.feature p {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
