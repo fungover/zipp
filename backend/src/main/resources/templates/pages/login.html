@@ -1,18 +1,166 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{layouts/layout}"
->
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/layout}">
 <head>
   <meta charset="UTF-8">
-  <title th:text="${title}"></title>
+  <title th:text="${title}">Login</title>
+
+  <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
+  <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}"/>
 </head>
 <body>
 <main>
   <div class="login__container" layout:fragment="welcome">
     <a th:href="@{/oauth2/authorization/google}">
-    <img class="login__button" th:src="@{/images/GoogleLogin.png}" alt="Google login button">
+      <img class="login__button" th:src="@{/images/GoogleLogin.png}" alt="Google login button">
     </a>
+
+    <button id="passkey-login-btn"
+            class="login__button login__button--passkey"
+            type="button">
+      Log in with passkey
+    </button>
+
+    <p id="passkey-message" class="login__message" hidden></p>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('Passkey script running');
+
+        const passkeyBtn = document.getElementById('passkey-login-btn');
+        const msgEl = document.getElementById('passkey-message');
+
+
+
+        const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+        const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.content : null;
+        const csrfHeaderName = csrfHeaderMeta ? csrfHeaderMeta.content : 'X-CSRF-TOKEN';
+
+        if (!window.PublicKeyCredential || !window.isSecureContext) {
+          console.warn('WebAuthn missing');
+          passkeyBtn.style.display = 'none';
+          return;
+        }
+
+        passkeyBtn.addEventListener('click', async () => {
+          console.log('Passkey-button pressed');
+          msgEl.hidden = false;
+          msgEl.textContent = 'Preparing login...';
+
+          try {
+            const optionsResp = await fetch('/webauthn/authenticate/options', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(csrfToken ? { [csrfHeaderName]: csrfToken } : {})
+              },
+              credentials: 'include',
+              body: '{}'
+            });
+
+            console.log('optionsResp status:', optionsResp.status);
+
+            if (optionsResp.status === 404 || optionsResp.status === 204) {
+              msgEl.textContent = 'No passkey registered. Use Google instead.';
+              return;
+            }
+
+            if (!optionsResp.ok) {
+              msgEl.textContent = 'Cannot get passkey.';
+              return;
+            }
+
+            const options = await optionsResp.json();
+
+            options.challenge = base64urlToArrayBuffer(options.challenge);
+
+            if (options.allowCredentials) {
+              options.allowCredentials = options.allowCredentials.map(cred => ({
+                ...cred,
+                id: base64urlToArrayBuffer(cred.id)
+              }));
+            }
+
+            const assertion = await navigator.credentials.get({ publicKey: options });
+
+            if (!assertion) {
+              msgEl.textContent = 'Passkey login canceled.';
+              return;
+            }
+
+            const result = {
+              id: assertion.id,
+              rawId: arrayBufferToBase64url(assertion.rawId),
+              type: assertion.type,
+              response: {
+                clientDataJSON: arrayBufferToBase64url(assertion.response.clientDataJSON),
+                authenticatorData: arrayBufferToBase64url(assertion.response.authenticatorData),
+                signature: arrayBufferToBase64url(assertion.response.signature),
+                userHandle: assertion.response.userHandle
+                  ? arrayBufferToBase64url(assertion.response.userHandle)
+                  : null
+              }
+            };
+
+            const finishResp = await fetch('/login/webauthn', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(csrfToken ? { [csrfHeaderName]: csrfToken } : {})
+              },
+              credentials: 'include',
+              body: JSON.stringify(result)
+            });
+
+            console.log('finishResp status:', finishResp.status);
+
+            if (finishResp.ok) {
+              window.location.replace('/');
+            } else if (finishResp.status === 404) {
+              msgEl.textContent = 'No passkey found. Try Google-login instead.';
+            } else if (finishResp.status === 401) {
+              msgEl.textContent = 'Passkey verification failed.';
+            } else {
+              msgEl.textContent = 'Passkey login failed.';
+            }
+
+          } catch (e) {
+            console.error(e);
+            msgEl.textContent = 'Technical error.';
+          }
+        });
+      });
+
+      function base64urlToArrayBuffer(base64url) {
+        let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+        const pad = base64.length % 4;
+        if (pad === 2) base64 += '==';
+        else if (pad === 3) base64 += '=';
+        else if (pad !== 0 && pad !== 2 && pad !== 3) {
+          throw new Error('Illegal base64url string!');
+        }
+
+        const str = atob(base64);
+        const bytes = new Uint8Array(str.length);
+        for (let i = 0; i < str.length; i++) {
+          bytes[i] = str.charCodeAt(i);
+        }
+        return bytes.buffer;
+      }
+
+      function arrayBufferToBase64url(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        let base64 = btoa(binary);
+        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+      }
+    </script>
   </div>
 </main>
 </body>
