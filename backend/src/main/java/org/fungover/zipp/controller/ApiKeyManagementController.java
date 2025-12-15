@@ -11,8 +11,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -41,16 +50,16 @@ public class ApiKeyManagementController {
 
         UUID userId = extractUserId(principal);
 
+        Instant expiresAt = null;
+        if (request.expiresInDays() != null) {
+            expiresAt = Instant.now().plusSeconds(request.expiresInDays() * 86400L);
+        }
+
         ApiKeyService.CreatedApiKey created = apiKeyService.createApiKey(userId, request.name(), request.description(),
-                request.scopes(),
-                request.expiresInDays() != null
-                        ? java.time.Instant.now().plusSeconds(request.expiresInDays() * 86400L)
-                        : null);
+                request.scopes(), expiresAt);
 
         ApiKeyWithSecret response = new ApiKeyWithSecret(created.apiKey().getId(), created.apiKey().getName(),
-                created.apiKey().getDescription(), created.apiKey().getKeyPrefix(), created.plainKey(), // Secret -
-                                                                                                        // shown only
-                                                                                                        // once!
+                created.apiKey().getDescription(), created.apiKey().getKeyPrefix(), created.plainKey(),
                 created.apiKey().getScopes(), created.apiKey().getCreatedAt(), created.apiKey().getExpiresAt());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -104,25 +113,18 @@ public class ApiKeyManagementController {
      */
     @GetMapping("/scopes")
     public ResponseEntity<List<ScopeInfo>> getAvailableScopes() {
-        List<ScopeInfo> scopes = java.util.Arrays.stream(ApiKey.ApiScope.values())
+        List<ScopeInfo> scopes = Arrays.stream(ApiKey.ApiScope.values())
                 .map(scope -> new ScopeInfo(scope.name(), getScopeDescription(scope))).toList();
 
         return ResponseEntity.ok(scopes);
     }
 
-    /**
-     * Extract user ID from OAuth2 principal. Adjust this based on your User entity
-     * and how you store users.
-     */
     private UUID extractUserId(OAuth2User principal) {
-        // Option 1: If you store Google's 'sub' claim as UUID
         String sub = principal.getAttribute("sub");
         if (sub != null) {
-            // Create deterministic UUID from Google's sub claim
-            return UUID.nameUUIDFromBytes(sub.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return UUID.nameUUIDFromBytes(sub.getBytes());
         }
 
-        // Option 2: If you have a custom 'id' attribute
         Object idAttr = principal.getAttribute("id");
         if (idAttr != null) {
             if (idAttr instanceof UUID uuid) {
@@ -131,10 +133,9 @@ public class ApiKeyManagementController {
             return UUID.fromString(idAttr.toString());
         }
 
-        // Option 3: Use email as fallback
         String email = principal.getAttribute("email");
         if (email != null) {
-            return UUID.nameUUIDFromBytes(email.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return UUID.nameUUIDFromBytes(email.getBytes());
         }
 
         throw new IllegalStateException("Cannot extract user ID from principal");

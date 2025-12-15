@@ -6,7 +6,18 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * API key validation results.
+ * Result from API key validation.
+ *
+ * @param valid
+ *            whether the key is valid
+ * @param userId
+ *            the user ID associated with the key
+ * @param keyId
+ *            the API key ID
+ * @param scopes
+ *            the scopes granted to the key
+ * @param errorMessage
+ *            error message if validation failed
  */
 public record ApiKeyValidationResult(boolean valid, UUID userId, UUID keyId, Set<ApiScope> scopes,
         String errorMessage) {

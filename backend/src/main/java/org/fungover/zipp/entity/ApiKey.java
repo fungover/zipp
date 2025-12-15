@@ -1,16 +1,25 @@
 package org.fungover.zipp.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * This is supposed to use User. This is the actual key. This will behold the
- * model for an API-key in the db
- **/
 @Entity
 @Table(name = "api_keys", indexes = {@Index(name = "idx_api_key_hash", columnList = "keyHash"),
         @Index(name = "idx_api_key_user", columnList = "userId")})
@@ -21,16 +30,16 @@ public class ApiKey {
     private UUID id;
 
     @Column(nullable = false)
-    private UUID userId; // References the user with passkey auth
+    private UUID userId;
 
     @Column(nullable = false, unique = true)
-    private String keyHash; // SHA-256 hash of the actual key
+    private String keyHash;
 
     @Column(nullable = false, length = 12)
-    private String keyPrefix; // First 12 chars for identification (e.g., "zipp_live_ab")
+    private String keyPrefix;
 
     @Column(nullable = false, length = 100)
-    private String name; // User-defined name for the key
+    private String name;
 
     @Column(length = 500)
     private String description;
@@ -56,12 +65,9 @@ public class ApiKey {
 
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = Instant.now();
-        }
+        createdAt = Instant.now();
     }
 
-    // Constructors
     public ApiKey() {
     }
 
@@ -180,7 +186,7 @@ public class ApiKey {
     }
 
     public boolean hasScope(ApiScope scope) {
-        return scopes != null && scopes.contains(scope);
+        return scopes.contains(scope);
     }
 
     public enum KeyStatus {
@@ -191,11 +197,6 @@ public class ApiKey {
      * API scopes control what operations an API key can perform.
      */
     public enum ApiScope {
-        REPORTS_READ, // Read location reports
-        REPORTS_WRITE, // Create new reports
-        REPORTS_DELETE, // Delete reports
-        CATEGORIES_READ, // Read report categories
-        USERS_READ, // Read user info (limited)
-        STATS_READ // Read statistics
+        REPORTS_READ, REPORTS_WRITE, REPORTS_DELETE, CATEGORIES_READ, USERS_READ, STATS_READ
     }
 }

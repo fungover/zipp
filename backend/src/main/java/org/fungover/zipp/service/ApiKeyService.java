@@ -188,8 +188,12 @@ public class ApiKeyService {
     }
 
     /**
-     * Internal record to return both plaintext and the entity from createApiKey,
-     * without saving plaintext in the database.
+     * Internal record to return both plaintext and entity from createApiKey.
+     *
+     * @param plainKey
+     *            the plaintext API key (shown only once)
+     * @param apiKey
+     *            the persisted API key entity
      */
     public record CreatedApiKey(String plainKey, ApiKey apiKey) {
     }

@@ -37,7 +37,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
 
         String apiKey = request.getHeader(API_KEY_HEADER);
 
@@ -49,16 +49,16 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
                 // Create authentication tokens with scope-based authorities
                 ApiKeyAuthentication authentication = new ApiKeyAuthentication(validatedKey.getUserId(),
-                    validatedKey.getId(), validatedKey.getScopes());
+                        validatedKey.getId(), validatedKey.getScopes());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (InvalidApiKeyException e) {
                 // Invalid API key - return 401
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
-                String safeMessage = e.getMessage() != null ?
-                e.getMessage().replace("\\", "\\\\").replace("\"", "\\\"")
-                : "Invalid API key";
+                String safeMessage = e.getMessage() != null
+                        ? e.getMessage().replace("\\", "\\\\").replace("\"", "\\\"")
+                        : "Invalid API key";
                 response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"" + safeMessage + "\"}");
                 return;
             }
@@ -73,7 +73,8 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     private boolean shouldAuthenticateWithApiKey(HttpServletRequest request) {
         String path = request.getServletPath();
         // GraphQL and M2M API endpoints require API key
-        return path.equals("/graphql") || path.startsWith("/graphql/") || path.equals("/api/m2m") || path.startsWith("/api/m2m/");
+        return path.equals("/graphql") || path.startsWith("/graphql/") || path.equals("/api/m2m")
+                || path.startsWith("/api/m2m/");
     }
 
     /**

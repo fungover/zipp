@@ -45,8 +45,7 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain apiKeySecurityChain(HttpSecurity http) throws Exception {
-        http.securityMatcher("/graphql/**", "/api/m2m/**")
-                .csrf(csrf -> csrf.disable())
+        http.securityMatcher("/graphql/**", "/api/m2m/**").csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> {
@@ -57,13 +56,11 @@ public class SecurityConfig {
                     }
                     auth.requestMatchers("/api/m2m/**").hasRole("API_CLIENT");
                     auth.anyRequest().authenticated();
-                })
-                .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
+                }).exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
                     response.setStatus(401);
                     response.setContentType("application/json");
                     response.getWriter().write(
-                            "{\"error\":\"Unauthorized\",\"message\":\"API key required. Include X-API-Key header with a valid key.\"}"
-                    );
+                            "{\"error\":\"Unauthorized\",\"message\":\"API key required. Include X-API-Key header with a valid key.\"}");
                 }));
 
         return http.build();
@@ -77,22 +74,12 @@ public class SecurityConfig {
     @Profile("dev")
     public SecurityFilterChain oauthSecurityChainDev(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ROOT, LOGIN, LOGIN_ALL, OAUTH2_ALL, FAVICON, FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL)
-                        .permitAll()
-                        .anyRequest().permitAll()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage(LOGIN)
-                        .defaultSuccessUrl(ROOT, true)
-                        .userInfoEndpoint(userInfo -> userInfo.userService(co2us))
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl(ROOT)
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
-                )
+                .requestMatchers(ROOT, LOGIN, LOGIN_ALL, OAUTH2_ALL, FAVICON, FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL)
+                .permitAll().anyRequest().permitAll())
+                .oauth2Login(oauth2 -> oauth2.loginPage(LOGIN).defaultSuccessUrl(ROOT, true)
+                        .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
+                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl(ROOT).invalidateHttpSession(true)
+                        .clearAuthentication(true).deleteCookies("JSESSIONID"))
                 .csrf(csrf -> csrf.disable());
 
         return http.build();
@@ -106,24 +93,13 @@ public class SecurityConfig {
     @Profile("!dev")
     public SecurityFilterChain oauthSecurityChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ROOT, LOGIN, LOGIN_ALL, OAUTH2_ALL, FAVICON, FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL)
-                        .permitAll()
-                        .requestMatchers("/graphiql/**").permitAll()
-                        .requestMatchers("/api/keys/**").authenticated()
-                        .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage(LOGIN)
-                        .defaultSuccessUrl(ROOT, true)
-                        .userInfoEndpoint(userInfo -> userInfo.userService(co2us))
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl(ROOT)
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
-                )
+                .requestMatchers(ROOT, LOGIN, LOGIN_ALL, OAUTH2_ALL, FAVICON, FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL)
+                .permitAll().requestMatchers("/graphiql/**").permitAll().requestMatchers("/api/keys/**").authenticated()
+                .anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2.loginPage(LOGIN).defaultSuccessUrl(ROOT, true)
+                        .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
+                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl(ROOT).invalidateHttpSession(true)
+                        .clearAuthentication(true).deleteCookies("JSESSIONID"))
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/keys/**"));
 
         return http.build();
