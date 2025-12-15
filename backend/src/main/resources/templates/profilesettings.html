@@ -8,7 +8,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen min-w-screen">
+
 
 <div class="max-w-3xl mx-auto px-4 py-10 space-y-8">
 
@@ -130,7 +131,6 @@
     </ul>
   </div>
 
-
 </div>
 
 <script>
@@ -156,7 +156,7 @@
 
   async function registerPasskey() {
     if (!window.PublicKeyCredential) {
-      alert('Den här webbläsaren stödjer inte passkeys/WebAuthn.');
+      alert('This browser does not support passkeys/WebAuthn.');
       return;
     }
 
@@ -167,7 +167,7 @@
 
       if (!optionsRes.ok) {
         console.error('Error fetching registration options', optionsRes.status);
-        alert('Kunde inte hämta passkey-inställningar (options).');
+        alert('Could not fetch passkey settings (options).');
         return;
       }
 
@@ -189,7 +189,7 @@
       const credential = await navigator.credentials.create({ publicKey });
 
       if (!credential) {
-        alert('Ingen passkey skapades.');
+        alert('No passkey was created.');
         return;
       }
 
@@ -230,15 +230,15 @@
       });
 
       if (registerRes.ok) {
-        alert('Passkey registrerad!');
+        alert('Passkey registered successfully!');
       } else {
         const text = await registerRes.text();
         console.error('Register error:', registerRes.status, text);
-        alert('Misslyckades att registrera passkey (kolla serverloggarna).');
+        alert('Failed to register passkey (check server logs).');
       }
     } catch (err) {
       console.error(err);
-      alert('Ett fel uppstod vid passkey-registrering: ' + err);
+      alert('An error occurred during passkey registration: ' + err);
     }
   }
 

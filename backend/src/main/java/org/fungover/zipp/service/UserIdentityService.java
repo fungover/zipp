@@ -17,7 +17,11 @@ public class UserIdentityService {
         this.userRepository = userRepository;
     }
 
+    private static final String USER_NOT_FOUND_BY_PROVIDER_ID =
+        "User not found by providerId: ";
+
     public String getUserId(Authentication authentication) {
+
         if (authentication == null) {
             throw new IllegalStateException("No authentication");
         }
@@ -55,19 +59,19 @@ public class UserIdentityService {
 
             String providerId = extractOAuth2UserId(oauth);
             return userRepository.findByProviderId(providerId)
-                    .orElseThrow(() -> new IllegalStateException("User not found by providerId: " + providerId));
+                    .orElseThrow(() -> new IllegalStateException(USER_NOT_FOUND_BY_PROVIDER_ID + providerId));
         }
 
         if (principal instanceof UserDetails userDetails) {
             String providerId = userDetails.getUsername();
             return userRepository.findByProviderId(providerId)
-                    .orElseThrow(() -> new IllegalStateException("User not found by providerId: " + providerId));
+                    .orElseThrow(() -> new IllegalStateException(USER_NOT_FOUND_BY_PROVIDER_ID + providerId));
         }
 
         if (principal instanceof PublicKeyCredentialUserEntity pkUser) {
             String providerId = pkUser.getName();
             return userRepository.findByProviderId(providerId)
-                    .orElseThrow(() -> new IllegalStateException("User not found by providerId: " + providerId));
+                    .orElseThrow(() -> new IllegalStateException(USER_NOT_FOUND_BY_PROVIDER_ID + providerId));
         }
 
         if (principal instanceof User user) {

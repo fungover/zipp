@@ -62,5 +62,8 @@ public class JpaWebAuthnUserEntityRepository implements PublicKeyCredentialUserE
 
     @Override
     public void delete(Bytes id) {
+        // No-op by design:
+        // WebAuthn user entities represent actual application users, and must NOT be deleted
+        // through the WebAuthn credential layer. Deletion is handled explicitly in the UserService.
     }
 }
