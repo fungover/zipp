@@ -24,14 +24,22 @@ public class ReportService {
 
     private final GeometryFactory geometryFactory;
     private final ReportRepository reportRepository;
+    private final DuplicateDetectionService duplicateDetectionService;
 
-    public ReportService(GeometryFactory geometryFactory, ReportRepository reportRepository) {
+    public ReportService(GeometryFactory geometryFactory, ReportRepository reportRepository,
+            DuplicateDetectionService duplicateDetectionService) {
         this.geometryFactory = geometryFactory;
         this.reportRepository = reportRepository;
+        this.duplicateDetectionService = duplicateDetectionService;
     }
 
     @Transactional
     public ReportResponse createReport(User currentUser, Report dto) {
+
+        duplicateDetectionService.findDuplicate(dto).ifPresent(duplicate -> {
+            throw new IllegalArgumentException("Duplicate report detected, existing report id: " + duplicate.getId());
+        });
+
         Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
         point.setSRID(4326);
 
