@@ -26,10 +26,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
 
-  docker:
-    compose:
-      enabled: false
-
 #        provider:
 #          google:
 #            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
