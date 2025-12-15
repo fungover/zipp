@@ -21,8 +21,14 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "api_keys", indexes = {@Index(name = "idx_api_key_hash", columnList = "keyHash"),
-    @Index(name = "idx_api_key_user", columnList = "userId")})
+@Table(
+    name = "api_keys",
+    indexes = {
+        @Index(name = "idx_api_key_hash", columnList = "keyHash"),
+        @Index(name = "idx_api_key_user", columnList = "userId")
+    }
+)
+
 public class ApiKey {
 
     @Id
