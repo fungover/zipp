@@ -1,23 +1,35 @@
 package org.fungover.zipp.service;
 
+import org.fungover.zipp.entity.User;
+import org.fungover.zipp.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.webauthn.api.PublicKeyCredentialUserEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserIdentityService {
+
+    private final UserRepository userRepository;
+
+    public UserIdentityService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+    private static final String USER_NOT_FOUND_BY_PROVIDER_ID = "User not found by providerId: ";
+
     /**
      * Extracts the user {@code ID} from the authentication object. If it doesn't
      * find one, it throws an exception. If the principal is an {@link OAuth2User},
      * it tries to extract the user ID from the attributes: {@code sub}, {@code id},
      * {@code user_id} Currently, this only manages {@code OAuth2 authentication}
      * but can be built further on.
-     * 
+     *
      * @param authentication
      * @return the extracted {@code ID} as a {@code String}
      */
     public String getUserId(Authentication authentication) {
+
         if (authentication == null) {
             throw new IllegalStateException("No authentication");
         }
@@ -32,7 +44,49 @@ public class UserIdentityService {
             return userDetails.getUsername();
         }
 
+        if (principal instanceof PublicKeyCredentialUserEntity pkUser) {
+            return pkUser.getName();
+        }
+
         return authentication.getName();
+    }
+
+    public User getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("No authenticated user");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof OAuth2User oauth) {
+            String email = oauth.getAttribute("email");
+            if (email != null && !email.isBlank()) {
+                return userRepository.findByEmail(email)
+                        .orElseThrow(() -> new IllegalStateException("User not found by email: " + email));
+            }
+
+            String providerId = extractOAuth2UserId(oauth);
+            return userRepository.findByProviderId(providerId)
+                    .orElseThrow(() -> new IllegalStateException(USER_NOT_FOUND_BY_PROVIDER_ID + providerId));
+        }
+
+        if (principal instanceof UserDetails userDetails) {
+            String providerId = userDetails.getUsername();
+            return userRepository.findByProviderId(providerId)
+                    .orElseThrow(() -> new IllegalStateException(USER_NOT_FOUND_BY_PROVIDER_ID + providerId));
+        }
+
+        if (principal instanceof PublicKeyCredentialUserEntity pkUser) {
+            String providerId = pkUser.getName();
+            return userRepository.findByProviderId(providerId)
+                    .orElseThrow(() -> new IllegalStateException(USER_NOT_FOUND_BY_PROVIDER_ID + providerId));
+        }
+
+        if (principal instanceof User user) {
+            return user;
+        }
+
+        throw new IllegalStateException("Unsupported principal type: " + principal.getClass().getName());
     }
 
     /**
@@ -40,12 +94,11 @@ public class UserIdentityService {
      * {@code OAuth2 principal}. If it doesn't find one, it throws an exception. The
      * potential attributes are: {@code sub}, {@code id}, {@code user_id}, can be
      * extended in the future.
-     * 
+     *
      * @param oAuth2User
      * @return the extracted {@code ID} as a {@code String}
      */
     private String extractOAuth2UserId(OAuth2User oAuth2User) {
-
         Object sub = oAuth2User.getAttribute("sub");
         if (sub != null) {
             return sub.toString();
@@ -63,5 +116,4 @@ public class UserIdentityService {
 
         throw new IllegalStateException("Could not extract user ID from OAuth2 principal");
     }
-
 }
