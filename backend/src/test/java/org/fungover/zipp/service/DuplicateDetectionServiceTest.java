@@ -30,7 +30,8 @@ public class DuplicateDetectionServiceTest {
     void findDuplicateReturnsDuplicate() {
         ReportRepository reportRepository = mock(ReportRepository.class);
         DuplicateProperties duplicateProperties = new DuplicateProperties(50, 10);
-        DuplicateDetectionService duplicateDetectionService = new DuplicateDetectionService(duplicateProperties, reportRepository);
+        DuplicateDetectionService duplicateDetectionService = new DuplicateDetectionService(duplicateProperties,
+                reportRepository);
 
         ReportType reportType = ReportType.ACCIDENT;
         User user = mock(User.class);
@@ -44,14 +45,16 @@ public class DuplicateDetectionServiceTest {
         ReportEntity candidate = mock(ReportEntity.class);
         when(candidate.getCoordinates()).thenReturn(candidatePoint);
 
-        when(reportRepository.findAllByEventTypeAndStatusAndSubmittedAtAfter(eq(reportType), eq(ReportStatus.ACTIVE), any(Instant.class))).thenReturn(List.of(candidate));
+        when(reportRepository.findAllByEventTypeAndStatusAndSubmittedAtAfter(eq(reportType), eq(ReportStatus.ACTIVE),
+                any(Instant.class))).thenReturn(List.of(candidate));
 
         Optional<ReportEntity> result = duplicateDetectionService.findDuplicate(incoming);
 
         assertTrue(result.isPresent());
         assertSame(candidate, result.get());
 
-        verify(reportRepository).findAllByEventTypeAndStatusAndSubmittedAtAfter(eq(reportType), eq(ReportStatus.ACTIVE), any(Instant.class));
+        verify(reportRepository).findAllByEventTypeAndStatusAndSubmittedAtAfter(eq(reportType), eq(ReportStatus.ACTIVE),
+                any(Instant.class));
         verifyNoMoreInteractions(reportRepository);
     }
 
@@ -59,7 +62,8 @@ public class DuplicateDetectionServiceTest {
     void findDuplicateReturnsEmptyWhenNoDuplicateExists() {
         ReportRepository reportRepository = mock(ReportRepository.class);
         DuplicateProperties duplicateProperties = new DuplicateProperties(50, 10);
-        DuplicateDetectionService duplicateDetectionService = new DuplicateDetectionService(duplicateProperties, reportRepository);
+        DuplicateDetectionService duplicateDetectionService = new DuplicateDetectionService(duplicateProperties,
+                reportRepository);
 
         ReportType reportType = ReportType.ACCIDENT;
         User user = mock(User.class);
@@ -73,13 +77,15 @@ public class DuplicateDetectionServiceTest {
         ReportEntity candidate = mock(ReportEntity.class);
         when(candidate.getCoordinates()).thenReturn(candidatePoint);
 
-        when(reportRepository.findAllByEventTypeAndStatusAndSubmittedAtAfter(eq(reportType), eq(ReportStatus.ACTIVE), any(Instant.class))).thenReturn(List.of(candidate));
+        when(reportRepository.findAllByEventTypeAndStatusAndSubmittedAtAfter(eq(reportType), eq(ReportStatus.ACTIVE),
+                any(Instant.class))).thenReturn(List.of(candidate));
 
         Optional<ReportEntity> result = duplicateDetectionService.findDuplicate(incoming);
 
         assertTrue(result.isEmpty());
 
-        verify(reportRepository).findAllByEventTypeAndStatusAndSubmittedAtAfter(eq(reportType), eq(ReportStatus.ACTIVE), any(Instant.class));
+        verify(reportRepository).findAllByEventTypeAndStatusAndSubmittedAtAfter(eq(reportType), eq(ReportStatus.ACTIVE),
+                any(Instant.class));
         verifyNoMoreInteractions(reportRepository);
     }
 }

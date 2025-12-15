@@ -7,7 +7,6 @@ import org.fungover.zipp.entity.ReportImageEntity;
 import org.fungover.zipp.entity.ReportStatus;
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.repository.ReportRepository;
-import org.fungover.zipp.repository.UserRepository;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -27,7 +26,8 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final DuplicateDetectionService duplicateDetectionService;
 
-    public ReportService(GeometryFactory geometryFactory, ReportRepository reportRepository, DuplicateDetectionService duplicateDetectionService) {
+    public ReportService(GeometryFactory geometryFactory, ReportRepository reportRepository,
+            DuplicateDetectionService duplicateDetectionService) {
         this.geometryFactory = geometryFactory;
         this.reportRepository = reportRepository;
         this.duplicateDetectionService = duplicateDetectionService;

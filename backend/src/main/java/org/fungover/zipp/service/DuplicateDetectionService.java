@@ -31,11 +31,13 @@ public class DuplicateDetectionService {
         Instant submittedAt = report.submittedAt() != null ? report.submittedAt() : Instant.now();
         Instant cutOff = submittedAt.minus(Duration.ofMinutes(duplicateProperties.getTimeWindowInMinutes()));
 
-        List<ReportEntity> candidates = reportRepository.findAllByEventTypeAndStatusAndSubmittedAtAfter(report.eventType(), ReportStatus.ACTIVE, cutOff);
+        List<ReportEntity> candidates = reportRepository
+                .findAllByEventTypeAndStatusAndSubmittedAtAfter(report.eventType(), ReportStatus.ACTIVE, cutOff);
 
         return candidates.stream().filter(r -> {
             Point point = r.getCoordinates();
-            return GeoUtils.distanceInMeters(report.latitude(), report.longitude(), point.getY(), point.getX()) <= duplicateProperties.getRadiusInMeters();
+            return GeoUtils.distanceInMeters(report.latitude(), report.longitude(), point.getY(),
+                    point.getX()) <= duplicateProperties.getRadiusInMeters();
         }).findFirst();
     }
 }
