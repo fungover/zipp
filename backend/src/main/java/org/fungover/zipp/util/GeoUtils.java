@@ -1,6 +1,6 @@
 package org.fungover.zipp.util;
 
-public class GeoUtils {
+public final class GeoUtils {
     // Mean Earth radius in meters according to WGS84 standard
     private static final double EARTH_RADIUS = 6371000.0;
 
