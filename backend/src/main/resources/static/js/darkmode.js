@@ -7,11 +7,13 @@ document.addEventListener('DOMContentLoaded', function() {
   document.documentElement.setAttribute('data-theme', currentTheme);
 
   // Toggle theme on button click
-  toggle.addEventListener('click', function() {
-    const theme = document.documentElement.getAttribute('data-theme');
-    const newTheme = theme === 'light' ? 'dark' : 'light';
+  if (toggle) {
+    toggle.addEventListener('click', function() {
+      const theme = document.documentElement.getAttribute('data-theme');
+      const newTheme = theme === 'light' ? 'dark' : 'light';
 
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-  });
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+  }
 });
