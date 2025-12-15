@@ -3,9 +3,9 @@
 .iml
 .iws
 out/
-
 ### Environment Variables
 backend/.env
 .env.local
 .env
 .env.properties
+.env.*

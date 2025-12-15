@@ -24,7 +24,7 @@ public class AuthenticationController {
     /**
      * Example of accessing values from OAuth2 via Controller can be used to test
      * user login
-     * 
+     *
      * @param principal
      *            returns String Name and email of logged-in user
      * @return

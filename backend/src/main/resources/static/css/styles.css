@@ -41,14 +41,20 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+main {
+  flex: 1;
+}
+
 .header {
-  display: grid;
+  display: flex;
   grid-template-columns: 1fr 1fr 2fr;
   align-items: center;
+  justify-content: space-between;
   border-radius: 0.5rem;
   background-color: var(--header-bg);
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: var(--header-text);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
   transition: background-color 0.3s ease;
 }
 
