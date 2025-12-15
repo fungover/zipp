@@ -20,4 +20,3 @@ public class DuplicateProperties {
         return timeWindowInMinutes;
     }
 }
-
