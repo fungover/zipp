@@ -119,7 +119,7 @@ public class ApiKeyManagementController {
         String sub = principal.getAttribute("sub");
         if (sub != null) {
             // Create deterministic UUID from Google's sub claim
-            return UUID.nameUUIDFromBytes(sub.getBytes());
+            return UUID.nameUUIDFromBytes(sub.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         }
 
         // Option 2: If you have a custom 'id' attribute
@@ -134,7 +134,7 @@ public class ApiKeyManagementController {
         // Option 3: Use email as fallback
         String email = principal.getAttribute("email");
         if (email != null) {
-            return UUID.nameUUIDFromBytes(email.getBytes());
+            return UUID.nameUUIDFromBytes(email.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         }
 
         throw new IllegalStateException("Cannot extract user ID from principal");

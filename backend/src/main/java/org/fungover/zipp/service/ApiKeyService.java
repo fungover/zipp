@@ -42,7 +42,7 @@ public class ApiKeyService {
      * @param description
      *            optional description
      * @param scopes
-     *            Change access modifier
+     *            set of API scopes defining access permissions
      * @param expiresAt
      *            possible expiration date, otherwise null
      * @return CreatedApiKey – both plaintext key (shown ONCE) and saved entity
@@ -100,7 +100,6 @@ public class ApiKeyService {
      * - Hash plaintext - Looking up in DB on keyHash - Checking status/expiry via
      * apiKey.isValid() - Updating lastUsedAt
      *
-     * Updating lastUsedAt
      */
     @Transactional
     public ApiKey validateApiKey(String rawApiKey) {
@@ -142,7 +141,7 @@ public class ApiKeyService {
     }
 
     // ------------------------
-    // PRIVAT HELP-METODS
+    // PRIVAT HELPER METODS
     // ------------------------
 
     /**
