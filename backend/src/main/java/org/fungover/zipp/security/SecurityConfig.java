@@ -1,6 +1,7 @@
 package org.fungover.zipp.security;
 
 import org.fungover.zipp.service.CustomOAuth2UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -30,6 +31,12 @@ public class SecurityConfig {
 
     private final CustomOAuth2UserService co2us;
 
+    @Value("${webauthn.rpId}")
+    private String rpId;
+
+    @Value("${webauthn.allowedOrigins}")
+    private String allowedOrigins;
+
     public SecurityConfig(CustomOAuth2UserService co2us) {
         this.co2us = co2us;
     }
@@ -42,7 +49,7 @@ public class SecurityConfig {
                 FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL, WEBAUTHN_ALL).permitAll().anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2.loginPage(LOGIN).defaultSuccessUrl(ROOT, true)
                         .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
-                .webAuthn(webauthn -> webauthn.rpId("localhost").allowedOrigins("http://localhost:8080"))
+                .webAuthn(webauthn -> webauthn.rpId(rpId).allowedOrigins(allowedOrigins.split(",")))
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl(ROOT).invalidateHttpSession(true)
                         .clearAuthentication(true).deleteCookies("JSESSIONID"))
                 .csrf(csrf -> csrf.disable());
@@ -58,7 +65,7 @@ public class SecurityConfig {
                 FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL, WEBAUTHN_ALL).permitAll().anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2.loginPage(LOGIN).defaultSuccessUrl(ROOT, true)
                         .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
-                .webAuthn(webauthn -> webauthn.rpId("localhost").allowedOrigins("http://localhost:8080"))
+                .webAuthn(webauthn -> webauthn.rpId(rpId).allowedOrigins(allowedOrigins.split(",")))
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl(ROOT).invalidateHttpSession(true)
                         .clearAuthentication(true).deleteCookies("JSESSIONID"))
                 .csrf(csrf -> csrf.ignoringRequestMatchers(WEBAUTHN_REGISTER_ALL, WEBAUTHN_AUTHENTICATE_ALL,
