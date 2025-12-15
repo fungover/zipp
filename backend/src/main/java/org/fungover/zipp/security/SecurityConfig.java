@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .webAuthn(webauthn -> webauthn.rpId(rpId).allowedOrigins(allowedOrigins.split(",")))
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl(ROOT).invalidateHttpSession(true)
                         .clearAuthentication(true).deleteCookies("JSESSIONID"))
-                .csrf(csrf -> csrf.disable());
+                .csrf(csrf -> csrf.disable()); // NOSONAR: CSRF is intentionally disabled in dev environment only
 
         return http.build();
     }
