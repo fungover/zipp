@@ -32,7 +32,7 @@ public class DuplicateDetectionServiceTest {
         DuplicateProperties duplicateProperties = new DuplicateProperties(50, 10);
         DuplicateDetectionService duplicateDetectionService = new DuplicateDetectionService(duplicateProperties, reportRepository);
 
-        ReportType reportType = ReportType.valueOf("ACCIDENT");
+        ReportType reportType = ReportType.ACCIDENT;
         User user = mock(User.class);
         Instant submittedAt = Instant.now();
 
@@ -50,6 +50,34 @@ public class DuplicateDetectionServiceTest {
 
         assertTrue(result.isPresent());
         assertSame(candidate, result.get());
+
+        verify(reportRepository).findAllByEventTypeAndStatusAndSubmittedAtAfter(eq(reportType), eq(ReportStatus.ACTIVE), any(Instant.class));
+        verifyNoMoreInteractions(reportRepository);
+    }
+
+    @Test
+    void findDuplicateReturnsEmptyWhenNoDuplicateExists() {
+        ReportRepository reportRepository = mock(ReportRepository.class);
+        DuplicateProperties duplicateProperties = new DuplicateProperties(50, 10);
+        DuplicateDetectionService duplicateDetectionService = new DuplicateDetectionService(duplicateProperties, reportRepository);
+
+        ReportType reportType = ReportType.ACCIDENT;
+        User user = mock(User.class);
+        Instant submittedAt = Instant.now();
+
+        Report incoming = new Report(user, "test", reportType, 59.0, 18.0, submittedAt, ReportStatus.ACTIVE, null);
+
+        Point candidatePoint = geometryFactory.createPoint(new Coordinate(11.97, 57.70));
+        candidatePoint.setSRID(4326);
+
+        ReportEntity candidate = mock(ReportEntity.class);
+        when(candidate.getCoordinates()).thenReturn(candidatePoint);
+
+        when(reportRepository.findAllByEventTypeAndStatusAndSubmittedAtAfter(eq(reportType), eq(ReportStatus.ACTIVE), any(Instant.class))).thenReturn(List.of(candidate));
+
+        Optional<ReportEntity> result = duplicateDetectionService.findDuplicate(incoming);
+
+        assertTrue(result.isEmpty());
 
         verify(reportRepository).findAllByEventTypeAndStatusAndSubmittedAtAfter(eq(reportType), eq(ReportStatus.ACTIVE), any(Instant.class));
         verifyNoMoreInteractions(reportRepository);
