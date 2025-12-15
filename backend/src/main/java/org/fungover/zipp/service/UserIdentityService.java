@@ -17,8 +17,7 @@ public class UserIdentityService {
         this.userRepository = userRepository;
     }
 
-    private static final String USER_NOT_FOUND_BY_PROVIDER_ID =
-        "User not found by providerId: ";
+    private static final String USER_NOT_FOUND_BY_PROVIDER_ID = "User not found by providerId: ";
 
     public String getUserId(Authentication authentication) {
 

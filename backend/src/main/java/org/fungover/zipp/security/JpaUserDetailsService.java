@@ -21,8 +21,9 @@ public class JpaUserDetailsService implements UserDetailsService {
         User user = userRepository.findByProviderId(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        // Password is not used for WebAuthn authentication, placeholder required by Spring Security
-        return org.springframework.security.core.userdetails.User.withUsername(user.getProviderId())
-                .password("{noop}").roles("USER").build(); // NOSONAR
+        // Password is not used for WebAuthn authentication, placeholder required by
+        // Spring Security
+        return org.springframework.security.core.userdetails.User.withUsername(user.getProviderId()).password("{noop}")
+                .roles("USER").build(); // NOSONAR
     }
 }
