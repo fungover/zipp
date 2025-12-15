@@ -22,7 +22,7 @@ import java.util.UUID;
 public record ApiKeyValidationResult(boolean valid, UUID userId, UUID keyId, Set<ApiScope> scopes,
         String errorMessage) {
     public static ApiKeyValidationResult valid(UUID userId, UUID keyId, Set<ApiScope> scopes) {
-        return new ApiKeyValidationResult(true, userId, keyId, scopes, null);
+        return new ApiKeyValidationResult(true, userId, keyId, Set.copyOf(scopes), null);
     }
 
     public static ApiKeyValidationResult invalid(String message) {

@@ -59,8 +59,8 @@ public class SecurityConfig {
                 }).exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
                     response.setStatus(401);
                     response.setContentType("application/json");
-                    response.getWriter().write(
-                            "{\"error\":\"Unauthorized\",\"message\":\"API key required. Include X-API-Key header with a valid key.\"}");
+                    response.getWriter().write("{\"error\":\"Unauthorized\","
+                    +                            "\"message\":\"API key required. Include X-API-Key header with a valid key.\"}");
                 }));
 
         return http.build();
