@@ -3,14 +3,15 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8">
-    <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css" media="all"/>
-    <title></title>
+  <meta charset="UTF-8">
+  <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css" media="all"/>
+  <script th:src="@{/js/darkmode.js}" defer></script>
+  <title></title>
 </head>
 <body>
 <header th:replace="~{fragments/header :: header}"></header>
 <main>
-    <div layout:fragment="welcome"></div>
+  <div layout:fragment="welcome"></div>
 </main>
 <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
