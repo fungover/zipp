@@ -1,4 +1,4 @@
-package org.fungover.zipp.dto;
+package org.fungover.zipp.entity;
 
 public enum ReportType {
     ACCIDENT, DEBRIS, OTHER

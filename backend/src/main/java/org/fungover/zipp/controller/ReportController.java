@@ -3,6 +3,7 @@ package org.fungover.zipp.controller;
 import jakarta.validation.Valid;
 import org.fungover.zipp.dto.Report;
 import org.fungover.zipp.dto.ReportResponse;
+import org.fungover.zipp.entity.User;
 import org.fungover.zipp.service.ReportService;
 import org.fungover.zipp.service.UserIdentityService;
 import org.slf4j.Logger;
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +26,7 @@ import java.util.List;
 public class ReportController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
+
     private final ReportService reportService;
     private final KafkaTemplate<String, ReportResponse> template;
     private final UserIdentityService userIdentityService;
@@ -41,15 +43,12 @@ public class ReportController {
             Authentication authentication) {
         LOG.info("Report received: {}", reportRequest);
 
-        String userId = userIdentityService.getUserId(authentication);
+        User currentUser = userIdentityService.getCurrentUser(authentication);
 
-        var newReport = reportService.createReport(userId, reportRequest);
+        ReportResponse newReport = reportService.createReport(currentUser, reportRequest);
 
-        /*
-         * For now the userId is provided by the client later this can be replaced with
-         * SecurityContextHolder.getContext().getAuthentication()
-         */
         sendReport("report", newReport);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(newReport);
     }
 
