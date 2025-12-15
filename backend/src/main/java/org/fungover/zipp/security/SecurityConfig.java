@@ -69,7 +69,8 @@ public class SecurityConfig {
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl(ROOT).invalidateHttpSession(true)
                         .clearAuthentication(true).deleteCookies("JSESSIONID"))
                 .csrf(csrf -> csrf.ignoringRequestMatchers(WEBAUTHN_REGISTER_ALL, WEBAUTHN_AUTHENTICATE_ALL,
-                        LOGIN_WEBAUTHN)); // NOSONAR: WebAuthn endpoints cannot include CSRF tokens; ignoring is required and safe.
+                        LOGIN_WEBAUTHN)); // NOSONAR: WebAuthn endpoints cannot include CSRF tokens; ignoring is
+                                          // required and safe.
 
         return http.build();
     }
