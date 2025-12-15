@@ -21,4 +21,13 @@ class ReplayServiceTest {
         assertTrue(replayed.contains("event1"));
         assertTrue(replayed.contains("event2"));
     }
+
+    @Test
+    void bufferShouldNotExceedMaxSize() {
+        ReplayService replayService = new ReplayService();
+        for (int i = 1; i <= 10; i++) {
+            replayService.addEvent("event" + i);
+    }
+        List<String> replayed = replayService.getReplayEvents();
+        assertEquals
 }
