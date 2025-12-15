@@ -7,6 +7,7 @@ import org.fungover.zipp.entity.ReportImageEntity;
 import org.fungover.zipp.entity.ReportStatus;
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.repository.ReportRepository;
+import org.fungover.zipp.repository.UserRepository;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -24,14 +25,21 @@ public class ReportService {
 
     private final GeometryFactory geometryFactory;
     private final ReportRepository reportRepository;
+    private final DuplicateDetectionService duplicateDetectionService;
 
-    public ReportService(GeometryFactory geometryFactory, ReportRepository reportRepository) {
+    public ReportService(GeometryFactory geometryFactory, ReportRepository reportRepository, DuplicateDetectionService duplicateDetectionService) {
         this.geometryFactory = geometryFactory;
         this.reportRepository = reportRepository;
+        this.duplicateDetectionService = duplicateDetectionService;
     }
 
     @Transactional
     public ReportResponse createReport(User currentUser, Report dto) {
+
+        duplicateDetectionService.findDuplicate(dto).ifPresent(duplicate -> {
+            throw new IllegalArgumentException("Duplicate report detected, existing report id: " + duplicate.getId());
+        });
+
         Point point = geometryFactory.createPoint(new Coordinate(dto.longitude(), dto.latitude()));
         point.setSRID(4326);
 
