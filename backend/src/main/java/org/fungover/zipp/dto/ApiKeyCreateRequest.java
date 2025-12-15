@@ -21,7 +21,8 @@ import java.util.Set;
  */
 public record ApiKeyCreateRequest(
 
-        @NotBlank(message = "Name is required") @Size(max = 100, message = "Name must be at most 100 characters") String name,
+        @NotBlank(message = "Name is required")
+        @Size(max = 100, message = "Name must be at most 100 characters") String name,
 
         @Size(max = 500, message = "Description must be at most 500 chars") String description,
 
