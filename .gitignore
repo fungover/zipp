@@ -3,6 +3,7 @@
 .iml
 .iws
 out/
+target/
 
 ### Environment Variables
 backend/.env
