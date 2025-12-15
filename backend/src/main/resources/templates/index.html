@@ -18,7 +18,7 @@
     </p>
 
     <div class="main__actions">
-      <a th:href="@{/login}" class="btn btn-primary">Log In</a>
+      <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn btn-primary">Log In</a>
     </div>
   </section>
   <section class="features">
