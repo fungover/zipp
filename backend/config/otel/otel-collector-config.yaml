@@ -1,0 +1,42 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "http://*"
+            - "https://*"
+
+  hostmetrics:
+    collection_interval: 10s
+    scrapers:
+      cpu: {}
+      memory: {}
+      disk: {}
+      filesystem: {}
+      load: {}
+      network: {}
+      process: {}
+    host_path_prefix: "/host"
+
+
+exporters:
+  prometheus:
+    endpoint: "0.0.0.0:${OTEL_COLLECTOR_PORT_PROM}"
+  debug:
+    verbosity: detailed
+
+processors:
+  resourcedetection:
+    detectors: [env, docker, system]
+
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp, hostmetrics]
+      processors: [resourcedetection]
+      exporters: [prometheus, debug]
