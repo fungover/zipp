@@ -50,6 +50,9 @@ public class ReportEntity {
     @Column(nullable = false)
     private ReportStatus status;
 
+    @Column(name = "expired_at")
+    private Instant expiredAt;
+
     @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ReportImageEntity> images = new HashSet<>();
 
@@ -114,6 +117,10 @@ public class ReportEntity {
     public void setStatus(ReportStatus status) {
         this.status = status;
     }
+
+    public Instant getExpiredAt() { return expiredAt; }
+
+    public void setExpiredAt(Instant expiredAt) { this.expiredAt = expiredAt; }
 
     public User getSubmittedBy() {
         return submittedBy;
