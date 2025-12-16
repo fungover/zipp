@@ -7,8 +7,12 @@ receivers:
         endpoint: 0.0.0.0:4318
         cors:
           allowed_origins:
-            - "http://*"
-            - "https://*"
+            - "*"                # allow browser testing
+          allowed_headers:
+            - "Content-Type"
+            - "Accept"
+            - "Origin"
+            - "Authorization"
 
   hostmetrics:
     collection_interval: 10s
@@ -22,31 +26,22 @@ receivers:
       process: {}
     host_path_prefix: "/host"
 
-
 exporters:
   prometheus:
     endpoint: "0.0.0.0:${OTEL_COLLECTOR_PORT_PROM}"
-  otlphttp/loki:
-    endpoint: "http://loki:3100/loki/api/v1/push"
-    headers:
-     Content-Type: application/json
 
+  # OTLP HTTP exporter pointed at Loki base path (do NOT include /v1/logs here)
+  otlphttp:
+    endpoint: "http://loki:3100/otlp"   # exporter will append /v1/logs
+    compression: none
+    encoding: json
 
-#  loki:
-#    endpoint: "http://loki:3100/loki/api/v1/push"
-#  headers:
-#    Content-Type: application/json
-#    tls:
-#      insecure: true
   debug:
     verbosity: detailed
-
 
 processors:
   resourcedetection:
     detectors: [env, docker, system]
-
-
 
 service:
   pipelines:
@@ -54,6 +49,8 @@ service:
       receivers: [otlp, hostmetrics]
       processors: [resourcedetection]
       exporters: [prometheus, debug]
+
     logs:
       receivers: [otlp]
-      exporters: [otlphttp/loki]
+      processors: [resourcedetection]
+      exporters: [otlphttp, debug]

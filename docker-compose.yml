@@ -137,10 +137,11 @@ services:
       networks:
         - app-net
       volumes:
-
         - ./backend/config/loki/loki-data:/loki
         - ./backend/config/loki/loki-config.yaml:/backend/config/loki/loki-config.yaml
-      command: [--config.expand-env=true,--config.file=/backend/config/loki/loki-config.yaml]
+      command:
+        - --config.expand-env=true
+        - --config.file=/backend/config/loki/loki-config.yaml
 
   grafana:
     image: grafana/grafana:12.2.0
@@ -154,6 +155,10 @@ services:
       - ./backend/config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./backend/config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./backend/config/grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"   # or Viewer for read-only
+      GF_AUTH_ANONYMOUS_ORG_NAME: "Main Org."
 
   node-exporter:
     image: prom/node-exporter:latest
