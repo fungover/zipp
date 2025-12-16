@@ -26,12 +26,26 @@ receivers:
 exporters:
   prometheus:
     endpoint: "0.0.0.0:${OTEL_COLLECTOR_PORT_PROM}"
+  otlphttp/loki:
+    endpoint: "http://loki:3100/loki/api/v1/push"
+    headers:
+     Content-Type: application/json
+
+
+#  loki:
+#    endpoint: "http://loki:3100/loki/api/v1/push"
+#  headers:
+#    Content-Type: application/json
+#    tls:
+#      insecure: true
   debug:
     verbosity: detailed
+
 
 processors:
   resourcedetection:
     detectors: [env, docker, system]
+
 
 
 service:
@@ -40,3 +54,6 @@ service:
       receivers: [otlp, hostmetrics]
       processors: [resourcedetection]
       exporters: [prometheus, debug]
+    logs:
+      receivers: [otlp]
+      exporters: [otlphttp/loki]

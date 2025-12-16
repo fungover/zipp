@@ -59,6 +59,29 @@ services:
       retries: 5
     command: --default-authentication-plugin=mysql_native_password
 
+#  spring-app:
+#    image: container-registry.oracle.com/java/openjdk:25
+#    container_name: spring-app
+#    depends_on:
+#      - otel-collector
+#    networks:
+#      - app-net
+#    volumes:
+#      - ./backend/app.jar:/app/app.jar
+#      - ./backend/otel/opentelemetry-javaagent.jar:/otel/opentelemetry-javaagent.jar
+#    environment:
+#      - JAVA_OPTS=-Xms256m -Xmx512m
+#    command: >
+#      java
+#      -javaagent:/otel/opentelemetry-javaagent.jar
+#      -Dotel.exporter.otlp.endpoint=http://otel-collector:4318
+#      -Dotel.exporter.otlp.protocol=http/protobuf
+#      -Dotel.resource.attributes=service.name=spring-app
+#      -jar /app/app.jar
+#    ports:
+#      - "8080:8080"
+
+
   otel-collector:
     image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.139.0
     container_name: otel-collector
@@ -67,7 +90,7 @@ services:
         limits:
           memory: 200M
     restart: unless-stopped
-    command: [ "--config=/backend/config/otel/otel-collector-config.yaml"]
+    command: --config=/backend/config/otel/otel-collector-config.yaml
     user: 0:0
     volumes:
       - ./backend/config/otel/otel-collector-config.yaml:/backend/config/otel/otel-collector-config.yaml
@@ -105,6 +128,19 @@ services:
     restart: unless-stopped
     ports:
       - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+
+  loki:
+      image: grafana/loki:latest
+      container_name: loki
+      ports:
+        - "3100:3100"
+      networks:
+        - app-net
+      volumes:
+
+        - ./backend/config/loki/loki-data:/loki
+        - ./backend/config/loki/loki-config.yaml:/backend/config/loki/loki-config.yaml
+      command: [--config.expand-env=true,--config.file=/backend/config/loki/loki-config.yaml]
 
   grafana:
     image: grafana/grafana:12.2.0
