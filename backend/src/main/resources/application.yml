@@ -16,6 +16,17 @@ spring:
               - email
             redirect-uri: "https://zipp.city/login/oauth2/code/google"
             authorization-grant-type: authorization_code
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+
 #        provider:
 #          google:
 #            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
