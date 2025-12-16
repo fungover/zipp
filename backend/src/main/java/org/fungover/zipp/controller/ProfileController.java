@@ -26,6 +26,9 @@ public class ProfileController {
 
     @GetMapping("/profilesettings")
     public String showProfile(Model model, Authentication authentication) {
+        boolean loggedIn = authentication != null && authentication.isAuthenticated();
+        model.addAttribute("isLoggedIn", loggedIn);
+
         User user = profileService.getCurrentUser(authentication);
         model.addAttribute("user", user);
 
