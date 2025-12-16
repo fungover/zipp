@@ -50,7 +50,9 @@ public class ReportExpirationService {
         }
 
         reportRepository.saveAll(toExpire);
-        LOG.info("Expired {} reports", toExpire.size());
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Expired {} reports", toExpire.size());
+        }
     }
 
     /**
@@ -69,6 +71,8 @@ public class ReportExpirationService {
                 deleteThreshold);
 
         reportRepository.deleteAll(toDelete);
-        LOG.info("Deleted {} expired reports", toDelete.size());
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Deleted {} expired reports", toDelete.size());
+        }
     }
 }
