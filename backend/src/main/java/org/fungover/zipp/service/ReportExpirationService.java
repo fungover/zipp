@@ -17,16 +17,12 @@ import java.util.List;
 @Service
 public class ReportExpirationService {
 
-    private static final Logger LOG =
-        LoggerFactory.getLogger(ReportExpirationService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ReportExpirationService.class);
 
     private final ReportRepository reportRepository;
     private final ReportConfig reportConfig;
 
-    public ReportExpirationService(
-        ReportRepository reportRepository,
-        ReportConfig reportConfig
-    ) {
+    public ReportExpirationService(ReportRepository reportRepository, ReportConfig reportConfig) {
         this.reportRepository = reportRepository;
         this.reportConfig = reportConfig;
     }
@@ -41,14 +37,10 @@ public class ReportExpirationService {
             return;
         }
 
-        Instant expirationThreshold =
-            Instant.now().minus(reportConfig.getExpirationHours(), ChronoUnit.HOURS);
+        Instant expirationThreshold = Instant.now().minus(reportConfig.getExpirationHours(), ChronoUnit.HOURS);
 
-        List<ReportEntity> toExpire =
-            reportRepository.findAllByStatusAndSubmittedAtBefore(
-                ReportStatus.ACTIVE,
-                expirationThreshold
-            );
+        List<ReportEntity> toExpire = reportRepository.findAllByStatusAndSubmittedAtBefore(ReportStatus.ACTIVE,
+                expirationThreshold);
 
         Instant now = Instant.now();
 
@@ -71,17 +63,10 @@ public class ReportExpirationService {
             return;
         }
 
-        Instant deleteThreshold =
-            Instant.now().minus(
-                reportConfig.getDeleteExpiredAfterDays(),
-                ChronoUnit.DAYS
-            );
+        Instant deleteThreshold = Instant.now().minus(reportConfig.getDeleteExpiredAfterDays(), ChronoUnit.DAYS);
 
-        List<ReportEntity> toDelete =
-            reportRepository.findAllByStatusAndExpiredAtBefore(
-                ReportStatus.EXPIRED,
-                deleteThreshold
-            );
+        List<ReportEntity> toDelete = reportRepository.findAllByStatusAndExpiredAtBefore(ReportStatus.EXPIRED,
+                deleteThreshold);
 
         reportRepository.deleteAll(toDelete);
         LOG.info("Deleted {} expired reports", toDelete.size());

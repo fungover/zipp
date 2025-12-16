@@ -9,11 +9,9 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "report")
 @Validated
 public class ReportConfig {
-    @Positive
-    private long expirationHours;
+    @Positive private long expirationHours;
 
-    @Positive
-    private long deleteExpiredAfterDays;
+    @Positive private long deleteExpiredAfterDays;
 
     public long getExpirationHours() {
         return expirationHours;

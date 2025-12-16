@@ -118,9 +118,13 @@ public class ReportEntity {
         this.status = status;
     }
 
-    public Instant getExpiredAt() { return expiredAt; }
+    public Instant getExpiredAt() {
+        return expiredAt;
+    }
 
-    public void setExpiredAt(Instant expiredAt) { this.expiredAt = expiredAt; }
+    public void setExpiredAt(Instant expiredAt) {
+        this.expiredAt = expiredAt;
+    }
 
     public User getSubmittedBy() {
         return submittedBy;
