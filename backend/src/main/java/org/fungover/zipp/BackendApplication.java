@@ -22,9 +22,7 @@ public class BackendApplication {
     }
 
     @Bean
-    public NewTopic newTopic(
-        @Value("${app.kafka.topic.report}") String topic
-    ) {
+    public NewTopic newTopic(@Value("${app.kafka.topic.report}") String topic) {
         return new NewTopic(topic, 1, (short) 3);
     }
 }

@@ -26,21 +26,16 @@ public class ReportController {
     private final ReportEventPublisher reportEventPublisher;
     private final UserIdentityService userIdentityService;
 
-    public ReportController(
-        ReportService reportService,
-        ReportEventPublisher reportEventPublisher,
-        UserIdentityService userIdentityService
-    ) {
+    public ReportController(ReportService reportService, ReportEventPublisher reportEventPublisher,
+            UserIdentityService userIdentityService) {
         this.reportService = reportService;
         this.reportEventPublisher = reportEventPublisher;
         this.userIdentityService = userIdentityService;
     }
 
     @PostMapping
-    public ResponseEntity<ReportResponse> createReport(
-        @Valid @RequestBody Report reportRequest,
-        Authentication authentication
-    ) {
+    public ResponseEntity<ReportResponse> createReport(@Valid @RequestBody Report reportRequest,
+            Authentication authentication) {
         String userId = userIdentityService.getUserId(authentication);
 
         var newReport = reportService.createReport(userId, reportRequest);
@@ -55,4 +50,3 @@ public class ReportController {
         return ResponseEntity.ok(reportService.getAllReports());
     }
 }
-

@@ -22,18 +22,10 @@ public class EventListenerService {
 
     }
 
-    @KafkaListener(
-        topics = "${app.kafka.topic.report}",
-        groupId = "#{T(java.util.UUID).randomUUID().toString()}"
-    )
+    @KafkaListener(topics = "${app.kafka.topic.report}", groupId = "#{T(java.util.UUID).randomUUID().toString()}")
     public void listen(ReportAvro event) {
         ReportResponse dto = mapper.toDto(event);
 
-        sseService.send(
-            dto.submittedByUserId(),
-            dto
-        );
+        sseService.send(dto.submittedByUserId(), dto);
     }
 }
-
-

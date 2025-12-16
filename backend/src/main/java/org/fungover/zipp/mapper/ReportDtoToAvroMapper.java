@@ -11,18 +11,11 @@ public final class ReportDtoToAvroMapper {
 
     public ReportAvro toAvro(ReportResponse r) {
 
-        var b = ReportAvro.newBuilder()
-            .setSubmittedByUserId(r.submittedByUserId())
-            .setDescription(r.description())
-            .setEventType(ReportType.valueOf(r.eventType().name()))
-            .setLatitude(r.latitude())
-            .setLongitude(r.longitude());
+        var b = ReportAvro.newBuilder().setSubmittedByUserId(r.submittedByUserId()).setDescription(r.description())
+                .setEventType(ReportType.valueOf(r.eventType().name())).setLatitude(r.latitude())
+                .setLongitude(r.longitude());
 
-        var imageUrls = r.imageUrls() == null
-            ? null
-            : r.imageUrls().stream()
-            .map(s -> (CharSequence) s)
-            .toList();
+        var imageUrls = r.imageUrls() == null ? null : r.imageUrls().stream().map(s -> (CharSequence) s).toList();
 
         b.setImageUrls(imageUrls);
 
@@ -30,12 +23,8 @@ public final class ReportDtoToAvroMapper {
             b.setSubmittedAt(r.submittedAt());
         }
 
-        b.setStatus(r.status() != null
-            ? ReportStatus.valueOf(r.status().name())
-            : ReportStatus.ACTIVE);
+        b.setStatus(r.status() != null ? ReportStatus.valueOf(r.status().name()) : ReportStatus.ACTIVE);
 
         return b.build();
     }
 }
-
-

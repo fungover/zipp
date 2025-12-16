@@ -18,11 +18,8 @@ public class ReportEventPublisher {
     private final ReportDtoToAvroMapper mapper;
     private final String topic;
 
-    public ReportEventPublisher(
-        KafkaTemplate<String, ReportAvro> template,
-        ReportDtoToAvroMapper mapper,
-        @Value("${app.kafka.topic.report}") String topic
-    ) {
+    public ReportEventPublisher(KafkaTemplate<String, ReportAvro> template, ReportDtoToAvroMapper mapper,
+            @Value("${app.kafka.topic.report}") String topic) {
         this.template = template;
         this.mapper = mapper;
         this.topic = topic;
@@ -31,13 +28,12 @@ public class ReportEventPublisher {
     public void publishReportCreated(ReportResponse report) {
         ReportAvro avro = mapper.toAvro(report);
 
-        template.send(topic, report.submittedByUserId(), avro)
-            .whenComplete((result, ex) -> {
-                if (ex != null) {
-                    LOG.error("Failed to publish report {}", report, ex);
-                } else {
-                    LOG.debug("Published report {}", report);
-                }
-            });
+        template.send(topic, report.submittedByUserId(), avro).whenComplete((result, ex) -> {
+            if (ex != null) {
+                LOG.error("Failed to publish report {}", report, ex);
+            } else {
+                LOG.debug("Published report {}", report);
+            }
+        });
     }
 }
