@@ -25,7 +25,7 @@ public class UserIdentityService {
      * it tries to extract the user ID from the attributes: {@code sub}, {@code id},
      * {@code user_id} Currently, this only manages {@code OAuth2 authentication}
      * but can be built further on.
-     * 
+     *
      * @param authentication
      * @return the extracted {@code ID} as a {@code String}
      */
@@ -95,7 +95,7 @@ public class UserIdentityService {
      * {@code OAuth2 principal}. If it doesn't find one, it throws an exception. The
      * potential attributes are: {@code sub}, {@code id}, {@code user_id}, can be
      * extended in the future.
-     * 
+     *
      * @param oAuth2User
      * @return the extracted {@code ID} as a {@code String}
      */
