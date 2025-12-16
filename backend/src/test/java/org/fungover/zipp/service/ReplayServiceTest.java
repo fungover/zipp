@@ -27,7 +27,10 @@ class ReplayServiceTest {
         ReplayService replayService = new ReplayService();
         for (int i = 1; i <= 10; i++) {
             replayService.addEvent("event" + i);
-    }
+        }
         List<String> replayed = replayService.getReplayEvents();
-        assertEquals
+        assertEquals(5, replayed.size());
+        assertTrue(replayed.contains("event6"));
+        assertTrue(replayed.contains("event10"));
+    }
 }
