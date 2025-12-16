@@ -4,11 +4,10 @@ import org.fungover.zipp.dto.ReportResponse;
 import org.fungover.zipp.kafka.ReportAvro;
 import org.fungover.zipp.kafka.ReportStatus;
 import org.fungover.zipp.kafka.ReportType;
-import org.fungover.zipp.dto.Report;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class ReportAvroMapper {
+public final class ReportDtoToAvroMapper {
 
     public ReportAvro toAvro(ReportResponse r) {
 
@@ -38,3 +37,5 @@ public final class ReportAvroMapper {
         return b.build();
     }
 }
+
+

@@ -2,6 +2,7 @@ package org.fungover.zipp.service;
 
 import org.fungover.zipp.kafka.ReportAvro;
 import org.fungover.zipp.kafka.ReportType;
+import org.fungover.zipp.mapper.ReportAvroToDtoMapper;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -11,7 +12,8 @@ class EventListenerServiceTest {
     @Test
     void listenerShouldForwardEventToSseService() {
         SseService sseService = mock(SseService.class);
-        EventListenerService listener = new EventListenerService(sseService);
+        ReportAvroToDtoMapper mapper = mock(ReportAvroToDtoMapper.class);
+        EventListenerService listener = new EventListenerService(sseService, mapper);
 
         ReportAvro event = ReportAvro.newBuilder()
             .setSubmittedByUserId("map123")

@@ -25,6 +25,6 @@ public class BackendApplication {
     public NewTopic newTopic(
         @Value("${app.kafka.topic.report}") String topic
     ) {
-        return new NewTopic(topic, 1, (short) 1);
+        return new NewTopic(topic, 1, (short) 3);
     }
 }
