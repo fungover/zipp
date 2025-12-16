@@ -14,4 +14,6 @@ public interface ReportRepository extends JpaRepository<ReportEntity, Long> {
     List<ReportEntity> findAllBySubmittedByEmail(String email);
 
     List<ReportEntity> findAllByStatusAndSubmittedAtBefore(ReportStatus reportStatus, Instant expirationThreshold);
+
+    List<ReportEntity> findAllByStatusAndExpiredAtBefore(ReportStatus status, Instant expiredBefore);
 }
