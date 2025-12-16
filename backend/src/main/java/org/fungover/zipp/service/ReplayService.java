@@ -11,16 +11,28 @@ import java.util.List;
 public class ReplayService {
 
     private final Deque<String> buffer = new ArrayDeque<>();
-    private final int maxSize = 5;
+    private final int maxSize;
 
-    public void addEvent(String event) {
+    public ReplayService() {
+        this(5);
+    }
+
+    public ReplayService(int maxSize) {
+        this.maxSize = maxSize;
+    }
+
+    public synchronized void addEvent(String event) {
         if (buffer.size() == maxSize) {
             buffer.removeFirst();
         }
         buffer.addLast(event);
     }
 
-    public List<String> getReplayEvents() {
+    public synchronized List<String> getReplayEvents() {
         return new ArrayList<>(buffer);
+    }
+
+    public synchronized void clear() {
+        buffer.clear();
     }
 }
