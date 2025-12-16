@@ -25,7 +25,8 @@ import java.util.UUID;
 @Service
 public class ApiKeyService {
 
-    private static final long MAX_ACTIVE_KEYS_PER_USER = 10L; //Added a constant here since PMD does not want numbers in if statements
+    private static final long MAX_ACTIVE_KEYS_PER_USER = 10L;
+
     private final ApiKeyRepository apiKeyRepository;
     private final SecureRandom secureRandom = new SecureRandom();
 
@@ -36,23 +37,26 @@ public class ApiKeyService {
     /**
      * Creates a new API key for a user.
      *
-     * @param userId      owner's userId
-     * @param name        username on the key
-     * @param description optional description
-     * @param scopes      set of API scopes defining access permissions
-     * @param expiresAt   possible expiration date, otherwise null
+     * @param userId
+     *            owner's userId
+     * @param name
+     *            username on the key
+     * @param description
+     *            optional description
+     * @param scopes
+     *            set of API scopes defining access permissions
+     * @param expiresAt
+     *            possible expiration date, otherwise null
      * @return CreatedApiKey – both plaintext key (shown ONCE) and saved entity
      */
     @Transactional
     public CreatedApiKey createApiKey(UUID userId, String name, String description, Set<ApiKey.ApiScope> scopes,
-                                      Instant expiresAt) {
+            Instant expiresAt) {
 
         long activeKeys = apiKeyRepository.countActiveKeysByUserId(userId);
         if (activeKeys >= MAX_ACTIVE_KEYS_PER_USER) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Maximum number of active API keys reached (" + MAX_ACTIVE_KEYS_PER_USER + ")"
-            );
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Maximum number of active API keys reached (" + MAX_ACTIVE_KEYS_PER_USER + ")");
         }
 
         // 1) generate plaintext key
@@ -109,7 +113,7 @@ public class ApiKeyService {
         String hash = sha256Hex(rawApiKey);
 
         ApiKey apiKey = apiKeyRepository.findByKeyHash(hash)
-            .orElseThrow(() -> new InvalidApiKeyException("Invalid API key"));
+                .orElseThrow(() -> new InvalidApiKeyException("Invalid API key"));
 
         if (!apiKey.isValid()) {
             throw new InvalidApiKeyException("API key is not active or has expired");
@@ -128,7 +132,7 @@ public class ApiKeyService {
     @Transactional
     public void revokeApiKey(UUID apiKeyId, UUID currentUserId) {
         ApiKey apiKey = apiKeyRepository.findById(apiKeyId)
-            .orElseThrow(() -> new InvalidApiKeyException("API key not found"));
+                .orElseThrow(() -> new InvalidApiKeyException("API key not found"));
 
         if (!apiKey.getUserId().equals(currentUserId)) {
             throw new InvalidApiKeyException("You are not allowed to revoke this API key");
@@ -189,8 +193,10 @@ public class ApiKeyService {
     /**
      * Internal record to return both plaintext and entity from createApiKey.
      *
-     * @param plainKey the plaintext API key (shown only once)
-     * @param apiKey   the persisted API key entity
+     * @param plainKey
+     *            the plaintext API key (shown only once)
+     * @param apiKey
+     *            the persisted API key entity
      */
     public record CreatedApiKey(String plainKey, ApiKey apiKey) {
     }

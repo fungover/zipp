@@ -72,11 +72,10 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
      */
     private boolean shouldAuthenticateWithApiKey(HttpServletRequest request) {
         String path = request.getServletPath();
-        // GraphQL and M2M API endpoints require API key, I added a null exception to make the PMD happy
-        return "/graphql".equals(path)
-            || (path != null && path.startsWith("/graphql/"))
-            || "/api/m2m".equals(path)
-            || (path != null && path.startsWith("/api/m2m/"));
+        // GraphQL and M2M API endpoints require API key, I added a null exception to
+        // make the PMD happy
+        return "/graphql".equals(path) || (path != null && path.startsWith("/graphql/")) || "/api/m2m".equals(path)
+                || (path != null && path.startsWith("/api/m2m/"));
     }
 
     /**
@@ -90,7 +89,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         private final UUID apiKeyId;
         private final Set<ApiScope> scopes;
 
-        @SuppressWarnings("PMD.ConstructorCallsOverridableMethod") //setAuthenticated(true) should not be called in a constructor so I have to do this
+        @SuppressWarnings("PMD.ConstructorCallsOverridableMethod") // setAuthenticated(true)
         public ApiKeyAuthentication(UUID userId, UUID apiKeyId, Set<ApiScope> scopes) {
             super(buildAuthorities(scopes));
             this.userId = userId;
