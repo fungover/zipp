@@ -181,6 +181,14 @@ main {
    width: 100%;
    margin-top: 20px;
  }
+
+ .features__report{
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+ }
+
 .report{
   max-width: 600px;
   border-style: solid;
@@ -227,7 +235,7 @@ main {
   height: 130px;
   width: 130px;
   border-style: solid;
-  border-color: var(--report-border);;
+  border-color: var(--report-border);
   border-radius: 0.5rem;
   background-color: var(--report-button-bg);
 }
@@ -251,6 +259,25 @@ main {
   font-weight: bold;
   text-align: center;
   color: cadetblue;
+}
+
+.map__button{
+  text-align: center;
+  margin-top: 2rem;
+  height: 80px;
+  width: 250px;
+  border: 0.25rem solid cadetblue;
+  border-radius: 1rem;
+  background-color: var(--report-button-bg);
+}
+
+.map__button:hover{
+  cursor: pointer;
+  border: 0.5rem solid cadetblue;
+}
+
+.map__button:focus{
+  outline: 0.25rem solid cadetblue;
 }
 
 .main__intro {
