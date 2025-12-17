@@ -5,20 +5,49 @@
 >
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${title}"></title>
 </head>
 <body>
-<main>
-    <div class="welcome" layout:fragment="welcome">
-        <h1 class="welcome__title">
-          Welcome
-          <span th:if="${isLoggedIn}" th:text="${userName}"></span>
-        </h1>
-        <p class="welcome__text" th:unless="${isLoggedIn}"> Please log in to make a report</p>
-      <div th:if="${isLoggedIn}" >
-        <form th:replace="~{fragments/report :: report}"></form>
+<main layout:fragment="welcome">
+  <section class="main__intro">
+    <h1 class="main__title">Welcome to Zipp</h1>
+
+    <p class="main__subtitle">
+      Report and explore interesting or important locations in your area.
+    </p>
+
+    <div class="main__actions">
+      <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn btn-primary">Log In</a>
+    </div>
+  </section>
+  <section>
+    <div th:if="${isLoggedIn}" >
+      <form th:replace="~{fragments/report :: report}"></form>
+    </div>
+  </section>
+  <section class="features">
+    <h2>What you can do</h2>
+
+    <div class="features__grid">
+      <div class="feature">
+        <h3>Report places of interest</h3>
+        <p>Submit reports for hazards, interesting finds, or anything noteworthy using geolocation.</p>
+      </div>
+      <div class="feature">
+        <h3>View reports on a map</h3>
+        <p>See all submitted locations visually on an interactive map.</p>
+      </div>
+      <div class="feature">
+        <h3>Real-time updates</h3>
+        <p>New reports are processed and distributed using Kafka.</p>
+      </div>
+      <div class="feature">
+        <h3>Secure accounts</h3>
+        <p>Create an account to submit reports and manage your contributions safely.</p>
       </div>
     </div>
+  </section>
 </main>
 
 </body>
