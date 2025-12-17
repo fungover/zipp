@@ -3,28 +3,12 @@
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 <head>
-  <meta charset="UTF-8">
-  <title th:text="${title}">Zipp</title>
-
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${title}"></title>
 </head>
 
 <body>
-<main>
-
-  <div class="welcome" layout:fragment="welcome">
-    <h1 class="welcome__title">
-      Welcome
-      <span th:if="${isLoggedIn}" th:text="${userName}"></span>
-    </h1>
-    <p class="welcome__text" th:unless="${isLoggedIn}"> Please log in to make a report</p>
-
-
-    <div id="map"></div>
-  </div>
 <main layout:fragment="welcome">
   <section class="main__intro">
     <h1 class="main__title">Welcome to Zipp</h1>
@@ -59,6 +43,7 @@
       </div>
     </div>
   </section>
+  <div id="map"></div>
 </main>
 
 <div layout:fragment="scripts">
@@ -66,8 +51,8 @@
   <script th:src="@{/js/map.js}"></script>
 
   <script async defer
-          th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${googleApiKey} + '&callback=initMap'}"
-          onerror="onGoogleMapsLoadError()">
+          th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${googleMapsApiKey} + '&callback=initMap'}"
+          >
   </script>
 </div>
 

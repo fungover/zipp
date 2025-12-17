@@ -25,7 +25,7 @@ public class IndexController {
             model.addAttribute("userName", userName);
         }
 
-        model.addAttribute("googleApiKey", googleMapsApiKey);
+        model.addAttribute("googleMapsApiKey", googleMapsApiKey);
 
         return "index";
     }

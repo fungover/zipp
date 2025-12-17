@@ -1,5 +1,5 @@
 
-  function initMap() {
+window.initMap = function initMap() {
 
   const defaultLocation = { lat: 59.3293, lng: 18.0686 }; //  (Stockholm)
 
@@ -26,12 +26,12 @@
   loadMap(userLocation);
 },
   (error) => {
-  console.warn("Location denied.Showing Stockholm instead.");
+  console.warn("Location denied. Showing Stockholm instead.");
   loadMap(defaultLocation);
 });
 }
   else {
-  console.warn("Geolocation are not approved. Showing Stockholm.");
+  console.warn("Geolocation is not approved. Showing Stockholm.");
   loadMap(defaultLocation);
 }
 }
