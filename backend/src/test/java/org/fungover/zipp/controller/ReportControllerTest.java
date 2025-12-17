@@ -69,8 +69,7 @@ class ReportControllerTest {
         attacker.setEmail("attacker@example.com");
         attacker.setProviderId("attacker-999");
 
-        Report inputReport = new Report(attacker, "Test description", ReportType.ACCIDENT, 59.3293, 18.0686, null, null,
-                null);
+        Report inputReport = new Report( "Test description", ReportType.ACCIDENT, 59.3293, 18.0686, null);
 
         ReportResponse saved = new ReportResponse(currentUser.getProviderId(), "Test description", ReportType.ACCIDENT,
                 59.3293, 18.0686, Instant.now(), ReportStatus.ACTIVE, List.of());
@@ -94,8 +93,7 @@ class ReportControllerTest {
         attacker.setEmail("attacker@example.com");
         attacker.setProviderId("attacker-999");
 
-        Report inputReport = new Report(attacker, "Report with images", ReportType.DEBRIS, 59.3293, 18.0686, null, null,
-                List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg"));
+        Report inputReport = new Report( "Report with images", ReportType.DEBRIS, 59.3293, 18.0686, List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg"));
 
         ReportResponse saved = new ReportResponse(currentUser.getProviderId(), "Report with images", ReportType.DEBRIS,
                 59.3293, 18.0686, Instant.now(), ReportStatus.ACTIVE,
