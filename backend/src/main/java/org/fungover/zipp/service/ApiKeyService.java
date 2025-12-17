@@ -25,6 +25,8 @@ import java.util.UUID;
 @Service
 public class ApiKeyService {
 
+    private static final long MAX_ACTIVE_KEYS_PER_USER = 10L;
+
     private final ApiKeyRepository apiKeyRepository;
     private final SecureRandom secureRandom = new SecureRandom();
 
@@ -38,7 +40,7 @@ public class ApiKeyService {
      * @param userId
      *            owner's userId
      * @param name
-     *            user name on the key
+     *            username on the key
      * @param description
      *            optional description
      * @param scopes
@@ -52,8 +54,9 @@ public class ApiKeyService {
             Instant expiresAt) {
 
         long activeKeys = apiKeyRepository.countActiveKeysByUserId(userId);
-        if (activeKeys >= 10) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Maximum number of active API keys reached (10)");
+        if (activeKeys >= MAX_ACTIVE_KEYS_PER_USER) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Maximum number of active API keys reached (" + MAX_ACTIVE_KEYS_PER_USER + ")");
         }
 
         // 1) generate plaintext key
@@ -96,7 +99,7 @@ public class ApiKeyService {
 
     /**
      * Validates an incoming API key (from e.g. X-API-Key header).
-     *
+     * <p>
      * - Hash plaintext - Looking up in DB on keyHash - Checking status/expiry via
      * apiKey.isValid() - Updating lastUsedAt
      *

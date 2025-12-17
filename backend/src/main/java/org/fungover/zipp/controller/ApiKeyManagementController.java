@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.nio.charset.StandardCharsets;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -122,7 +123,7 @@ public class ApiKeyManagementController {
     private UUID extractUserId(OAuth2User principal) {
         String sub = principal.getAttribute("sub");
         if (sub != null) {
-            return UUID.nameUUIDFromBytes(sub.getBytes());
+            return UUID.nameUUIDFromBytes(sub.getBytes(StandardCharsets.UTF_8));
         }
 
         Object idAttr = principal.getAttribute("id");
@@ -135,7 +136,7 @@ public class ApiKeyManagementController {
 
         String email = principal.getAttribute("email");
         if (email != null) {
-            return UUID.nameUUIDFromBytes(email.getBytes());
+            return UUID.nameUUIDFromBytes(email.getBytes(StandardCharsets.UTF_8));
         }
 
         throw new IllegalStateException("Cannot extract user ID from principal");

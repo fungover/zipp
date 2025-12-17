@@ -16,14 +16,13 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "api_keys", indexes = {@Index(name = "idx_api_key_hash", columnList = "keyHash"),
         @Index(name = "idx_api_key_user", columnList = "userId")})
-
 public class ApiKey {
 
     @Id
@@ -49,7 +48,7 @@ public class ApiKey {
     @CollectionTable(name = "api_key_scopes", joinColumns = @JoinColumn(name = "api_key_id"))
     @Column(name = "scope")
     @Enumerated(EnumType.STRING)
-    private Set<ApiScope> scopes = new HashSet<>();
+    private Set<ApiScope> scopes = EnumSet.noneOf(ApiScope.class);
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
