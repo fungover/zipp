@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @Transactional
 @EnableAutoConfiguration(exclude = {KafkaAutoConfiguration.class})
-class ReportControllerTest {
+class ReportControllerEndpointTest {
 
     @Autowired
     private MockMvc mockMvc;
