@@ -19,16 +19,8 @@ class EventListenerServiceTest {
         SseService sseService = mock(SseService.class);
         EventListenerService listener = new EventListenerService(sseService);
 
-        ReportResponse event = new ReportResponse(
-            "map123",
-            "Hello World",
-            ReportType.ACCIDENT,
-            59.0,
-            18.0,
-            Instant.now(),
-            ReportStatus.ACTIVE,
-            List.of()
-        );
+        ReportResponse event = new ReportResponse("map123", "Hello World", ReportType.ACCIDENT, 59.0, 18.0,
+                Instant.now(), ReportStatus.ACTIVE, List.of());
 
         listener.listen(event);
 
