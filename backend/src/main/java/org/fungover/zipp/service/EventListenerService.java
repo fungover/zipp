@@ -1,5 +1,6 @@
 package org.fungover.zipp.service;
 
+import org.fungover.zipp.dto.ReportResponse;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +18,9 @@ public class EventListenerService {
         this.sseService = sseService;
     }
 
-    @KafkaListener(topics = "reports", groupId = "zipp")
-    public void listen(ReportEvent event) {
+    @KafkaListener(topics = "reports", groupId = "#{T(java.util.UUID).randomUUID().toString()}")
+    public void listen(ReportResponse event) {
         LOGGER.info("Received: {}", event);
-        sseService.send(event.id(), event);
+        sseService.send(event.submittedByUserId(), event);
     }
 }
