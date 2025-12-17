@@ -21,6 +21,11 @@
       <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn btn-primary">Log In</a>
     </div>
   </section>
+  <section>
+    <div th:if="${isLoggedIn}" >
+      <form th:replace="~{fragments/report :: report}"></form>
+    </div>
+  </section>
   <section class="features">
     <h2>What you can do</h2>
 
