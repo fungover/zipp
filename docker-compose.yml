@@ -59,29 +59,6 @@ services:
       retries: 5
     command: --default-authentication-plugin=mysql_native_password
 
-#  spring-app:
-#    image: container-registry.oracle.com/java/openjdk:25
-#    container_name: spring-app
-#    depends_on:
-#      - otel-collector
-#    networks:
-#      - app-net
-#    volumes:
-#      - ./backend/app.jar:/app/app.jar
-#      - ./backend/otel/opentelemetry-javaagent.jar:/otel/opentelemetry-javaagent.jar
-#    environment:
-#      - JAVA_OPTS=-Xms256m -Xmx512m
-#    command: >
-#      java
-#      -javaagent:/otel/opentelemetry-javaagent.jar
-#      -Dotel.exporter.otlp.endpoint=http://otel-collector:4318
-#      -Dotel.exporter.otlp.protocol=http/protobuf
-#      -Dotel.resource.attributes=service.name=spring-app
-#      -jar /app/app.jar
-#    ports:
-#      - "8080:8080"
-
-
   otel-collector:
     image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.139.0
     container_name: otel-collector
@@ -137,11 +114,11 @@ services:
       networks:
         - app-net
       volumes:
-        - ./backend/config/loki/loki-data:/loki
-        - ./backend/config/loki/loki-config.yaml:/backend/config/loki/loki-config.yaml
+        - loki-data:/loki
+        - ./backend/config/loki/loki-config.yaml:/etc/loki/loki-config.yaml
       command:
         - --config.expand-env=true
-        - --config.file=/backend/config/loki/loki-config.yaml
+        - --config.file=/etc/loki/loki-config.yaml
 
   grafana:
     image: grafana/grafana:12.2.0
@@ -156,9 +133,13 @@ services:
       - ./backend/config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./backend/config/grafana/dashboards:/var/lib/grafana/dashboards
     environment:
+      # Allow anonymous users to view dashboards and drilldown
       GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"   # or Viewer for read-only
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Editor"   # or Viewer for read-only
       GF_AUTH_ANONYMOUS_ORG_NAME: "Main Org."
+      # Optional: set default admin in case you still want login
+      GF_SECURITY_ADMIN_USER: "test"
+      GF_SECURITY_ADMIN_PASSWORD: "test"
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -182,3 +163,4 @@ services:
 volumes:
   kafka-data:
   mysql-data:
+  loki-data:
