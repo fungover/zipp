@@ -138,8 +138,8 @@ services:
       GF_AUTH_ANONYMOUS_ORG_ROLE: "Editor"   # or Viewer for read-only
       GF_AUTH_ANONYMOUS_ORG_NAME: "Main Org."
       # Optional: set default admin in case you still want login
-      GF_SECURITY_ADMIN_USER: "test"
-      GF_SECURITY_ADMIN_PASSWORD: "test"
+      GF_SECURITY_ADMIN_USER: "${Grafana_Login}"
+      GF_SECURITY_ADMIN_PASSWORD: "${Grafana_Password}"
 
   node-exporter:
     image: prom/node-exporter:latest
