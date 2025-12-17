@@ -27,6 +27,12 @@ public class SecurityConfig {
     private static final String CSS_ALL = "/css/**";
     private static final String IMAGES_ALL = "/images/**";
     private static final String JS_ALL = "/js/**";
+    private static final String WEBAUTHN_ALL = "/webauthn/**";
+    private static final String API = "/api/reports";
+
+    private static final String WEBAUTHN_REGISTER_ALL = "/webauthn/register/**";
+    private static final String WEBAUTHN_AUTHENTICATE_ALL = "/webauthn/authenticate/**";
+    private static final String LOGIN_WEBAUTHN = "/login/webauthn";
 
     private final CustomOAuth2UserService co2us;
     private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
@@ -73,9 +79,10 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     @Profile("dev")
-    public SecurityFilterChain oauthSecurityChainDev(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(ROOT, LOGIN, LOGIN_ALL, OAUTH2_ALL, FAVICON, FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL)
+    public SecurityFilterChain securityFilterChainDev(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(API).authenticated()
+                .requestMatchers(ROOT, LOGIN, LOGIN_ALL, OAUTH2_ALL, FAVICON, FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL,
+                        WEBAUTHN_ALL)
                 .permitAll().anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2.loginPage(LOGIN).defaultSuccessUrl(ROOT, true)
                         .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))

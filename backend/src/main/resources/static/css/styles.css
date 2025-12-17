@@ -12,6 +12,9 @@
   --subtitle-color: #555;
   --feature-title-color: #34495e;
   --feature-text-color: #666;
+  --report-border: #1E1E1E;
+  --report-bg: #ffffff;
+  --report-button-bg: #ffffff;
 }
 
 [data-theme="dark"] {
@@ -28,6 +31,9 @@
   --subtitle-color: #b0b0b0;
   --feature-title-color: #d0d0d0;
   --feature-text-color: #a0a0a0;
+  --report-border: #1E1E1E;
+  --report-bg: #ffffff;
+  --report-button-bg: #ffffff;
 }
 
 body {
@@ -168,6 +174,78 @@ main {
   border: 3px solid;
   border-color: cadetblue;
   border-radius: 0.5rem;
+}
+
+.report{
+  max-width: 600px;
+  border-style: solid;
+  border-color: var(--report-border);
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.report__title{
+  padding-left: 1rem  ;
+}
+
+.report__div{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.report__input{
+  border-style: solid;
+  border-color: var(--report-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  max-width: 90%;
+}
+
+.button__div{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.report__button{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 130px;
+  width: 130px;
+  border-style: solid;
+  border-color: var(--report-border);;
+  border-radius: 0.5rem;
+  background-color: var(--report-button-bg);
+}
+
+.report__button:hover{
+  cursor: pointer;
+  border: 0.25rem solid cadetblue;
+}
+
+.report__button:focus{
+  outline: 0.25rem solid cadetblue;
+}
+
+.button__image{
+  max-height: 70px;
+  width: fit-content;
+}
+
+.report__result{
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+  color: cadetblue;
 }
 
 .main__intro {
