@@ -42,11 +42,14 @@ public class WebAuthnCredentialEntity {
     @Lob
     private byte[] clientDataJSON;
 
+    @Column
+    private String label;
+
     protected WebAuthnCredentialEntity() {
     }
 
     public WebAuthnCredentialEntity(byte[] credentialId, User user, byte[] publicKey, long signatureCount,
-            String transports, byte[] attestationObject, byte[] clientDataJSON) {
+            String transports, byte[] attestationObject, byte[] clientDataJSON, String label) {
         this.credentialId = copy(credentialId);
         this.user = user;
         this.publicKey = copy(publicKey);
@@ -54,6 +57,25 @@ public class WebAuthnCredentialEntity {
         this.transports = transports;
         this.attestationObject = copy(attestationObject);
         this.clientDataJSON = copy(clientDataJSON);
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getEncodedId() {
+        try {
+            if (this.credentialId == null)
+                return "error";
+            return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(this.credentialId);
+        } catch (Exception e) {
+            return "error";
+        }
     }
 
     public byte[] getCredentialId() {
