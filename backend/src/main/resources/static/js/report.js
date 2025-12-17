@@ -27,9 +27,8 @@ button.forEach(button => {
         body: JSON.stringify({
           description: input.value,
           eventType: report,
-          latitude: location.latitude,
-          longitude: location.longitude,
-
+          latitude: location.lat,
+          longitude: location.lng,
           image: imageUrl.value,
         })
       })

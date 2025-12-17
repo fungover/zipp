@@ -21,7 +21,7 @@ function getGpsLocation(){
 
     navigator.geolocation.getCurrentPosition(
       position => {
-        resolve({latitude: position.coords.latitude, longitude: position.coords.longitude});
+        resolve({lat: position.coords.latitude, lng: position.coords.longitude});
       },
       error=>{
         console.warn(error.code);
@@ -33,9 +33,6 @@ function getGpsLocation(){
         maximumAge: 0,
       });
   })
-
-
-
 }
 
 async function getIpLocation() {
@@ -45,5 +42,5 @@ async function getIpLocation() {
  }
  const data = await response.json();
  const {lat, lon} = data;
-  return {latitude: lat, longitude: lon};
+ return {lat: lat, lng: lon};
 }
