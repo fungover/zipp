@@ -232,10 +232,10 @@ spec:
               name: google-oauth2-credentials
               key: GOOGLE_CLIENT_SECRET
         - name: GOOGLE_MAPS_API_KEY
-           valueFrom:
-             secretKeyRef:
-               name: google-map-oauth2-credentials
-               key: GOOGLE_CLIENT_MAP_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: google-map-oauth2-credentials
+              key: GOOGLE_CLIENT_MAP_SECRET
               """
 """
 					writeFile file: "${K8S_MANIFEST_DIR}/services/service.yaml", text: """
