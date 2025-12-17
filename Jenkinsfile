@@ -235,7 +235,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: google-map-oauth2-credentials
-              key: GOOGLE_CLIENT_MAP_SECRET
+              key:  GOOGLE_MAPS_API_KEY
               """
 """
 					writeFile file: "${K8S_MANIFEST_DIR}/services/service.yaml", text: """
