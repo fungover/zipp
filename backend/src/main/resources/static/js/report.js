@@ -29,8 +29,7 @@ button.forEach(button => {
           eventType: report,
           latitude: location.latitude,
           longitude: location.longitude,
-          submittedAt: Date.now(),
-          status: "ACTIVE",
+
           image: imageUrl.value,
         })
       })
