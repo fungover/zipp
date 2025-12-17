@@ -44,12 +44,11 @@ class M2MControllerTest {
         @Test
         @DisplayName("should throw exception for wrong authentication type")
         void shouldThrowExceptionForWrongAuthenticationType() {
-            UsernamePasswordAuthenticationToken wrongAuth =
-                new UsernamePasswordAuthenticationToken("user", "pass");
+            UsernamePasswordAuthenticationToken wrongAuth = new UsernamePasswordAuthenticationToken("user", "pass");
 
             assertThatThrownBy(() -> controller.ping(wrongAuth))
-                .isInstanceOf(AuthenticationCredentialsNotFoundException.class)
-                .hasMessageContaining("Missing API key authentication");
+                    .isInstanceOf(AuthenticationCredentialsNotFoundException.class)
+                    .hasMessageContaining("Missing API key authentication");
         }
     }
 
@@ -81,9 +80,8 @@ class M2MControllerTest {
 
             ApiKeyAuthentication auth = new ApiKeyAuthentication(userId, apiKeyId, scopes);
 
-            assertThatThrownBy(() -> controller.getReports(auth))
-                .isInstanceOf(AccessDeniedException.class)
-                .hasMessageContaining("Missing required scope: REPORTS_READ");
+            assertThatThrownBy(() -> controller.getReports(auth)).isInstanceOf(AccessDeniedException.class)
+                    .hasMessageContaining("Missing required scope: REPORTS_READ");
         }
     }
 
@@ -115,9 +113,8 @@ class M2MControllerTest {
 
             ApiKeyAuthentication auth = new ApiKeyAuthentication(userId, apiKeyId, scopes);
 
-            assertThatThrownBy(() -> controller.getStats(auth))
-                .isInstanceOf(AccessDeniedException.class)
-                .hasMessageContaining("Missing required scope: STATS_READ");
+            assertThatThrownBy(() -> controller.getStats(auth)).isInstanceOf(AccessDeniedException.class)
+                    .hasMessageContaining("Missing required scope: STATS_READ");
         }
     }
 }

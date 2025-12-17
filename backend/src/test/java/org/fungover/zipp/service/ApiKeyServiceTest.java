@@ -61,13 +61,8 @@ class ApiKeyServiceTest {
                 return key;
             });
 
-            ApiKeyService.CreatedApiKey result = apiKeyService.createApiKey(
-                userId,
-                "Test Key",
-                "Test Description",
-                Set.of(ApiScope.REPORTS_READ),
-                null
-            );
+            ApiKeyService.CreatedApiKey result = apiKeyService.createApiKey(userId, "Test Key", "Test Description",
+                    Set.of(ApiScope.REPORTS_READ), null);
 
             assertThat(result.plainKey()).startsWith("zipp_live_");
             assertThat(result.apiKey().getName()).isEqualTo("Test Key");
@@ -81,15 +76,9 @@ class ApiKeyServiceTest {
         void shouldThrowExceptionWhenMaxKeysReached() {
             when(apiKeyRepository.countActiveKeysByUserId(userId)).thenReturn(10L);
 
-            assertThatThrownBy(() -> apiKeyService.createApiKey(
-                userId,
-                "Too Many Keys",
-                null,
-                Set.of(ApiScope.REPORTS_READ),
-                null
-            ))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasMessageContaining("Maximum number of active API keys reached");
+            assertThatThrownBy(() -> apiKeyService.createApiKey(userId, "Too Many Keys", null,
+                    Set.of(ApiScope.REPORTS_READ), null)).isInstanceOf(ResponseStatusException.class)
+                    .hasMessageContaining("Maximum number of active API keys reached");
         }
 
         @Test
@@ -102,13 +91,8 @@ class ApiKeyServiceTest {
                 return key;
             });
 
-            ApiKeyService.CreatedApiKey result = apiKeyService.createApiKey(
-                userId,
-                "Prefix Test",
-                null,
-                Set.of(),
-                null
-            );
+            ApiKeyService.CreatedApiKey result = apiKeyService.createApiKey(userId, "Prefix Test", null, Set.of(),
+                    null);
 
             assertThat(result.apiKey().getKeyPrefix()).hasSize(12);
             assertThat(result.apiKey().getKeyPrefix()).startsWith("zipp_live_");
@@ -136,17 +120,15 @@ class ApiKeyServiceTest {
         @Test
         @DisplayName("should throw exception for null API key")
         void shouldThrowExceptionForNullApiKey() {
-            assertThatThrownBy(() -> apiKeyService.validateApiKey(null))
-                .isInstanceOf(InvalidApiKeyException.class)
-                .hasMessageContaining("API key is missing");
+            assertThatThrownBy(() -> apiKeyService.validateApiKey(null)).isInstanceOf(InvalidApiKeyException.class)
+                    .hasMessageContaining("API key is missing");
         }
 
         @Test
         @DisplayName("should throw exception for blank API key")
         void shouldThrowExceptionForBlankApiKey() {
-            assertThatThrownBy(() -> apiKeyService.validateApiKey("   "))
-                .isInstanceOf(InvalidApiKeyException.class)
-                .hasMessageContaining("API key is missing");
+            assertThatThrownBy(() -> apiKeyService.validateApiKey("   ")).isInstanceOf(InvalidApiKeyException.class)
+                    .hasMessageContaining("API key is missing");
         }
 
         @Test
@@ -155,8 +137,7 @@ class ApiKeyServiceTest {
             when(apiKeyRepository.findByKeyHash(anyString())).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> apiKeyService.validateApiKey("invalid_key"))
-                .isInstanceOf(InvalidApiKeyException.class)
-                .hasMessageContaining("Invalid API key");
+                    .isInstanceOf(InvalidApiKeyException.class).hasMessageContaining("Invalid API key");
         }
 
         @Test
@@ -167,8 +148,7 @@ class ApiKeyServiceTest {
             when(apiKeyRepository.findByKeyHash(anyString())).thenReturn(Optional.of(revokedKey));
 
             assertThatThrownBy(() -> apiKeyService.validateApiKey("zipp_live_revokedkey"))
-                .isInstanceOf(InvalidApiKeyException.class)
-                .hasMessageContaining("not active or has expired");
+                    .isInstanceOf(InvalidApiKeyException.class).hasMessageContaining("not active or has expired");
         }
 
         @Test
@@ -179,8 +159,7 @@ class ApiKeyServiceTest {
             when(apiKeyRepository.findByKeyHash(anyString())).thenReturn(Optional.of(expiredKey));
 
             assertThatThrownBy(() -> apiKeyService.validateApiKey("zipp_live_expiredkey"))
-                .isInstanceOf(InvalidApiKeyException.class)
-                .hasMessageContaining("not active or has expired");
+                    .isInstanceOf(InvalidApiKeyException.class).hasMessageContaining("not active or has expired");
         }
 
         @Test
@@ -226,8 +205,7 @@ class ApiKeyServiceTest {
             when(apiKeyRepository.findById(apiKey.getId())).thenReturn(Optional.of(apiKey));
 
             assertThatThrownBy(() -> apiKeyService.revokeApiKey(apiKey.getId(), userId))
-                .isInstanceOf(InvalidApiKeyException.class)
-                .hasMessageContaining("not allowed to revoke");
+                    .isInstanceOf(InvalidApiKeyException.class).hasMessageContaining("not allowed to revoke");
 
             verify(apiKeyRepository, never()).save(any(ApiKey.class));
         }
@@ -239,8 +217,7 @@ class ApiKeyServiceTest {
             when(apiKeyRepository.findById(keyId)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> apiKeyService.revokeApiKey(keyId, userId))
-                .isInstanceOf(InvalidApiKeyException.class)
-                .hasMessageContaining("not found");
+                    .isInstanceOf(InvalidApiKeyException.class).hasMessageContaining("not found");
         }
     }
 

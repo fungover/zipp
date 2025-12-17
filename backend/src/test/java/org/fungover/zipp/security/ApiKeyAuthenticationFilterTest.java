@@ -93,8 +93,7 @@ class ApiKeyAuthenticationFilterTest {
 
             when(request.getHeader("X-API-Key")).thenReturn("invalid_key");
             when(request.getServletPath()).thenReturn("/api/m2m/ping");
-            when(apiKeyService.validateApiKey("invalid_key"))
-                .thenThrow(new InvalidApiKeyException("Invalid API key"));
+            when(apiKeyService.validateApiKey("invalid_key")).thenThrow(new InvalidApiKeyException("Invalid API key"));
             when(response.getWriter()).thenReturn(printWriter);
 
             filter.doFilterInternal(request, response, filterChain);
@@ -137,42 +136,27 @@ class ApiKeyAuthenticationFilterTest {
         void shouldBuildCorrectAuthoritiesFromScopes() {
             Set<ApiScope> scopes = Set.of(ApiScope.REPORTS_READ, ApiScope.STATS_READ);
 
-            ApiKeyAuthenticationFilter.ApiKeyAuthentication auth =
-                new ApiKeyAuthenticationFilter.ApiKeyAuthentication(
-                    UUID.randomUUID(),
-                    UUID.randomUUID(),
-                    scopes
-                );
+            ApiKeyAuthenticationFilter.ApiKeyAuthentication auth = new ApiKeyAuthenticationFilter.ApiKeyAuthentication(
+                    UUID.randomUUID(), UUID.randomUUID(), scopes);
 
-            assertThat(auth.getAuthorities())
-                .extracting("authority")
-                .contains("ROLE_API_CLIENT", "SCOPE_REPORTS_READ", "SCOPE_STATS_READ");
+            assertThat(auth.getAuthorities()).extracting("authority").contains("ROLE_API_CLIENT", "SCOPE_REPORTS_READ",
+                    "SCOPE_STATS_READ");
         }
 
         @Test
         @DisplayName("should have ROLE_API_CLIENT even with empty scopes")
         void shouldHaveRoleApiClientWithEmptyScopes() {
-            ApiKeyAuthenticationFilter.ApiKeyAuthentication auth =
-                new ApiKeyAuthenticationFilter.ApiKeyAuthentication(
-                    UUID.randomUUID(),
-                    UUID.randomUUID(),
-                    Set.of()
-                );
+            ApiKeyAuthenticationFilter.ApiKeyAuthentication auth = new ApiKeyAuthenticationFilter.ApiKeyAuthentication(
+                    UUID.randomUUID(), UUID.randomUUID(), Set.of());
 
-            assertThat(auth.getAuthorities())
-                .extracting("authority")
-                .contains("ROLE_API_CLIENT");
+            assertThat(auth.getAuthorities()).extracting("authority").contains("ROLE_API_CLIENT");
         }
 
         @Test
         @DisplayName("should check scope correctly")
         void shouldCheckScopeCorrectly() {
-            ApiKeyAuthenticationFilter.ApiKeyAuthentication auth =
-                new ApiKeyAuthenticationFilter.ApiKeyAuthentication(
-                    UUID.randomUUID(),
-                    UUID.randomUUID(),
-                    Set.of(ApiScope.REPORTS_READ)
-                );
+            ApiKeyAuthenticationFilter.ApiKeyAuthentication auth = new ApiKeyAuthenticationFilter.ApiKeyAuthentication(
+                    UUID.randomUUID(), UUID.randomUUID(), Set.of(ApiScope.REPORTS_READ));
 
             assertThat(auth.hasScope(ApiScope.REPORTS_READ)).isTrue();
             assertThat(auth.hasScope(ApiScope.STATS_READ)).isFalse();
