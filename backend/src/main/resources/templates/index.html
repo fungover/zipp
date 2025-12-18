@@ -21,11 +21,14 @@
       <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn btn-primary">Log In</a>
     </div>
   </section>
-  <section>
-    <div th:if="${isLoggedIn}" >
+
+  <section class="features">
+    <div class="features__report" th:if="${isLoggedIn}" >
       <form th:replace="~{fragments/report :: report}"></form>
+      <button th:replace="~{fragments/map :: displayLocation}"></button>
     </div>
   </section>
+
   <section class="features">
     <h2>What you can do</h2>
 
@@ -53,7 +56,7 @@
 
 <div layout:fragment="scripts">
 
-  <script th:src="@{/js/map.js}"></script>
+  <script type="module" th:src="@{/js/map.js}"></script>
 
   <script async defer
           th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${googleMapsApiKey} + '&callback=initMap'}"
