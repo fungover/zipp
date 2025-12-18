@@ -8,15 +8,14 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.util.List;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class EventListenerServiceTest {
 
     @Test
     void listenerShouldForwardEventToSseService() {
 
-        SseService sseService = mock(SseService.class);
+        SseService sseService = spy(SseService.class);
         EventListenerService listener = new EventListenerService(sseService);
 
         ReportResponse event = new ReportResponse("map123", "Hello World", ReportType.ACCIDENT, 59.0, 18.0,

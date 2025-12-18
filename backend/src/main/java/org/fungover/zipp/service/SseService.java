@@ -30,6 +30,7 @@ public class SseService {
     }
 
     public void send(String id, Object event) {
+        LOGGER.info("Sending event to id={} with payload={}", id, event);
         var list = emitters.get(id);
         if (list == null) {
             return;
