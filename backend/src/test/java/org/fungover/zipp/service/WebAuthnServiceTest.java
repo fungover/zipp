@@ -31,16 +31,8 @@ class WebAuthnServiceTest {
         UUID userId = UUID.randomUUID();
         user.setId(userId);
 
-        WebAuthnCredentialEntity mockEntity = new WebAuthnCredentialEntity(
-            new byte[]{1, 2, 3},
-            user,
-            new byte[]{4, 5, 6},
-            0L,
-            "usb",
-            null,
-            null,
-            "My Device"
-        );
+        WebAuthnCredentialEntity mockEntity = new WebAuthnCredentialEntity(new byte[]{1, 2, 3}, user,
+                new byte[]{4, 5, 6}, 0L, "usb", null, null, "My Device");
 
         when(repository.findAllByUserId(userId)).thenReturn(List.of(mockEntity));
 

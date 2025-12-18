@@ -11,15 +11,17 @@ import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.api.CredentialRecord;
 import org.springframework.security.web.webauthn.api.PublicKeyCose; // NEW IMPORT
 import java.util.Optional;
-import java.util.UUID;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class JpaWebAuthnCredentialRepositoryTest {
 
-    @Mock private WebAuthnCredentialEntityRepository credRepo;
-    @Mock private UserRepository userRepo;
-    @InjectMocks private JpaWebAuthnCredentialRepository repository;
+    @Mock
+    private WebAuthnCredentialEntityRepository credRepo;
+    @Mock
+    private UserRepository userRepo;
+    @InjectMocks
+    private JpaWebAuthnCredentialRepository repository;
 
     @Test
     void testSaveNewCredential() {
