@@ -22,10 +22,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ReportExpirationServiceTest {
@@ -65,7 +65,8 @@ class ReportExpirationServiceTest {
 
         reportExpirationService.expireOldReports();
 
-        verify(reportConfig, times(2)).getExpirationHours(); // Called twice in the service
+        // Called twice in the service (check + threshold)
+        verify(reportConfig, times(2)).getExpirationHours();
         verify(reportRepository).findAllByStatusAndSubmittedAtBefore(eq(ReportStatus.ACTIVE), instantCaptor.capture());
 
         Instant threshold = instantCaptor.getValue();
@@ -76,6 +77,7 @@ class ReportExpirationServiceTest {
         List<ReportEntity> savedReports = reportListCaptor.getValue();
         assertEquals(2, savedReports.size());
         assertTrue(savedReports.stream().allMatch(r -> r.getStatus() == ReportStatus.EXPIRED));
+        assertTrue(savedReports.stream().allMatch(r -> r.getExpiredAt() != null));
     }
 
     @Test
@@ -136,6 +138,48 @@ class ReportExpirationServiceTest {
         List<ReportEntity> savedReports = reportListCaptor.getValue();
         savedReports.forEach(report -> assertEquals(ReportStatus.EXPIRED, report.getStatus(),
                 "Report " + report.getId() + " should be EXPIRED"));
+    }
+
+    @Test
+    void shouldDeleteExpiredReportsOlderThanConfiguredDays() {
+        long deleteAfterDays = 30L;
+        when(reportConfig.getDeleteExpiredAfterDays()).thenReturn(deleteAfterDays);
+
+        Instant now = Instant.now();
+
+        ReportEntity oldExpired1 = createReport(10L, ReportStatus.EXPIRED,
+                now.minus(deleteAfterDays + 5, ChronoUnit.DAYS));
+        oldExpired1.setExpiredAt(now.minus(deleteAfterDays + 5, ChronoUnit.DAYS));
+
+        ReportEntity oldExpired2 = createReport(11L, ReportStatus.EXPIRED,
+                now.minus(deleteAfterDays + 10, ChronoUnit.DAYS));
+        oldExpired2.setExpiredAt(now.minus(deleteAfterDays + 10, ChronoUnit.DAYS));
+
+        List<ReportEntity> toDelete = Arrays.asList(oldExpired1, oldExpired2);
+
+        when(reportRepository.findAllByStatusAndExpiredAtBefore(eq(ReportStatus.EXPIRED), any(Instant.class)))
+                .thenReturn(toDelete);
+
+        reportExpirationService.deleteExpiredReports();
+
+        verify(reportRepository).findAllByStatusAndExpiredAtBefore(eq(ReportStatus.EXPIRED), instantCaptor.capture());
+        Instant threshold = instantCaptor.getValue();
+        Instant expectedThreshold = Instant.now().minus(deleteAfterDays, ChronoUnit.DAYS);
+        assertTrue(Math.abs(threshold.toEpochMilli() - expectedThreshold.toEpochMilli()) < 1000);
+
+        verify(reportRepository).deleteAll(toDelete);
+    }
+
+    @Test
+    void shouldHandleNoExpiredReportsToDelete() {
+        when(reportConfig.getDeleteExpiredAfterDays()).thenReturn(30L);
+        when(reportRepository.findAllByStatusAndExpiredAtBefore(eq(ReportStatus.EXPIRED), any(Instant.class)))
+                .thenReturn(Collections.emptyList());
+
+        reportExpirationService.deleteExpiredReports();
+
+        verify(reportRepository).findAllByStatusAndExpiredAtBefore(eq(ReportStatus.EXPIRED), any(Instant.class));
+        verify(reportRepository).deleteAll(Collections.emptyList());
     }
 
     private ReportEntity createReport(Long id, ReportStatus status, Instant submittedAt) {
