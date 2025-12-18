@@ -92,7 +92,18 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
         User user = userRepo.findById(uuid)
                 .orElseThrow(() -> new IllegalStateException("User not found for WebAuthn credential"));
 
+        var existingEntity = credRepo.findById(credentialRecord.getCredentialId().getBytes());
+
         WebAuthnCredentialEntity entity = mapToEntity(credentialRecord, user);
+
+        if (existingEntity.isPresent()) {
+            entity = existingEntity.get();
+            entity.setSignatureCount(credentialRecord.getSignatureCount());
+            entity.setTransports(WebAuthnCredentialEntity.transportsToString(credentialRecord.getTransports()));
+        } else {
+            entity = mapToEntity(credentialRecord, user);
+        }
+
         credRepo.save(entity);
     }
 

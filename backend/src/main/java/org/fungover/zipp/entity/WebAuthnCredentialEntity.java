@@ -94,8 +94,16 @@ public class WebAuthnCredentialEntity {
         return signatureCount;
     }
 
+    public void setSignatureCount(long signatureCount) {
+        this.signatureCount = signatureCount;
+    }
+
     public String getTransports() {
         return transports;
+    }
+
+    public void setTransports(String transports) {
+        this.transports = transports;
     }
 
     public byte[] getAttestationObject() {
