@@ -1,72 +1,166 @@
-body{
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    max-width: 1280px;
-    min-height: 100vh;
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-main{
-    flex: 1;
-}
-.header{
-    display: flex;
-    grid-template-columns: 1fr 1fr 2fr;
-    align-items: center;
-    justify-content: space-between;
-    border-radius: 0.5rem;
-    background-color: #1E1E1E;
-    font-size: 1.5rem;
-    color: white;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-}
-.header__image{
-    margin-left: 1rem;
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --header-bg: #1E1E1E;
+  --header-text: #ffffff;
+  --link-color: #ffffff;
+  --link-hover: cadetblue;
+  --intro-bg: #f0f4f8;
+  --feature-bg: #ffffff;
+  --feature-border: #ddd;
+  --title-color: #2c3e50;
+  --subtitle-color: #555;
+  --feature-title-color: #34495e;
+  --feature-text-color: #666;
+  --report-border: #1E1E1E;
+  --report-bg: #ffffff;
+  --report-button-bg: #ffffff;
 }
 
-.header__title{
-    text-align: center;
+[data-theme="dark"] {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --header-bg: #000000;
+  --header-text: #ffffff;
+  --link-color: #ffffff;
+  --link-hover: #5f9ea0;
+  --intro-bg: #1a1a1a;
+  --feature-bg: #2a2a2a;
+  --feature-border: #444;
+  --title-color: #e0e0e0;
+  --subtitle-color: #b0b0b0;
+  --feature-title-color: #d0d0d0;
+  --feature-text-color: #a0a0a0;
+  --report-border: #1E1E1E;
+  --report-bg: #ffffff;
+  --report-button-bg: #ffffff;
 }
 
-.navigation{
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-right: 1rem;
+body {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  max-width: 1280px;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
-.navigation__link{
-    color: white;
-    text-decoration: none;
+
+main {
+  flex: 1;
 }
-.navigation__link:hover{
-    font-weight: bold;
-    color:cadetblue;
+
+.header {
+  display: flex;
+  grid-template-columns: 1fr 1fr 2fr;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0.5rem;
+  background-color: var(--header-bg);
+  font-size: 1.5rem;
+  color: var(--header-text);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  transition: background-color 0.3s ease;
 }
-.navigation__link:active{
+
+.header__image {
+  margin-left: 1rem;
+}
+
+.header__title {
+  text-align: center;
+}
+
+.navigation {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-right: 1rem;
+}
+
+.navigation__link {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.navigation__link:hover {
   font-weight: bold;
-  color:cadetblue;
+  color: var(--link-hover);
+}
+
+.navigation__link:active {
+  font-weight: bold;
+  color: var(--link-hover);
 }
 
 .navigation__link:focus {
-  outline: 0.25rem solid cadetblue;
+  outline: 0.25rem solid var(--link-hover);
   outline-offset: 0.25rem;
 }
 
-.menu__burger{
-    color: white;
+/* Dark Mode Toggle Button */
+.navigation__darkmode-toggle {
+  background: none;
+  border: 2px solid var(--link-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  padding: 0;
 }
 
-.footer{
-    font-size: 1rem;
-    min-height: 50px;
-    background-color: #1E1E1E;
-    border-radius: 0.5rem;
-    text-align: center;
-    color: white;
-    box-shadow: 0 -4px 6px rgba(0,0,0,0.3);
+.navigation__darkmode-toggle:hover {
+  transform: scale(1.1);
+  border-color: var(--link-hover);
 }
 
-.login__container{
+.navigation__darkmode-toggle:focus {
+  outline: 0.25rem solid var(--link-hover);
+  outline-offset: 0.25rem;
+}
+
+/* Toggle icon visibility */
+[data-theme="light"] .moon-icon {
+  display: inline;
+}
+
+[data-theme="light"] .sun-icon {
+  display: none;
+}
+
+[data-theme="dark"] .moon-icon {
+  display: none;
+}
+
+[data-theme="dark"] .sun-icon {
+  display: inline;
+}
+
+.menu__burger {
+  color: white;
+}
+
+.footer {
+  font-size: 1rem;
+  min-height: 50px;
+  background-color: var(--header-bg);
+  border-radius: 0.5rem;
+  text-align: center;
+  color: var(--header-text);
+  transition: background-color 0.3s ease;
+  box-shadow: 0 -4px 6px rgba(0,0,0,0.3);
+}
+
+.login__container {
   display: block;
   width: 192px;
   margin: 2rem auto;
@@ -76,12 +170,12 @@ main{
   border-radius: 0.5rem;
 }
 
-.login__button{
+.login__button {
   border-radius: 0.5rem;
   border: 3px solid transparent;
 }
 
-.login__button:hover{
+.login__button:hover {
   border: 3px solid;
   border-color: cadetblue;
   border-radius: 0.5rem;
@@ -91,24 +185,104 @@ main{
   margin-top: 1rem;
 }
 
+ #map {
+   height: 600px;
+   width: 100%;
+   margin-top: 20px;
+ }
+.report{
+  max-width: 600px;
+  border-style: solid;
+  border-color: var(--report-border);
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.report__title{
+  padding-left: 1rem  ;
+}
+
+.report__div{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+.report__input{
+  border-style: solid;
+  border-color: var(--report-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  max-width: 90%;
+}
+
+.button__div{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.report__button{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 130px;
+  width: 130px;
+  border-style: solid;
+  border-color: var(--report-border);;
+  border-radius: 0.5rem;
+  background-color: var(--report-button-bg);
+}
+
+.report__button:hover{
+  cursor: pointer;
+  border: 0.25rem solid cadetblue;
+}
+
+.report__button:focus{
+  outline: 0.25rem solid cadetblue;
+}
+
+.button__image{
+  max-height: 70px;
+  width: fit-content;
+}
+
+.report__result{
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+  color: cadetblue;
+}
+
 .main__intro {
   text-align: center;
   padding: 60px 20px;
-  background-color: #f0f4f8;
+  background-color: var(--intro-bg);
   border-radius: 8px;
   margin-bottom: 40px;
+  transition: background-color 0.3s ease;
 }
 
 .main__title {
   font-size: 2.5rem;
   margin-bottom: 20px;
-  color: #2c3e50;
+  color: var(--title-color);
+  transition: color 0.3s ease;
 }
 
 .main__subtitle {
   font-size: 1.2rem;
-  color: #555;
+  color: var(--subtitle-color);
   margin-bottom: 30px;
+  transition: color 0.3s ease;
 }
 
 .main__actions .btn {
@@ -139,7 +313,8 @@ main{
   text-align: center;
   margin-bottom: 40px;
   font-size: 2rem;
-  color: #2c3e50;
+  color: var(--title-color);
+  transition: color 0.3s ease;
 }
 
 .features__grid {
@@ -149,12 +324,12 @@ main{
 }
 
 .feature {
-  background-color: #ffffff;
-  border: 1px solid #ddd;
+  background-color: var(--feature-bg);
+  border: 1px solid var(--feature-border);
   padding: 20px;
   border-radius: 8px;
   text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .feature:hover {
@@ -164,13 +339,15 @@ main{
 
 .feature h3 {
   margin-bottom: 15px;
-  color: #34495e;
+  color: var(--feature-title-color);
+  transition: color 0.3s ease;
 }
 
 .feature p {
-  color: #666;
+  color: var(--feature-text-color);
   font-size: 0.95rem;
   line-height: 1.5;
+  transition: color 0.3s ease;
 }
 
 .login__title{

@@ -11,6 +11,9 @@
     <link rel="manifest" th:href="@{/favicon/site.webmanifest}">
     <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css" media="all"/>
     <title>Zipp</title>
+    <script type="module" defer th:src="@{/js/report.js}"></script>
+    <script th:src="@{/js/darkmode.js}" defer></script>
+    <title></title>
 </head>
 <body>
 <header th:replace="~{fragments/header :: header}"></header>
@@ -18,5 +21,6 @@
     <div layout:fragment="welcome"></div>
 </main>
 <footer th:replace="~{fragments/footer :: footer}"></footer>
+<div layout:fragment="scripts"></div>
 </body>
 </html>
