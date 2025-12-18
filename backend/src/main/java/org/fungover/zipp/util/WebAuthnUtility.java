@@ -4,6 +4,10 @@ import java.util.Base64;
 
 public class WebAuthnUtility {
 
+    private WebAuthnUtility() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static byte[] base64UrlToBytes(String base64Url) {
         return Base64.getUrlDecoder().decode(base64Url);
     }

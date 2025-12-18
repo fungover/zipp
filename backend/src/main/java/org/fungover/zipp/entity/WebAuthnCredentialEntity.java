@@ -70,8 +70,9 @@ public class WebAuthnCredentialEntity {
 
     public String getEncodedId() {
         try {
-            if (this.credentialId == null)
+            if (this.credentialId == null) {
                 return "error";
+            }
             return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(this.credentialId);
         } catch (Exception e) {
             return "error";
