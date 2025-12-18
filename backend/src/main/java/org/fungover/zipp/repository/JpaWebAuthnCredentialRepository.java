@@ -94,7 +94,7 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
 
         var existingEntity = credRepo.findById(credentialRecord.getCredentialId().getBytes());
 
-        WebAuthnCredentialEntity entity = mapToEntity(credentialRecord, user);
+        WebAuthnCredentialEntity entity;
 
         if (existingEntity.isPresent()) {
             entity = existingEntity.get();
