@@ -1,5 +1,5 @@
 <header class="header" th:fragment="header">
-  <a>
+  <a  th:href="@{/}">
     <img class="header__image" th:src="@{/images/ZippLogo.png}" alt="Zipp logo">
   </a>
   <div class="header__nav" th:replace="~{fragments/navigation :: navigation}"></div>
