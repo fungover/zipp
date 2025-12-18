@@ -1,6 +1,6 @@
 <header class="header" th:fragment="header">
-  <a  th:href="@{/}">
-    <img class="header__image" th:src="@{/images/ZippLogo.png}" alt="Zipp logo" aria-label="Go to home page">
+  <a th:href="@{/}" aria-label="Go to home page">
+    <img class="header__image" th:src="@{/images/ZippLogo.png}" alt="Zipp logo" >
   </a>
   <div class="header__nav" th:replace="~{fragments/navigation :: navigation}"></div>
 </header>
