@@ -9,9 +9,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.api.CredentialRecord;
-import org.springframework.security.web.webauthn.api.PublicKeyCose; // NEW IMPORT
+import org.springframework.security.web.webauthn.api.PublicKeyCose;
 import java.util.Optional;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class JpaWebAuthnCredentialRepositoryTest {

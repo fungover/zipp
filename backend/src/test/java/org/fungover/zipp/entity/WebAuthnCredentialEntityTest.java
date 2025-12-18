@@ -3,7 +3,10 @@ package org.fungover.zipp.entity;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.web.webauthn.api.AuthenticatorTransport;
 import java.util.Set;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WebAuthnCredentialEntityTest {
 
