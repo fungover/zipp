@@ -115,4 +115,19 @@ class ProfileControllerTest {
 
         assertThrows(IllegalArgumentException.class, () -> controller.deleteReport(666L, auth));
     }
+
+    @Test
+    void deletePasskeyShouldRedirectToProfile() {
+        Authentication auth = mock(Authentication.class);
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        String encodedId = java.util.Base64.getUrlEncoder().encodeToString("test-id".getBytes());
+
+        when(profileService.getCurrentUser(auth)).thenReturn(user);
+
+        String result = controller.deletePasskey(encodedId, auth);
+
+        assertEquals("redirect:/profilesettings", result);
+        verify(webAuthnService).deletePasskey(any(), eq(user));
+    }
 }
