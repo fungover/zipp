@@ -3,6 +3,23 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 <head>
+
+  <script>
+    const theme = localStorage.getItem('theme')
+      || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+  <style>
+    html {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    html[data-theme="light"] {
+      background-color: #ffffff;
+      color: #000000;
+    }
+  </style>
     <meta charset="UTF-8">
     <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
     <link rel="icon" type="image/png" sizes="32x32" th:href="@{/favicon/favicon-32x32.png}">
