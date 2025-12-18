@@ -8,7 +8,7 @@ import org.fungover.zipp.entity.ReportType;
 
 import java.util.List;
 
-public record Report(User submittedBy, @NotBlank String description, @NotNull ReportType eventType,
+public record Report(@NotBlank String description, @NotNull ReportType eventType,
 
         @DecimalMin(value = "-90.0") @DecimalMax(value = "90.0") @NotNull Double latitude,
 
