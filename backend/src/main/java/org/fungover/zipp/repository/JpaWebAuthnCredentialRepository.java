@@ -1,5 +1,6 @@
 package org.fungover.zipp.repository;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.entity.WebAuthnCredentialEntity;
 import org.springframework.security.web.webauthn.api.Bytes;
@@ -8,6 +9,8 @@ import org.springframework.security.web.webauthn.api.ImmutableCredentialRecord;
 import org.springframework.security.web.webauthn.api.ImmutablePublicKeyCose;
 import org.springframework.security.web.webauthn.management.UserCredentialRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
 import java.util.UUID;
@@ -57,8 +60,18 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
                 ? record.getAttestationClientDataJSON().getBytes()
                 : null;
 
+        String labelFromUrl = "";
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            String param = request.getParameter("label");
+            if (param != null && !param.isBlank()) {
+                labelFromUrl = param;
+            }
+        }
+
         return new WebAuthnCredentialEntity(credentialId, user, record.getPublicKey().getBytes(),
-                record.getSignatureCount(), transports, attestationObject, clientDataJSON);
+                record.getSignatureCount(), transports, attestationObject, clientDataJSON, labelFromUrl);
     }
 
     @Override
@@ -79,7 +92,18 @@ public class JpaWebAuthnCredentialRepository implements UserCredentialRepository
         User user = userRepo.findById(uuid)
                 .orElseThrow(() -> new IllegalStateException("User not found for WebAuthn credential"));
 
-        WebAuthnCredentialEntity entity = mapToEntity(credentialRecord, user);
+        var existingEntity = credRepo.findById(credentialRecord.getCredentialId().getBytes());
+
+        WebAuthnCredentialEntity entity;
+
+        if (existingEntity.isPresent()) {
+            entity = existingEntity.get();
+            entity.setSignatureCount(credentialRecord.getSignatureCount());
+            entity.setTransports(WebAuthnCredentialEntity.transportsToString(credentialRecord.getTransports()));
+        } else {
+            entity = mapToEntity(credentialRecord, user);
+        }
+
         credRepo.save(entity);
     }
 
