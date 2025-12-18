@@ -68,7 +68,10 @@ services:
           memory: 200M
     restart: unless-stopped
     command: [ "--config=/backend/config/otel/otel-collector-config.yaml"]
-    user: 0:0
+    # user: "10001:10001"
+    read_only: true
+    tmpfs:
+      - /tmp
     volumes:
       - ./backend/config/otel/otel-collector-config.yaml:/backend/config/otel/otel-collector-config.yaml
     networks:
