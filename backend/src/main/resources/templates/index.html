@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
-      layout:decorate="~{layouts/layout}"
->
+      layout:decorate="~{layouts/layout}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${title}"></title>
 </head>
+
 <body>
 <main layout:fragment="welcome">
   <section class="main__intro">
@@ -21,6 +21,14 @@
       <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn btn-primary">Log In</a>
     </div>
   </section>
+
+  <section class="features">
+    <div class="features__report" th:if="${isLoggedIn}" >
+      <form th:replace="~{fragments/report :: report}"></form>
+      <button th:replace="~{fragments/map :: displayLocation}"></button>
+    </div>
+  </section>
+
   <section class="features">
     <h2>What you can do</h2>
 
@@ -43,7 +51,21 @@
       </div>
     </div>
   </section>
+  <div id="map"></div>
 </main>
+
+<div layout:fragment="scripts">
+
+  <script type="module" th:src="@{/js/map.js}"></script>
+
+  <script async defer
+          th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${googleMapsApiKey} + '&callback=initMap'}"
+          >
+  </script>
+</div>
 
 </body>
 </html>
+
+
+

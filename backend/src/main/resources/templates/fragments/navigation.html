@@ -2,4 +2,8 @@
     <a class="navigation__link" href="/">Home</a>
     <a class="navigation__link" th:unless="${isLoggedIn}" href="/login">Login</a>
     <a class="navigation__link" th:if="${isLoggedIn}" href="/profilesettings">Profile</a>
+    <button class="navigation__darkmode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
+        <span class="sun-icon">☀️</span>
+        <span class="moon-icon">🌙</span>
+    </button>
 </nav>

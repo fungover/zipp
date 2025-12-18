@@ -24,6 +24,7 @@ public class SecurityConfig {
     private static final String IMAGES_ALL = "/images/**";
     private static final String JS_ALL = "/js/**";
     private static final String WEBAUTHN_ALL = "/webauthn/**";
+    private static final String API = "/api/reports";
 
     private static final String WEBAUTHN_REGISTER_ALL = "/webauthn/register/**";
     private static final String WEBAUTHN_AUTHENTICATE_ALL = "/webauthn/authenticate/**";
@@ -45,8 +46,10 @@ public class SecurityConfig {
     @Order(1)
     @Profile("dev")
     public SecurityFilterChain securityFilterChainDev(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth.requestMatchers(ROOT, LOGIN, LOGIN_ALL, OAUTH2_ALL, FAVICON,
-                FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL, WEBAUTHN_ALL).permitAll().anyRequest().permitAll())
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(API).authenticated()
+                .requestMatchers(ROOT, LOGIN, LOGIN_ALL, OAUTH2_ALL, FAVICON, FAVICON_ALL, CSS_ALL, IMAGES_ALL, JS_ALL,
+                        WEBAUTHN_ALL)
+                .permitAll().anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2.loginPage(LOGIN).defaultSuccessUrl(ROOT, true)
                         .userInfoEndpoint(userInfo -> userInfo.userService(co2us)))
                 .webAuthn(webauthn -> webauthn.rpId(rpId).allowedOrigins(allowedOrigins.split(",")))
