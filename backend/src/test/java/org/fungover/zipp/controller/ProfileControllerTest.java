@@ -4,6 +4,7 @@ import org.fungover.zipp.entity.ReportEntity;
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.service.ProfileService;
 import org.fungover.zipp.repository.ReportRepository;
+import org.fungover.zipp.service.WebAuthnService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
@@ -28,12 +29,14 @@ class ProfileControllerTest {
     private ProfileService profileService;
     private ReportRepository reportRepository;
     private User mockUser;
+    private WebAuthnService webAuthnService;
 
     @BeforeEach
     void setup() {
         profileService = mock(ProfileService.class);
         reportRepository = mock(ReportRepository.class);
-        controller = new ProfileController(profileService, reportRepository);
+        webAuthnService = mock(WebAuthnService.class);
+        controller = new ProfileController(profileService, reportRepository, webAuthnService);
 
         mockUser = new User();
         mockUser.setId(UUID.randomUUID());
