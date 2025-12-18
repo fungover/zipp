@@ -16,7 +16,7 @@ class EventListenerServiceTest {
     @Test
     void listenerShouldForwardEventToSseService() {
 
-        SseService sseService = spy(SseService.class);
+        SseService sseService = spy(new SseService());
         EventListenerService listener = new EventListenerService(sseService);
 
         ReportResponse event = new ReportResponse("map123", "Hello World", ReportType.ACCIDENT, 59.0, 18.0,
