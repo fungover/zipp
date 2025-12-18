@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ReportConfigTest {
 
     @Test
-    void setExpirationHours_acceptsPositiveValue() {
+    void setExpirationHoursAcceptsPositiveValue() {
         ReportConfig config = new ReportConfig();
 
         config.setExpirationHours(5L);
@@ -17,7 +17,7 @@ class ReportConfigTest {
     }
 
     @Test
-    void setExpirationHours_throwsForNonPositiveValue() {
+    void setExpirationHoursThrowsForNonPositiveValue() {
         ReportConfig config = new ReportConfig();
 
         assertThrows(IllegalArgumentException.class, () -> config.setExpirationHours(0L));
@@ -25,7 +25,7 @@ class ReportConfigTest {
     }
 
     @Test
-    void setDeleteExpiredAfterDays_acceptsPositiveValue() {
+    void setDeleteExpiredAfterDaysAcceptsPositiveValue() {
         ReportConfig config = new ReportConfig();
 
         config.setDeleteExpiredAfterDays(10L);
@@ -34,7 +34,7 @@ class ReportConfigTest {
     }
 
     @Test
-    void setDeleteExpiredAfterDays_throwsForNonPositiveValue() {
+    void setDeleteExpiredAfterDaysThrowsForNonPositiveValue() {
         ReportConfig config = new ReportConfig();
 
         assertThrows(IllegalArgumentException.class, () -> config.setDeleteExpiredAfterDays(0L));
