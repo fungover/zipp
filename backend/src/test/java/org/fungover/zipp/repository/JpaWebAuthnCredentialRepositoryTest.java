@@ -11,6 +11,9 @@ import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.api.CredentialRecord;
 import org.springframework.security.web.webauthn.api.PublicKeyCose;
 import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
@@ -69,5 +72,36 @@ class JpaWebAuthnCredentialRepositoryTest {
 
         verify(existing).setSignatureCount(500L);
         verify(credRepo).save(existing);
+    }
+
+    @Test
+    void testFindMethods() {
+        byte[] id = new byte[]{1, 2, 3};
+        Bytes bytesId = new Bytes(id);
+
+        User user = new User();
+        user.setId(UUID.randomUUID());
+
+        WebAuthnCredentialEntity entity = mock(WebAuthnCredentialEntity.class);
+        when(entity.getCredentialId()).thenReturn(id);
+        when(entity.getPublicKey()).thenReturn(id);
+
+        when(entity.getUser()).thenReturn(user);
+
+        when(credRepo.findById(id)).thenReturn(Optional.of(entity));
+
+        CredentialRecord result = repository.findByCredentialId(bytesId);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void testSaveWithMissingUserThrowsException() {
+        CredentialRecord record = mock(CredentialRecord.class);
+        when(record.getUserEntityUserId()).thenReturn(new Bytes(new byte[16]));
+
+        when(userRepo.findById(any())).thenReturn(Optional.empty());
+
+        assertThrows(IllegalStateException.class, () -> repository.save(record));
     }
 }
