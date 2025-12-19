@@ -11,6 +11,7 @@ spring:
               - email
             redirect-uri: "https://zipp.city/login/oauth2/code/google"
             authorization-grant-type: authorization_code
+
 #        provider:
 #          google:
 #            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
