@@ -22,6 +22,15 @@ spring:
 #            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
 #            user-name-attribute: sub
 
+report:
+  expiration-hours: 1
+  delete-expired-after-days: 1
+
+cleanup:
+  expire-cron: "0 */5 * * * ?" # every 5 minutes
+  delete-cron: "0 */5 * * * ?"
+
+
   # GraphQL
   graphql:
     graphiql:
@@ -36,6 +45,4 @@ zipp:
     # Allow /graphql without API key in dev
     graphql-open: true
 
-report:
-  expiration-hours: 12
 

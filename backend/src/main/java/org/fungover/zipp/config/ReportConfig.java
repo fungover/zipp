@@ -11,6 +11,8 @@ import org.springframework.validation.annotation.Validated;
 public class ReportConfig {
     @Positive private long expirationHours = 1;
 
+    @Positive private long deleteExpiredAfterDays;
+
     public long getExpirationHours() {
         return expirationHours;
     }
@@ -20,5 +22,16 @@ public class ReportConfig {
             throw new IllegalArgumentException("expirationHours must be positive");
         }
         this.expirationHours = expirationHours;
+    }
+
+    public long getDeleteExpiredAfterDays() {
+        return deleteExpiredAfterDays;
+    }
+
+    public void setDeleteExpiredAfterDays(long deleteExpiredAfterDays) {
+        if (deleteExpiredAfterDays <= 0) {
+            throw new IllegalArgumentException("deleteExpiredAfterDays must be positive");
+        }
+        this.deleteExpiredAfterDays = deleteExpiredAfterDays;
     }
 }

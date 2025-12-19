@@ -1,5 +1,10 @@
 report:
   expiration-hours: 12
+  delete-expired-after-days: 30
+
+cleanup:
+  expire-cron: "0 0 * * * ?"     # every hour (Quartz-style)
+  delete-cron: "0 30 2 * * ?"    # daily 02:30 (Quartz-style)
 
 zipp:
   security:
