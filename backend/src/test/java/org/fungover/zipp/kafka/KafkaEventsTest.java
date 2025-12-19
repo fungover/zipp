@@ -1,64 +1,52 @@
 package org.fungover.zipp.kafka;
 
 import org.fungover.zipp.TestLogAppender;
-import org.fungover.zipp.controller.ReportController;
 import org.fungover.zipp.dto.ReportResponse;
-import org.fungover.zipp.service.ReportService;
-import org.fungover.zipp.service.UserIdentityService;
+import org.fungover.zipp.mapper.ReportDtoToAvroMapper;
+import org.fungover.zipp.service.ReportEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.security.core.Authentication;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import static org.fungover.zipp.entity.ReportStatus.ACTIVE;
 import static org.fungover.zipp.entity.ReportType.OTHER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class KafkaEventsTest {
 
+    @Mock
+    KafkaTemplate<String, ReportAvro> kafkaTemplate;
+
+    @Mock
+    ReportDtoToAvroMapper mapper;
+
     @InjectMocks
-    private ReportController reportController;
-
-    @Mock
-    private KafkaTemplate<String, ReportResponse> kafkaTemplate;
-
-    @Mock
-    private ReportService reportService;
-
-    @Mock
-    private UserIdentityService userIdentityService;
-
-    @Mock
-    private Authentication authentication;
+    ReportEventPublisher reportEventPublisher;
 
     @Test
     void kafkaReportSentSuccessfully() {
-        ReportResponse savedReport = new ReportResponse("user1", "test report", OTHER, 0.0, 0.0, Instant.now(), ACTIVE,
+        ReportResponse report = new ReportResponse("user1", "test report", OTHER, 0.0, 0.0, Instant.now(), ACTIVE,
                 null);
 
-        when(kafkaTemplate.send(anyString(), any())).thenReturn(CompletableFuture.completedFuture(null));
+        ReportAvro avro = new ReportAvro();
 
-        reportController.sendReport("report", savedReport);
+        when(mapper.toAvro(report)).thenReturn(avro);
+        when(kafkaTemplate.send(any(), any(), any())).thenReturn(CompletableFuture.completedFuture(null));
 
-        ArgumentCaptor<String> topicCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<ReportResponse> reportCaptor = ArgumentCaptor.forClass(ReportResponse.class);
+        reportEventPublisher.publishReportCreated(report);
 
-        verify(kafkaTemplate).send(topicCaptor.capture(), reportCaptor.capture());
-
-        assertEquals("report", topicCaptor.getValue());
-        assertEquals(savedReport, reportCaptor.getValue());
+        verify(kafkaTemplate).send(any(), eq("user1"), eq(avro));
     }
 
     @Test
@@ -66,18 +54,21 @@ class KafkaEventsTest {
         ReportResponse incomingReport = new ReportResponse("user1", "test report", OTHER, 0.0, 0.0, Instant.now(),
                 ACTIVE, null);
 
-        CompletableFuture<SendResult<String, ReportResponse>> failedFuture = new CompletableFuture<>();
-        failedFuture.completeExceptionally(new RuntimeException());
-        when(kafkaTemplate.send(anyString(), any())).thenReturn(failedFuture);
+        CompletableFuture<SendResult<String, ReportAvro>> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new RuntimeException("Kafka is down"));
+
+        // Stubbing med matchers för alla parametrar
+        when(kafkaTemplate.send(nullable(String.class), nullable(String.class), nullable(ReportAvro.class)))
+                .thenReturn(failedFuture);
 
         ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory
-                .getLogger(ReportController.class);
+                .getLogger(ReportEventPublisher.class);
 
         TestLogAppender appender = new TestLogAppender();
         logger.addAppender(appender);
         appender.start();
 
-        reportController.sendReport("report", incomingReport);
+        reportEventPublisher.publishReportCreated(incomingReport);
 
         boolean hasError = appender.getLogs().stream()
                 .anyMatch(event -> event.getLevel() == ch.qos.logback.classic.Level.ERROR

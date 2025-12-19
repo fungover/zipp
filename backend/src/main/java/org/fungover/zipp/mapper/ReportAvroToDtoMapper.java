@@ -11,7 +11,9 @@ public class ReportAvroToDtoMapper {
         return new ReportResponse(avro.getSubmittedByUserId().toString(), avro.getDescription().toString(),
                 org.fungover.zipp.entity.ReportType.valueOf(avro.getEventType().name()), avro.getLatitude(),
                 avro.getLongitude(), avro.getSubmittedAt(),
-                avro.getStatus() != null ? org.fungover.zipp.entity.ReportStatus.valueOf(avro.getStatus().name()) : null,
+                avro.getStatus() != null
+                        ? org.fungover.zipp.entity.ReportStatus.valueOf(avro.getStatus().name())
+                        : null,
                 avro.getImageUrls() == null ? null : avro.getImageUrls().stream().map(CharSequence::toString).toList());
     }
 }
