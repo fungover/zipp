@@ -5,13 +5,13 @@ import org.fungover.zipp.dto.ReportResponse;
 import org.fungover.zipp.entity.ReportStatus;
 import org.fungover.zipp.entity.ReportType;
 import org.fungover.zipp.entity.User;
+import org.fungover.zipp.service.ReportEventPublisher;
 import org.fungover.zipp.service.ReportService;
 import org.fungover.zipp.service.UserIdentityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.security.core.Authentication;
 
@@ -23,7 +23,6 @@ import java.util.concurrent.CompletableFuture;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -34,7 +33,7 @@ class ReportControllerTest {
 
     private ReportController controller;
     private ReportService reportService;
-    private KafkaTemplate<String, ReportResponse> kafkaTemplate;
+    private ReportEventPublisher eventPublisher;
     private UserIdentityService userIdentityService;
 
     private Authentication authentication;
@@ -43,10 +42,10 @@ class ReportControllerTest {
     @BeforeEach
     void setup() {
         reportService = mock(ReportService.class);
-        kafkaTemplate = mock(KafkaTemplate.class);
+        eventPublisher = mock(ReportEventPublisher.class);
         userIdentityService = mock(UserIdentityService.class);
 
-        controller = new ReportController(reportService, kafkaTemplate, userIdentityService);
+        controller = new ReportController(reportService, eventPublisher, userIdentityService);
 
         authentication = mock(Authentication.class);
 
@@ -59,7 +58,6 @@ class ReportControllerTest {
 
         CompletableFuture<SendResult<String, ReportResponse>> future = new CompletableFuture<>();
         future.complete(null);
-        when(kafkaTemplate.send(eq("report"), any(ReportResponse.class))).thenReturn(future);
     }
 
     @Test
@@ -83,7 +81,7 @@ class ReportControllerTest {
 
         verify(userIdentityService).getCurrentUser(authentication);
         verify(reportService).createReport(currentUser, inputReport);
-        verify(kafkaTemplate).send(eq("report"), eq(saved));
+        verify(eventPublisher).publishReportCreated(eq(saved));
     }
 
     @Test
@@ -110,7 +108,7 @@ class ReportControllerTest {
 
         verify(userIdentityService).getCurrentUser(authentication);
         verify(reportService).createReport(currentUser, inputReport);
-        verify(kafkaTemplate).send(eq("report"), eq(saved));
+        verify(eventPublisher).publishReportCreated(eq(saved));
     }
 
     @Test
@@ -132,7 +130,7 @@ class ReportControllerTest {
 
         verify(reportService).getAllReports();
         verifyNoInteractions(userIdentityService);
-        verifyNoInteractions(kafkaTemplate);
+        verifyNoInteractions(eventPublisher);
     }
 
     @Test
@@ -147,6 +145,6 @@ class ReportControllerTest {
 
         verify(reportService).getAllReports();
         verifyNoInteractions(userIdentityService);
-        verifyNoInteractions(kafkaTemplate);
+        verifyNoInteractions(eventPublisher);
     }
 }

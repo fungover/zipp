@@ -21,7 +21,6 @@ spring:
 #            user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
 #            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
 #            user-name-attribute: sub
-
   # GraphQL
   graphql:
     graphiql:
@@ -38,4 +37,3 @@ zipp:
 
 report:
   expiration-hours: 12
-

@@ -1,0 +1,33 @@
+{
+  "type": "record",
+  "name": "ReportAvro",
+  "namespace": "org.fungover.zipp.kafka",
+  "fields": [
+    { "name": "submittedByUserId", "type": "string" },
+    { "name": "description", "type": "string"
+    },
+
+    { "name": "eventType", "type": { "type": "enum", "name": "ReportType",
+      "symbols": ["ACCIDENT", "DEBRIS", "OTHER"] }
+    },
+
+    { "name": "latitude", "type": "double" },
+    { "name": "longitude", "type": "double" },
+
+    { "name": "submittedAt",
+      "type": ["null", { "type": "long", "logicalType": "timestamp-millis"}],
+      "default": null
+    },
+
+    { "name": "status",
+      "type": ["null", { "type": "enum", "name": "ReportStatus",
+        "symbols": ["ACTIVE", "RESOLVED", "EXPIRED"] }],
+      "default": null
+    },
+
+    { "name": "imageUrls",
+      "type": ["null", { "type": "array", "items": "string" }],
+      "default": null
+    }
+  ]
+}

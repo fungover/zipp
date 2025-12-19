@@ -1,4 +1,11 @@
 spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    properties:
+      schema.registry.url: http://localhost:8081
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
   security:
     oauth2:
       client:
@@ -11,7 +18,6 @@ spring:
               - email
             redirect-uri: "https://zipp.city/login/oauth2/code/google"
             authorization-grant-type: authorization_code
-
 #        provider:
 #          google:
 #            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
@@ -30,5 +36,7 @@ zipp:
   security:
     graphql-open: false
 
+
 report:
   expiration-hours: 12
+

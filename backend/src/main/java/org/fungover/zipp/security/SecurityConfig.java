@@ -50,6 +50,7 @@ public class SecurityConfig {
      */
     @Bean
     @Order(1)
+    @Profile("dev")
     public SecurityFilterChain apiKeySecurityChain(HttpSecurity http) throws Exception {
         http.securityMatcher("/graphql/**", "/api/m2m/**").csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
