@@ -1,5 +1,5 @@
 report:
-  expirationHours: 24
+  expiration-hours: 12
 
 zipp:
   security:
