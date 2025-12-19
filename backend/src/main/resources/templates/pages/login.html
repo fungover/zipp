@@ -13,15 +13,16 @@
 <body>
 <main>
   <div class="login__container" layout:fragment="welcome">
+    <h1 class="login__title">Login</h1>
+    <p class="login__subtitle">Please choose preferred login method:</p>
     <a th:href="@{/oauth2/authorization/google}">
       <img class="login__button" th:src="@{/images/GoogleLogin.png}" alt="Google login button">
     </a>
 
-    <button id="passkey-login-btn"
+    <img id="passkey-login-btn"
+         th:src="@{/images/PasskeyLogin.png}"
             class="login__button login__button--passkey"
             type="button">
-      Log in with passkey
-    </button>
 
     <p id="passkey-message" class="login__message" hidden></p>
 

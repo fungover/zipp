@@ -3,6 +3,23 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 <head>
+
+  <script>
+    const theme = localStorage.getItem('theme')
+      || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+  <style>
+    html {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    html[data-theme="light"] {
+      background-color: #ffffff;
+      color: #000000;
+    }
+  </style>
     <meta charset="UTF-8">
     <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
     <link rel="icon" type="image/png" sizes="32x32" th:href="@{/favicon/favicon-32x32.png}">
@@ -10,7 +27,9 @@
     <link rel="apple-touch-icon" sizes="180x180" th:href="@{/favicon/apple-touch-icon.png}">
     <link rel="manifest" th:href="@{/favicon/site.webmanifest}">
     <link th:href="@{/css/styles.css}" rel="stylesheet" type="text/css" media="all"/>
+    <title>Zipp</title>
     <script type="module" defer th:src="@{/js/report.js}"></script>
+    <script type="module" th:src="@{/js/getReports.js}" defer></script>
     <script th:src="@{/js/darkmode.js}" defer></script>
     <title></title>
 </head>
@@ -18,7 +37,6 @@
 <header th:replace="~{fragments/header :: header}"></header>
 <main>
     <div layout:fragment="welcome"></div>
-
 </main>
 <footer th:replace="~{fragments/footer :: footer}"></footer>
 <div layout:fragment="scripts"></div>

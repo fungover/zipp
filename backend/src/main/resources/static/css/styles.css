@@ -45,6 +45,7 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 main {
@@ -164,10 +165,14 @@ main {
   width: 192px;
   margin: 2rem auto;
   min-height: 300px;
+  padding: 2rem;
+  box-shadow: 0 0px 8px rgba(0, 0, 0, 0.4);
+  border-radius: 0.5rem;
 }
 
 .login__button {
   border-radius: 0.5rem;
+  border: 3px solid transparent;
 }
 
 .login__button:hover {
@@ -176,11 +181,23 @@ main {
   border-radius: 0.5rem;
 }
 
+.login__button--passkey{
+  margin-top: 1rem;
+}
+
  #map {
    height: 600px;
    width: 100%;
    margin-top: 20px;
  }
+
+ .features__report{
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+ }
+
 .report{
   max-width: 600px;
   border-style: solid;
@@ -227,7 +244,7 @@ main {
   height: 130px;
   width: 130px;
   border-style: solid;
-  border-color: var(--report-border);;
+  border-color: var(--report-border);
   border-radius: 0.5rem;
   background-color: var(--report-button-bg);
 }
@@ -251,6 +268,25 @@ main {
   font-weight: bold;
   text-align: center;
   color: cadetblue;
+}
+
+.map__button{
+  text-align: center;
+  margin-top: 2rem;
+  height: 80px;
+  width: 250px;
+  border: 0.25rem solid cadetblue;
+  border-radius: 1rem;
+  background-color: var(--report-button-bg);
+}
+
+.map__button:hover{
+  cursor: pointer;
+  border: 0.5rem solid cadetblue;
+}
+
+.map__button:focus{
+  outline: 0.25rem solid cadetblue;
 }
 
 .main__intro {
@@ -339,4 +375,19 @@ main {
   font-size: 0.95rem;
   line-height: 1.5;
   transition: color 0.3s ease;
+}
+
+.login__title{
+  font-size: 2.5rem;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.login__subtitle{
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 30px;
+  text-align: center;
 }

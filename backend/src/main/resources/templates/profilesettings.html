@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
 <head>
   <meta charset="UTF-8">
   <title>User Profile</title>
@@ -8,7 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<div class="bg-gray-100 min-h-screen" layout:fragment="welcome">
 
 <div class="max-w-3xl mx-auto px-4 py-10 space-y-8">
 
@@ -18,7 +19,8 @@
          alt="User avatar"
          class="w-32 h-32 rounded-full mx-auto object-cover shadow">
 
-    <h1 th:text="${user.name}" class="text-3xl font-bold mt-4">John Doe</h1>
+    <h1 th:text="${user.displayName != null and user.displayName.length() > 0 ? user.displayName : user.name}"
+        class="text-3xl font-bold mt-4">John Doe</h1>
     <p th:text="${user.email}" class="text-gray-600 mt-1">john.doe@example.com</p>
 
   </div>
@@ -89,15 +91,48 @@
   <div class="bg-white rounded-xl shadow-md p-6">
     <h2 class="text-xl font-semibold mb-4">Security</h2>
 
-    <button
-      id="add-passkey-btn"
-      class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold shadow transition w-full sm:w-auto">
-      Add Passkey
-    </button>
+    <ul th:if="${userPasskeys != null and !userPasskeys.isEmpty()}" class="space-y-3">
+      <li th:each="pk : ${userPasskeys}" class="flex items-center justify-between bg-gray-50 p-3 rounded-lg border">
 
-    <p class="text-sm text-gray-500 mt-3">
-      Passkeys let you log in using biometrics or device credentials.
-    </p>
+        <div>
+        <span class="font-medium text-gray-800 block"
+              th:text="${(pk.label != null and !pk.label.isEmpty()) ? pk.label : 'Saved Passkey'}">
+          Device Name
+        </span>
+          <span class="text-[10px] text-gray-400 font-mono" th:text="${#strings.abbreviate(pk.encodedId, 12)}">ID...</span>
+        </div>
+
+        <form th:action="@{'/profilesettings/passkeys/' + ${pk.encodedId}}" method="post">
+          <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit"
+                  onclick="return confirm('Delete this passkey?')"
+                  class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm">
+            Delete
+          </button>
+        </form>
+      </li>
+
+      <li class="pt-2 flex flex-col sm:flex-row gap-2">
+        <input type="text"
+               placeholder="Enter your device name..."
+               class="px-3 py-2 border rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none passkey-label-input">
+        <button class="text-emerald-600 font-semibold hover:underline add-passkey-btn">
+          + Add another passkey
+        </button>
+      </li>
+    </ul>
+
+    <div th:if="${userPasskeys == null or userPasskeys.isEmpty()}" class="text-center py-4">
+      <div class="mb-4">
+        <input type="text"
+               placeholder="Enter your device name..."
+               class="px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500 w-full max-w-xs mx-auto block mb-3 passkey-label-input">
+        <button class="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold shadow hover:bg-emerald-700 transition add-passkey-btn">
+        Add Passkey
+        </button>
+      <p class="text-sm text-gray-500 mt-3">Passkeys let you log in securely using your device's biometrics.</p>
+      </div>
+    </div>
   </div>
 
   <div class="bg-white rounded-xl shadow-md p-6">
@@ -160,6 +195,9 @@
       return;
     }
 
+    const labelInput = document.querySelector('.passkey-label-input');
+    const chosenLabel = (labelInput && labelInput.value.trim()) ? labelInput.value.trim() : "Unnamed Passkey"
+
     try {
       const optionsRes = await fetch('/webauthn/register/options', {
         method: 'POST'
@@ -217,11 +255,11 @@
       const registerBody = {
         publicKey: {
           credential: credentialJson,
-          label: 'Profile passkey'
+          label: chosenLabel
         }
       };
 
-      const registerRes = await fetch('/webauthn/register', {
+      const registerRes = await fetch('/webauthn/register?label=' + encodeURIComponent(chosenLabel), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -231,6 +269,7 @@
 
       if (registerRes.ok) {
         alert('Passkey registered successfully!');
+        window.location.reload();
       } else {
         const text = await registerRes.text();
         console.error('Register error:', registerRes.status, text);
@@ -243,14 +282,17 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('add-passkey-btn');
+    const btn = document.querySelectorAll('.add-passkey-btn');
     if (!btn) return;
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      registerPasskey();
+
+    btn.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerPasskey();
+      });
     });
   });
 </script>
 
-</body>
+</div>
 </html>
