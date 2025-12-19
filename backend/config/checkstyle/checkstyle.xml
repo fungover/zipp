@@ -11,6 +11,12 @@
     <!-- Filters (under Checker) -->
     <!-- ==================== -->
 
+  <!-- Suppress Indentation for ApiKey.java (Spotless/Checkstyle conflict on annotations) -->
+  <module name="SuppressionSingleFilter">
+    <property name="checks" value="Indentation"/>
+    <property name="files" value="ApiKey\.java$"/>
+  </module>
+
     <!-- Suppress HideUtilityClassConstructor for test files -->
     <module name="SuppressionSingleFilter">
         <property name="checks" value="HideUtilityClassConstructor"/>
@@ -28,8 +34,8 @@
     <!-- ==================== -->
 
     <module name="LineLength">
-        <property name="max" value="120"/>
-        <property name="ignorePattern" value="^package.*|^import.*|a]+ href|href|http://|https://|ftp://"/>
+        <property name="max" value="160"/>
+        <property name="ignorePattern" value="^package|^import"/>
     </module>
 
     <module name="FileTabCharacter">

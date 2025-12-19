@@ -1,0 +1,15 @@
+report:
+  expirationHours: 24
+
+zipp:
+  security:
+    graphql-open: true
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-client-id
+            client-secret: test-client-secret
