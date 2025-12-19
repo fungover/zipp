@@ -30,3 +30,19 @@ cleanup:
   expire-cron: "0 */5 * * * ?" # every 5 minutes
   delete-cron: "0 */5 * * * ?"
 
+
+  # GraphQL
+  graphql:
+    graphiql:
+      enabled: true    # Enables /graphiql UI in dev
+    schema:
+      printer:
+        enabled: true  # Allows introspection
+
+# Zipp-specific config
+zipp:
+  security:
+    # Allow /graphql without API key in dev
+    graphql-open: true
+
+

@@ -4,6 +4,7 @@ import org.fungover.zipp.entity.ReportEntity;
 import org.fungover.zipp.entity.User;
 import org.fungover.zipp.service.ProfileService;
 import org.fungover.zipp.repository.ReportRepository;
+import org.fungover.zipp.service.WebAuthnService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
@@ -28,12 +29,14 @@ class ProfileControllerTest {
     private ProfileService profileService;
     private ReportRepository reportRepository;
     private User mockUser;
+    private WebAuthnService webAuthnService;
 
     @BeforeEach
     void setup() {
         profileService = mock(ProfileService.class);
         reportRepository = mock(ReportRepository.class);
-        controller = new ProfileController(profileService, reportRepository);
+        webAuthnService = mock(WebAuthnService.class);
+        controller = new ProfileController(profileService, reportRepository, webAuthnService);
 
         mockUser = new User();
         mockUser.setId(UUID.randomUUID());
@@ -111,5 +114,20 @@ class ProfileControllerTest {
         when(reportRepository.findById(666L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> controller.deleteReport(666L, auth));
+    }
+
+    @Test
+    void deletePasskeyShouldRedirectToProfile() {
+        Authentication auth = mock(Authentication.class);
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        String encodedId = java.util.Base64.getUrlEncoder().encodeToString("test-id".getBytes());
+
+        when(profileService.getCurrentUser(auth)).thenReturn(user);
+
+        String result = controller.deletePasskey(encodedId, auth);
+
+        assertEquals("redirect:/profilesettings", result);
+        verify(webAuthnService).deletePasskey(any(), eq(user));
     }
 }
