@@ -18,7 +18,7 @@ public class EventListenerService {
         this.sseService = sseService;
     }
 
-    @KafkaListener(topics = "reports", groupId = "#{T(java.util.UUID).randomUUID().toString()}")
+    @KafkaListener(topics = "report", groupId = "#{T(java.util.UUID).randomUUID().toString()}")
     public void listen(ReportResponse event) {
         LOGGER.info("Received: {}", event);
         sseService.send(event.submittedByUserId(), event);
