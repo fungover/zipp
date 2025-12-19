@@ -236,6 +236,24 @@ spec:
             secretKeyRef:
               name: google-map-oauth2-credentials
               key:  GOOGLE_MAPS_API_KEY
+        - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: google-oauth2-credentials
+              key: GOOGLE_CLIENT_ID
+        - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: google-oauth2-credentials
+              key: GOOGLE_CLIENT_SECRET
+        - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_SCOPE
+          value: "openid,profile,email"
+        - name: REPORT_DELETEEXPIREDAFTERDAYS
+          value: "30"
+        - name: CLEANUP_EXPIRE_CRON
+          value: "0 0 * * * ?"
+        - name: CLEANUP_DELETE_CRON
+          value: "0 30 2 * * ?"
 """
 					writeFile file: "${K8S_MANIFEST_DIR}/services/service.yaml", text: """
 apiVersion: v1
