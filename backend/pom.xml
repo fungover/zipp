@@ -262,6 +262,7 @@
         </dependencies>
       </plugin>
 
+      <!-- PMD - Static code analysis (Java 25 compatible) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
