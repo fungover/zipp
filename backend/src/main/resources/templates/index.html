@@ -56,7 +56,7 @@
 
 <div layout:fragment="scripts">
 
-  <script type="module" th:src="@{/js/map.js}"></script>
+  <script th:src="@{/js/map.js}"></script>
 
   <script async defer
           th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${googleMapsApiKey} + '&callback=initMap'}"
