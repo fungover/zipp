@@ -85,6 +85,11 @@ main {
   color: var(--link-color);
   text-decoration: none;
   transition: color 0.3s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
 }
 
 .navigation__link:hover {
