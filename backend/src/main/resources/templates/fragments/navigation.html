@@ -4,7 +4,14 @@
   <a class="navigation__link" th:if="${isLoggedIn}" href="/profilesettings"
     >Profile</a
   >
-  <a class="navigation__link" th:if="${isLoggedIn}" href="/logout">Logout</a>
+  <form
+    th:if="${isLoggedIn}"
+    th:action="@{/logout}"
+    method="post"
+    class="navigation__link"
+  >
+    <button type="submit" class="navigation__link">Logout</button>
+  </form>
   <button
     class="navigation__darkmode-toggle"
     id="darkModeToggle"
