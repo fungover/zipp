@@ -24,7 +24,7 @@ spring:
 
 report:
   expiration-hours: 1
-  delete-expired-after-days: 1
+  delete-expired-after-days: 30
 
 cleanup:
   expire-cron: "0 */5 * * * ?" # every 5 minutes
